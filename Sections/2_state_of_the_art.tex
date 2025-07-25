@@ -1,0 +1,76 @@
+\chapter{State of the Art}
+
+In this chapter, the current state of research in semantic multi-object search, map reconstruction, and object detection is reviewed. The goal is to identify strengths and limitations of existing methods and establish the technological context for the proposed hybrid approach. The chapter is divided into three key areas: approaches for searching multiple objects semantically, techniques for building and maintaining persistent semantic maps, and recent advances in object detection and promptable models for open-vocabulary tasks.
+\section{Geometric Exploration}
+
+\begin{itemize}
+    \item Geometric exploration aims to explore unknown environments by navigating toward frontiers — the boundaries between known and unknown space — typically within a SLAM-based mapping framework.
+    
+    \item Selecting the frontier closest to the robot minimizes path cost (\textit{greedy strategy})~\cite{topiwala2018frontierbasedexplorationautonomous}.  
+    \textit{Advantage:} simple and efficient.  
+    \textit{Limitation:} ignores potential information gain.
+    
+    \item Prioritizing frontiers based on maximum expected information gain (e.g., entropy, mutual information) enables more informative exploration~\cite{bourgault2002informationbasedadaptiveexploration, Suresh_2024}.
+    
+    \item Selecting the largest frontier clusters improves stability and continuity in exploration~\cite{stachniss2009efficientexploration}.
+    
+    \item These approaches are purely geometric and lack semantic awareness. They are not suitable for open-vocabulary object queries or multi-object search tasks requiring semantic reasoning.
+\end{itemize}
+
+\section{Semantic Multi-Object Search Approaches}
+\begin{itemize}
+    \item Review of methods targeting simultaneous or sequential search for multiple objects in unknown environments.
+    \item Analysis of VLFM, VLMaps, OneMap, GeFF, ObjectNav,\dots regarding:
+    \begin{itemize}
+        \item Success Rate (SR) and Success weighted by Path Length (SPL) as key metrics.
+        \item Real-time capabilities and computational requirements.
+        \item Handling of open-vocabulary queries.
+    \end{itemize}
+    \item Discussion of semantic exploration frameworks combining language models with spatial reasoning.
+    \item Challenges of maintaining semantic context across multiple targets.
+\end{itemize}
+
+\section{Map Reconstruction and Persistent Semantic Mapping}
+\begin{itemize}
+    \item Overview of approaches to build and update semantic maps during exploration.
+    \item Techniques for fusing sensor data into persistent 2D/3D representations.
+    \item Comparison of representations (Octomaps, point clouds, voxel grids) in terms of:
+    \begin{itemize}
+        \item Memory efficiency.
+        \item Ability to store semantic labels persistently.
+    \end{itemize}
+    \item Discussion of \dots
+    \begin{itemize}
+        \item ConceptGraphs
+        \item ConceptGraph-Online
+        \item OpenFusion
+        \item Clio
+        \item OpenScene
+        \item GeFF
+        \item CLIP-Fields
+        \item ConceptFusion
+        \item VLMaps
+        \item LERF
+    \end{itemize}
+    as examples of global 3D semantic maps.
+    \item Limitations in updating or correcting the map after wrong detections.
+\end{itemize}
+
+\section{Object Detection and Promptable Models}
+\begin{itemize}
+    \item Review of traditional and open-vocabulary object detection methods.
+    \item Analysis of grounding-capable detectors and segmentation models for zero-shot tasks.
+    \item Specific evaluation of the following models for their suitability in semantic multi-object search:
+    \begin{itemize}
+        \item YOLOv7
+        \item GroundingDINO
+        \item MobileSAM
+        \item GroundedSAM
+        \item SEEM
+        \item OWL-ViT
+        \item MaskDINO
+    \end{itemize}
+    \item Discussion of promptable vision-language models supporting multi-modal queries (text, image, audio).
+    \item Challenges with false positives in zero-shot settings and their implications for reliable multi-object detection.
+\end{itemize}
+

@@ -1,0 +1,687 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{busch2025onemap}{misc}{}
+      \name{author}{5}{}{%
+        {{hash=fe1cf7d2ba78910b29595b20937b8d69}{%
+           family={Busch},
+           familyi={B\bibinitperiod},
+           given={Finn\bibnamedelima Lukas},
+           giveni={F\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=98af6af53f110022348e5a48e5fd6ac7}{%
+           family={Homberger},
+           familyi={H\bibinitperiod},
+           given={Timon},
+           giveni={T\bibinitperiod}}}%
+        {{hash=10b327ad346937f11605867fb04e4843}{%
+           family={Ortega-Peimbert},
+           familyi={O\bibinithyphendelim P\bibinitperiod},
+           given={Jesús},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2ccb6d7acb985aa4cadc00ab854126c9}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Quantao},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=e4d88a7fb5c45992aabbb7e4f4b72a99}{%
+           family={Andersson},
+           familyi={A\bibinitperiod},
+           given={Olov},
+           giveni={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{4a51ef455213fcbdb498b359b532d691}
+      \strng{fullhash}{43d097d3e90dc14bcfa0428de5997a55}
+      \strng{bibnamehash}{43d097d3e90dc14bcfa0428de5997a55}
+      \strng{authorbibnamehash}{43d097d3e90dc14bcfa0428de5997a55}
+      \strng{authornamehash}{4a51ef455213fcbdb498b359b532d691}
+      \strng{authorfullhash}{43d097d3e90dc14bcfa0428de5997a55}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.RO}
+      \field{eprinttype}{arXiv}
+      \field{title}{One Map to Find Them All: Real-time Open-Vocabulary Mapping for Zero-shot Multi-Object Navigation}
+      \field{year}{2025}
+      \verb{eprint}
+      \verb 2409.11764
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2409.11764
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2409.11764
+      \endverb
+    \endentry
+    \entry{huang23vlmaps}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=1390d90baeb891b9cb48f7a8254bcba3}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Chenguang},
+           giveni={C\bibinitperiod}}}%
+        {{hash=150edd2c14f89929d32a5d2a664ca523}{%
+           family={Mees},
+           familyi={M\bibinitperiod},
+           given={Oier},
+           giveni={O\bibinitperiod}}}%
+        {{hash=5ea39ed379a3240bc8279fa2fae958ab}{%
+           family={Zeng},
+           familyi={Z\bibinitperiod},
+           given={Andy},
+           giveni={A\bibinitperiod}}}%
+        {{hash=98f4ab1bc2ac191d8f8a0651315ce9c0}{%
+           family={Burgard},
+           familyi={B\bibinitperiod},
+           given={Wolfram},
+           giveni={W\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {London, UK}%
+      }
+      \strng{namehash}{d739ed46f03c72bb8de2b5791208227b}
+      \strng{fullhash}{27798d751429330ac5bc762d5d2cbff2}
+      \strng{bibnamehash}{27798d751429330ac5bc762d5d2cbff2}
+      \strng{authorbibnamehash}{27798d751429330ac5bc762d5d2cbff2}
+      \strng{authornamehash}{d739ed46f03c72bb8de2b5791208227b}
+      \strng{authorfullhash}{27798d751429330ac5bc762d5d2cbff2}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the IEEE International Conference on Robotics and Automation (ICRA)}
+      \field{title}{Visual Language Maps for Robot Navigation}
+      \field{year}{2023}
+    \endentry
+    \entry{yokoyama2024vlfm}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=af20cdc780321fba58b1e5bec068bf8c}{%
+           family={Yokoyama},
+           familyi={Y\bibinitperiod},
+           given={Naoki},
+           giveni={N\bibinitperiod}}}%
+        {{hash=d235634814ed266793a4de24b71955e6}{%
+           family={Ha},
+           familyi={H\bibinitperiod},
+           given={Sehoon},
+           giveni={S\bibinitperiod}}}%
+        {{hash=d0a408119272ca1bd49b625e3b927d05}{%
+           family={Batra},
+           familyi={B\bibinitperiod},
+           given={Dhruv},
+           giveni={D\bibinitperiod}}}%
+        {{hash=b7f993b737edf8bf7fcefb63c1866ad1}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Jiuguang},
+           giveni={J\bibinitperiod}}}%
+        {{hash=d891d3df08ec99bda75fee1576150efe}{%
+           family={Bucher},
+           familyi={B\bibinitperiod},
+           given={Bernadette},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{9e9b7d118e9804740736653b8df09e12}
+      \strng{fullhash}{5d4e4cb29736799842dcf55d0365a025}
+      \strng{bibnamehash}{5d4e4cb29736799842dcf55d0365a025}
+      \strng{authorbibnamehash}{5d4e4cb29736799842dcf55d0365a025}
+      \strng{authornamehash}{9e9b7d118e9804740736653b8df09e12}
+      \strng{authorfullhash}{5d4e4cb29736799842dcf55d0365a025}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Robotics and Automation (ICRA)}
+      \field{title}{VLFM: Vision-Language Frontier Maps for Zero-Shot Semantic Navigation}
+      \field{year}{2024}
+    \endentry
+    \entry{gu2023conceptgraphsopenvocabulary3dscene}{misc}{}
+      \name{author}{16}{}{%
+        {{hash=33348af729fe6269e020eb6385e77773}{%
+           family={Gu},
+           familyi={G\bibinitperiod},
+           given={Qiao},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=5eeba4c91ded52d20e49ac54ec4e03de}{%
+           family={Kuwajerwala},
+           familyi={K\bibinitperiod},
+           given={Alihusein},
+           giveni={A\bibinitperiod}}}%
+        {{hash=929b6bfef8474e6c9917d05891502299}{%
+           family={Morin},
+           familyi={M\bibinitperiod},
+           given={Sacha},
+           giveni={S\bibinitperiod}}}%
+        {{hash=6ce2ec3bb10a1f4268e04ea143952547}{%
+           family={Jatavallabhula},
+           familyi={J\bibinitperiod},
+           given={Krishna\bibnamedelima Murthy},
+           giveni={K\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=b13361a49349c400f588620fa780e3c4}{%
+           family={Sen},
+           familyi={S\bibinitperiod},
+           given={Bipasha},
+           giveni={B\bibinitperiod}}}%
+        {{hash=60fb8a674557c18083c72009063bbb54}{%
+           family={Agarwal},
+           familyi={A\bibinitperiod},
+           given={Aditya},
+           giveni={A\bibinitperiod}}}%
+        {{hash=5511682a73e1cd6407feb0aa4cb5ca36}{%
+           family={Rivera},
+           familyi={R\bibinitperiod},
+           given={Corban},
+           giveni={C\bibinitperiod}}}%
+        {{hash=88c7f6c0c33dc4d9d14f34d0e2cf1282}{%
+           family={Paul},
+           familyi={P\bibinitperiod},
+           given={William},
+           giveni={W\bibinitperiod}}}%
+        {{hash=9790916aea9caf4d7b1b6dd4fddd49c1}{%
+           family={Ellis},
+           familyi={E\bibinitperiod},
+           given={Kirsty},
+           giveni={K\bibinitperiod}}}%
+        {{hash=58e34e482e0dd6e755329ae57da3b293}{%
+           family={Chellappa},
+           familyi={C\bibinitperiod},
+           given={Rama},
+           giveni={R\bibinitperiod}}}%
+        {{hash=97044e575d3c0a3dd2551779810add07}{%
+           family={Gan},
+           familyi={G\bibinitperiod},
+           given={Chuang},
+           giveni={C\bibinitperiod}}}%
+        {{hash=c579971f076a3407cb7ead563ea6635a}{%
+           family={Melo},
+           familyi={M\bibinitperiod},
+           given={Celso\bibnamedelima Miguel},
+           giveni={C\bibinitperiod\bibinitdelim M\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+        {{hash=5c7ff02e1f8b4c4aa7bfddece14f23d2}{%
+           family={Tenenbaum},
+           familyi={T\bibinitperiod},
+           given={Joshua\bibnamedelima B.},
+           giveni={J\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=2a80dd1cae02059e95bfed2f2715fd0a}{%
+           family={Torralba},
+           familyi={T\bibinitperiod},
+           given={Antonio},
+           giveni={A\bibinitperiod}}}%
+        {{hash=48e4453c138edbc36ce35f792ee4e636}{%
+           family={Shkurti},
+           familyi={S\bibinitperiod},
+           given={Florian},
+           giveni={F\bibinitperiod}}}%
+        {{hash=f3cc60b9900a00fd78f1896a99c71bf5}{%
+           family={Paull},
+           familyi={P\bibinitperiod},
+           given={Liam},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{cab573102e0c1a29db33b2b744a636b6}
+      \strng{fullhash}{0d4823bf362b3ca7239a6ab5cf7db43c}
+      \strng{bibnamehash}{cab573102e0c1a29db33b2b744a636b6}
+      \strng{authorbibnamehash}{cab573102e0c1a29db33b2b744a636b6}
+      \strng{authornamehash}{cab573102e0c1a29db33b2b744a636b6}
+      \strng{authorfullhash}{0d4823bf362b3ca7239a6ab5cf7db43c}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.RO}
+      \field{eprinttype}{arXiv}
+      \field{title}{ConceptGraphs: Open-Vocabulary 3D Scene Graphs for Perception and Planning}
+      \field{year}{2023}
+      \verb{eprint}
+      \verb 2309.16650
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2309.16650
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2309.16650
+      \endverb
+    \endentry
+    \entry{chaplot2020semexp}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=d61a282b0086c5c4d52c371e7c748278}{%
+           family={Chaplot},
+           familyi={C\bibinitperiod},
+           given={Devendra\bibnamedelima Singh},
+           giveni={D\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=f055f4907dc202953a27c95dcd85bd5e}{%
+           family={Gandhi},
+           familyi={G\bibinitperiod},
+           given={Dhiraj},
+           giveni={D\bibinitperiod}}}%
+        {{hash=83dd9d464c9f0ea982254939a7f021d8}{%
+           family={Gupta},
+           familyi={G\bibinitperiod},
+           given={Abhinav},
+           giveni={A\bibinitperiod}}}%
+        {{hash=bd2be300d445e9f6db7808f9533e66cb}{%
+           family={Salakhutdinov},
+           familyi={S\bibinitperiod},
+           given={Ruslan},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{45f010f9e0db0703268fb5358afa547e}
+      \strng{fullhash}{e9e6ade1b019c75997bd098dcd9bb7aa}
+      \strng{bibnamehash}{e9e6ade1b019c75997bd098dcd9bb7aa}
+      \strng{authorbibnamehash}{e9e6ade1b019c75997bd098dcd9bb7aa}
+      \strng{authornamehash}{45f010f9e0db0703268fb5358afa547e}
+      \strng{authorfullhash}{e9e6ade1b019c75997bd098dcd9bb7aa}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{In Neural Information Processing Systems}
+      \field{title}{Object Goal Navigation using Goal-Oriented Semantic Exploration}
+      \field{year}{2020}
+    \endentry
+    \entry{qui2024geff}{article}{}
+      \name{author}{11}{}{%
+        {{hash=981417c4f2d42bc4703570882d390db6}{%
+           family={Qiu},
+           familyi={Q\bibinitperiod},
+           given={Ri-Zhao},
+           giveni={R\bibinithyphendelim Z\bibinitperiod}}}%
+        {{hash=6accbe3d39f386e3a23ed7f49f8ba395}{%
+           family={Hu},
+           familyi={H\bibinitperiod},
+           given={Yafei},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=cb8970940af2e3cb9e4f85a60bd5e4d2}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Yuchen},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=aea28139ba5a2d0b205da890b63300d4}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Ge},
+           giveni={G\bibinitperiod}}}%
+        {{hash=cea66b8fd2d1c1cb2ec00e3a6decb99e}{%
+           family={Fu},
+           familyi={F\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=44d73f1598e7e50d9186da9af133ba1b}{%
+           family={Ye},
+           familyi={Y\bibinitperiod},
+           given={Jianglong},
+           giveni={J\bibinitperiod}}}%
+        {{hash=4f032c3b8f614937e4762c508ec169e0}{%
+           family={Mu},
+           familyi={M\bibinitperiod},
+           given={Jiteng},
+           giveni={J\bibinitperiod}}}%
+        {{hash=530994f35dcd3db12eeca41b0a54f76e}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Ruihan},
+           giveni={R\bibinitperiod}}}%
+        {{hash=afab17d34328e50027daf6cd0a3b5991}{%
+           family={Atanasov},
+           familyi={A\bibinitperiod},
+           given={Nikolay},
+           giveni={N\bibinitperiod}}}%
+        {{hash=ad26bf16eeaee427e8e36bea35587822}{%
+           family={Scherer},
+           familyi={S\bibinitperiod},
+           given={Sebastian},
+           giveni={S\bibinitperiod}}}%
+        {{hash=84a57ab121539e94069a33b4d40492c1}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaolong},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{c127928b0b2c7039bbd37b352978c805}
+      \strng{fullhash}{9af2d56d9025b424a427869c9906ddfc}
+      \strng{bibnamehash}{c127928b0b2c7039bbd37b352978c805}
+      \strng{authorbibnamehash}{c127928b0b2c7039bbd37b352978c805}
+      \strng{authornamehash}{c127928b0b2c7039bbd37b352978c805}
+      \strng{authorfullhash}{9af2d56d9025b424a427869c9906ddfc}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2403.07563}
+      \field{title}{Learning Generalizable Feature Fields for Mobile Manipulation}
+      \field{year}{2024}
+    \endentry
+    \entry{kashu2023openfusion}{article}{}
+      \name{author}{8}{}{%
+        {{hash=88bd00fa3da8f02583e49860ee63f964}{%
+           family={Yamazaki},
+           familyi={Y\bibinitperiod},
+           given={Kashu},
+           giveni={K\bibinitperiod}}}%
+        {{hash=547e02a85e9be856a7ac3e3a03cc76c7}{%
+           family={Hanyu},
+           familyi={H\bibinitperiod},
+           given={Taisei},
+           giveni={T\bibinitperiod}}}%
+        {{hash=aeaacd618096ffc85c31db1e368aa939}{%
+           family={Vo},
+           familyi={V\bibinitperiod},
+           given={Khoa},
+           giveni={K\bibinitperiod}}}%
+        {{hash=58f69df77049e52d7fc5c35a44cf1e92}{%
+           family={Pham},
+           familyi={P\bibinitperiod},
+           given={Thang},
+           giveni={T\bibinitperiod}}}%
+        {{hash=692369c69d93b9f35970575101d9481b}{%
+           family={Tran},
+           familyi={T\bibinitperiod},
+           given={Minh},
+           giveni={M\bibinitperiod}}}%
+        {{hash=3d1c3abf5a2903162305279f0592166c}{%
+           family={Doretto},
+           familyi={D\bibinitperiod},
+           given={Gianfranco},
+           giveni={G\bibinitperiod}}}%
+        {{hash=f480ed206a30d0a24ab31eb69169599c}{%
+           family={Nguyen},
+           familyi={N\bibinitperiod},
+           given={Anh},
+           giveni={A\bibinitperiod}}}%
+        {{hash=290bd2808b035ff51c50e06d209e3dda}{%
+           family={Le},
+           familyi={L\bibinitperiod},
+           given={Ngan},
+           giveni={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{fae24f2b38b9b9c8aeb1d4023dd47116}
+      \strng{fullhash}{34ea20663d0b1ba33fe862cf3ff96e67}
+      \strng{bibnamehash}{fae24f2b38b9b9c8aeb1d4023dd47116}
+      \strng{authorbibnamehash}{fae24f2b38b9b9c8aeb1d4023dd47116}
+      \strng{authornamehash}{fae24f2b38b9b9c8aeb1d4023dd47116}
+      \strng{authorfullhash}{34ea20663d0b1ba33fe862cf3ff96e67}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2310.03923}
+      \field{title}{Open-Fusion: Real-time Open-Vocabulary 3D Mapping and Queryable Scene Representation}
+      \field{year}{2023}
+    \endentry
+    \entry{zou2023seem}{misc}{}
+      \name{author}{9}{}{%
+        {{hash=8f8ca13697f2bccf3de1239bd107ca5f}{%
+           family={Zou},
+           familyi={Z\bibinitperiod},
+           given={Xueyan},
+           giveni={X\bibinitperiod}}}%
+        {{hash=28f60884b33f4a669bad592a2b59e04d}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Jianwei},
+           giveni={J\bibinitperiod}}}%
+        {{hash=8c6d18e2d167e1a3dc88c0166bbc3471}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Hao},
+           giveni={H\bibinitperiod}}}%
+        {{hash=89b23cce0bb40099f7b69f6577f665fe}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Feng},
+           giveni={F\bibinitperiod}}}%
+        {{hash=229579205f7962cf73029ed72bb3093b}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Linjie},
+           giveni={L\bibinitperiod}}}%
+        {{hash=b41fe9c6cc1e8e9f13e889d20e626c3c}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Jianfeng},
+           giveni={J\bibinitperiod}}}%
+        {{hash=998f2745dfb50f3e6cf8f035a17211f3}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Lijuan},
+           giveni={L\bibinitperiod}}}%
+        {{hash=159bca5607e3797666654a2e3022978a}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Jianfeng},
+           giveni={J\bibinitperiod}}}%
+        {{hash=0058780d2044b7ad95d263c45e1a1b15}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Yong\bibnamedelima Jae},
+           giveni={Y\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \strng{namehash}{bc3c036907f4628916a1f04c46253171}
+      \strng{fullhash}{8e02e9fd97d28dc2c8220ef83cbc923d}
+      \strng{bibnamehash}{bc3c036907f4628916a1f04c46253171}
+      \strng{authorbibnamehash}{bc3c036907f4628916a1f04c46253171}
+      \strng{authornamehash}{bc3c036907f4628916a1f04c46253171}
+      \strng{authorfullhash}{8e02e9fd97d28dc2c8220ef83cbc923d}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Segment Everything Everywhere All at Once}
+      \field{year}{2023}
+      \verb{eprint}
+      \verb 2304.06718
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2304.06718
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2304.06718
+      \endverb
+    \endentry
+    \entry{topiwala2018frontierbasedexplorationautonomous}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=0853ecfefade3fae46a402bbbb7f8f0f}{%
+           family={Topiwala},
+           familyi={T\bibinitperiod},
+           given={Anirudh},
+           giveni={A\bibinitperiod}}}%
+        {{hash=4e5a220d93a95563c29c9de4c296f9a3}{%
+           family={Inani},
+           familyi={I\bibinitperiod},
+           given={Pranav},
+           giveni={P\bibinitperiod}}}%
+        {{hash=73415c529643921ebfe5eeff5a014ab4}{%
+           family={Kathpal},
+           familyi={K\bibinitperiod},
+           given={Abhishek},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{422014b6e7868d7cf56b6a8a3ccdd122}
+      \strng{fullhash}{97f5edc81821f027eb40f1d170e711bd}
+      \strng{bibnamehash}{97f5edc81821f027eb40f1d170e711bd}
+      \strng{authorbibnamehash}{97f5edc81821f027eb40f1d170e711bd}
+      \strng{authornamehash}{422014b6e7868d7cf56b6a8a3ccdd122}
+      \strng{authorfullhash}{97f5edc81821f027eb40f1d170e711bd}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.RO}
+      \field{eprinttype}{arXiv}
+      \field{title}{Frontier Based Exploration for Autonomous Robot}
+      \field{year}{2018}
+      \verb{eprint}
+      \verb 1806.03581
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/1806.03581
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/1806.03581
+      \endverb
+    \endentry
+    \entry{bourgault2002informationbasedadaptiveexploration}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=dcfcdd9ebc39690474b3680ef4cee34b}{%
+           family={Bourgault},
+           familyi={B\bibinitperiod},
+           given={F.},
+           giveni={F\bibinitperiod}}}%
+        {{hash=93f8113550f6e94227730b6370d6032a}{%
+           family={Makarenko},
+           familyi={M\bibinitperiod},
+           given={A.A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=59ba2efc177ede966dd9910e409c759f}{%
+           family={Williams},
+           familyi={W\bibinitperiod},
+           given={S.B.},
+           giveni={S\bibinitperiod}}}%
+        {{hash=c8a8ec084ff8d1a85b889dbc2dac3455}{%
+           family={Grocholsky},
+           familyi={G\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod}}}%
+        {{hash=60a17232afc298ed9ad524d6a0d1b7eb}{%
+           family={Durrant-Whyte},
+           familyi={D\bibinithyphendelim W\bibinitperiod},
+           given={H.F.},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{2df7378d1adbf3d4a98b5d540b663c20}
+      \strng{fullhash}{a298db92a60ae5c07c5e52abc7331434}
+      \strng{bibnamehash}{a298db92a60ae5c07c5e52abc7331434}
+      \strng{authorbibnamehash}{a298db92a60ae5c07c5e52abc7331434}
+      \strng{authornamehash}{2df7378d1adbf3d4a98b5d540b663c20}
+      \strng{authorfullhash}{a298db92a60ae5c07c5e52abc7331434}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{IEEE/RSJ International Conference on Intelligent Robots and Systems}
+      \field{title}{Information based adaptive robotic exploration}
+      \field{volume}{1}
+      \field{year}{2002}
+      \field{pages}{540\bibrangedash 545 vol.1}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1109/IRDS.2002.1041446
+      \endverb
+      \keyw{Simultaneous localization and mapping;Australia;Mobile robots;Uncertainty;Vehicles;Robot sensing systems;Indoor environments;Programmable control;Adaptive control;Sensor fusion}
+    \endentry
+    \entry{Suresh_2024}{article}{}
+      \name{author}{3}{}{%
+        {{hash=b744444d8ddbe214bea3a540feb9ca55}{%
+           family={Suresh},
+           familyi={S\bibinitperiod},
+           given={Aamodh},
+           giveni={A\bibinitperiod}}}%
+        {{hash=62d38e871b8954002dd70ffe36fc4743}{%
+           family={Nieto-Granda},
+           familyi={N\bibinithyphendelim G\bibinitperiod},
+           given={Carlos},
+           giveni={C\bibinitperiod}}}%
+        {{hash=171010f5580394355b525842c335b044}{%
+           family={Martínez},
+           familyi={M\bibinitperiod},
+           given={Sonia},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{2}{%
+        {Institute of Electrical}%
+        {Electronics Engineers (IEEE)}%
+      }
+      \strng{namehash}{27185522b12de5d69026a59e30d558f0}
+      \strng{fullhash}{49c88b99a6063eea4bd6b0d89e786f8a}
+      \strng{bibnamehash}{49c88b99a6063eea4bd6b0d89e786f8a}
+      \strng{authorbibnamehash}{49c88b99a6063eea4bd6b0d89e786f8a}
+      \strng{authornamehash}{27185522b12de5d69026a59e30d558f0}
+      \strng{authorfullhash}{49c88b99a6063eea4bd6b0d89e786f8a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{2377-3774}
+      \field{journaltitle}{IEEE Robotics and Automation Letters}
+      \field{month}{9}
+      \field{number}{9}
+      \field{title}{Robotic Exploration Using Generalized Behavioral Entropy}
+      \field{volume}{9}
+      \field{year}{2024}
+      \field{pages}{8011\bibrangedash 8018}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1109/lra.2024.3433207
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1109/LRA.2024.3433207
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1109/LRA.2024.3433207
+      \endverb
+    \endentry
+    \entry{stachniss2009efficientexploration}{article}{}
+      \name{author}{3}{}{%
+        {{hash=5d87e0c36213202151bff64fdd9346a3}{%
+           family={Stachniss},
+           familyi={S\bibinitperiod},
+           given={Cyrill},
+           giveni={C\bibinitperiod}}}%
+        {{hash=df9da208ecddb1c6309b18d1ab6194fc}{%
+           family={Mozos},
+           familyi={M\bibinitperiod},
+           given={Oscar},
+           giveni={O\bibinitperiod}}}%
+        {{hash=98f4ab1bc2ac191d8f8a0651315ce9c0}{%
+           family={Burgard},
+           familyi={B\bibinitperiod},
+           given={Wolfram},
+           giveni={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{d48f2a5c5e2e1bdb58da3204096031bf}
+      \strng{fullhash}{c16cf0b44d19943774e3a411ae52a72a}
+      \strng{bibnamehash}{c16cf0b44d19943774e3a411ae52a72a}
+      \strng{authorbibnamehash}{c16cf0b44d19943774e3a411ae52a72a}
+      \strng{authornamehash}{d48f2a5c5e2e1bdb58da3204096031bf}
+      \strng{authorfullhash}{c16cf0b44d19943774e3a411ae52a72a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Annals of Mathematics and Artificial Intelligence}
+      \field{month}{01}
+      \field{title}{Efficient Exploration of Unknown Indoor Environments using a Team of Mobile Robots}
+      \field{volume}{52}
+      \field{year}{2009}
+      \field{pages}{205ff}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1007/s10472-009-9123-z
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

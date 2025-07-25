@@ -1,0 +1,15 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: latex_container_dev
+    privileged: true
+    network_mode: host
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  # Share X11 socket for GUI applications
+      - ..:/home/ubuntu/docs_algorithmic_payload_estimation:cached
+      - ${SSH_AUTH_SOCK}:/ssh-agent
+    command: /bin/bash
+    tty: true
+    ipc: host
