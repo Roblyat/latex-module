@@ -1,5 +1,18 @@
 \babel@toc {english}{}\relax 
-\contentsline {figure}{\numberline {\small 1\normalsize }{\ignorespaces Comparison of state-of-the-art methods regarding common properties.\relax }}{1}{figure.caption.15}%
-\contentsline {figure}{\numberline {\small 2\normalsize }{\ignorespaces Comparison of state-of-the-art methods regarding performance metrics.\relax }}{2}{figure.caption.16}%
-\contentsline {figure}{\numberline {\small 3\normalsize }{\ignorespaces System architecture\relax }}{6}{figure.caption.20}%
+\contentsline {figure}{\numberline {\small 1\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(R^2\) on effort \(\mathcal {D}_{\text {Cartesian}}\) test data}}{13}{figure.caption.8}%
+\contentsline {figure}{\numberline {\small 2\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(RMSE\) on effort \(\mathcal {D}_{\text {Cartesian}}\) test data}}{14}{figure.caption.9}%
+\contentsline {figure}{\numberline {\small 3\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(R^2\) on effort Cartesian trajectories without orientation change live prediction}}{15}{figure.caption.11}%
+\contentsline {figure}{\numberline {\small 4\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(RMSE\) on effort Cartesian trajectories without orientation change live prediction}}{15}{figure.caption.12}%
+\contentsline {figure}{\numberline {\small 5\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(R^2\) on effort \(\mathcal {D}_{\text {CartesianOC}}\) test data}}{16}{figure.caption.14}%
+\contentsline {figure}{\numberline {\small 6\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(RMSE\) on effort \(\mathcal {D}_{\text {CartesianOC}}\) test data}}{17}{figure.caption.15}%
+\contentsline {figure}{\numberline {\small 7\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(R^2\) on effort Cartesian trajectories with orientation change live prediction}}{18}{figure.caption.17}%
+\contentsline {figure}{\numberline {\small 8\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model \(RMSE\) on effort Cartesian trajectories with orientation change live prediction}}{18}{figure.caption.18}%
+\contentsline {figure}{\numberline {\small 9\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(R^2\) on wrench \(\mathcal {D}_{\text {Cartesian}}\) test data}}{19}{figure.caption.20}%
+\contentsline {figure}{\numberline {\small 10\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(RMSE\) on wrench \(\mathcal {D}_{\text {Cartesian}}\) test data}}{20}{figure.caption.21}%
+\contentsline {figure}{\numberline {\small 11\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(R^2\) on wrench Cartesian trajectories without orientation change live prediction}}{21}{figure.caption.23}%
+\contentsline {figure}{\numberline {\small 12\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(RMSE\) on wrench Cartesian trajectories without orientation change live prediction}}{22}{figure.caption.24}%
+\contentsline {figure}{\numberline {\small 13\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(R^2\) on wrench \(\mathcal {D}_{\text {CartesianOC}}\) test data}}{23}{figure.caption.26}%
+\contentsline {figure}{\numberline {\small 14\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(RMSE\) on wrench \(\mathcal {D}_{\text {CartesianOC}}\) test data}}{23}{figure.caption.27}%
+\contentsline {figure}{\numberline {\small 15\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(R^2\) on wrench Cartesian trajectories with orientation change live prediction}}{24}{figure.caption.29}%
+\contentsline {figure}{\numberline {\small 16\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model \(RMSE\) on wrench Cartesian trajectories with orientation change live prediction}}{25}{figure.caption.30}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

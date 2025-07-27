@@ -1,76 +1,83 @@
 \chapter{State of the Art}
 
-In this chapter, the current state of research in semantic multi-object search, map reconstruction, and object detection is reviewed. The goal is to identify strengths and limitations of existing methods and establish the technological context for the proposed hybrid approach. The chapter is divided into three key areas: approaches for searching multiple objects semantically, techniques for building and maintaining persistent semantic maps, and recent advances in object detection and promptable models for open-vocabulary tasks.
-\section{Geometric Exploration}
-
-\begin{itemize}
-    \item Geometric exploration aims to explore unknown environments by navigating toward frontiers — the boundaries between known and unknown space — typically within a SLAM-based mapping framework.
+    A focus in the current human-robot collaboration research is external force estimation for collaborative
+    industrial robots research \cite{bai2024sensorless, Popov2019, nadeau2022fast, kurdas2022online, su2021deep}. Due to the non-linearity in robotic systems, arising from factors such as the dynamics of joint coupling, friction, and gear reductions, various estimation methods have been established. A distinction is made between Classical Estimation Methods and Machine Learning and Neuronal Network Estimation Methods. Classical estimation methods are techniques based on mathematical models, optimization, and statistical analysis used to estimate unknown parameters or states of a system. These methods typically involve deterministic or probabilistic approaches that are derived from physical models, sensor data, and known system behaviors. They do not rely on data-driven learning algorithms but instead use analytical solutions and optimization frameworks to minimize errors or maximize the accuracy of parameter estimation. Classical estimation methods include Optimization-Based Methods (e.g., Least Squares (LS), Weighted Least Squares (WLS), Iterative Reweighted Least Squares (IRLS) \cite{dong2023dynamic, nadeau2022fast, golluccio2021robot, Xu2022accurate}), Model-Based and Analytical Techniques (e.g. Momentum Observer \cite{kurdas2022online}), and Statistical Techniques (e.g., Kalman Filter, Principal Component Analysis (PCA) \cite{liu2021sensorless,motor_current_estimation, berger2021feature}).
     
-    \item Selecting the frontier closest to the robot minimizes path cost (\textit{greedy strategy})~\cite{topiwala2018frontierbasedexplorationautonomous}.  
-    \textit{Advantage:} simple and efficient.  
-    \textit{Limitation:} ignores potential information gain.
+    Machine learning and neural network estimation methods use data-driven algorithms to model and predict unknown system parameters or states~\cite{ren2020learning, su2021deep}. These methods learn from historical data and can adapt to complex, non-linear relationships that may be difficult to model explicitly with classical approaches. The use of neural networks allows for pattern recognition and predictions based on input features, without needing explicit programming for each situation~\cite{zeng2019tossingbot, Kruzic2021}. Machine learning and neural network estimation methods include Neural Network Architectures (e.g., Feedforward Neural Networks~\cite{su2021deep}, Recurrent Neural Networks (RNNs)~\cite{berger2016estimating}, Long Short-Term Memory (LSTM)~\cite{berger2021feature, Kruzic2021}, Convolutional Neural Networks (CNNs)~\cite{Kruzic2021, zeng2019tossingbot}), Advanced Learning Models (e.g., Generative Adversarial Networks (GANs)~\cite{ren2020learning}, Conditional GANs (CGANs)~\cite{ren2020learning}, Least Squares GANs (LSGANs)~\cite{ren2020learning}), Probabilistic and Bayesian Methods (e.g., Gaussian Process Regression (GPR \cite{rasmussen2006gaussian})~\cite{haninger2022model, beckers2017stable,nguyen2008learning, HANINGER2023104431}, Hybrid GPR with Joint Stiffness Models \cite{blumberg2023estimation}, and Experience-Based and Feature Learning (e.g. Experience-Based Torque Estimation \cite{berger2016estimating, berger2015learning}).
+
+    These estimation methods are employed to gather information about various parameters in robotic control and motion. Estimating the dynamic model parameters of robotic systems that are not interacting with their environment focuses on optimizing the robot's trajectory control \cite{lee2020adaptive} and torque control \cite{nguyen2008learning}. Additionally, understanding the inverse kinematics \cite{ren2020learning} and inverse dynamics \cite{leon2022parameter, golluccio2021robot} of the robotic system~\eqref{eq:robot_dynamics} serves as a foundation for external contact force estimation. Here classical estimation methods are present\cite{dong2023dynamic, golluccio2021robot, deng2021dynamic}, as well as machine learning \cite{nguyen2008learning} and neuronal network estimation methods \cite{leon2022parameter,urrea2018parameter}.
+
+    For external contact force estimation, two key scenarios are considered. The first involves estimating contact forces at the robot's links \cite{Popov2019, su2021deep}, either with \cite{Popov2019} or without \cite{su2021deep} determining the location of the force on the link's surface, accounting for multiple contact points with the environment. The second scenario focuses on external contact force estimation at the TCP (Tool Center Point), where only the TCP interacts with the environment. TCP external contact force estimations are crucial for trajectory and control optimization \cite{HANINGER2023104431, haninger2022model}, torque control \cite{motor_current_estimation}, and detecting and minimizing positioning errors \cite{Tan2023, lu2023external}. This involves estimating \(\phi_{\text{effective}}\). Classical TCP contact force estimation \cite{motor_current_estimation}, machine learning methods \cite{HANINGER2023104431, haninger2022model, beckers2017stable, berger2015learning,blumberg2023estimation} and neuronal network estimation models \cite{Tan2023, lu2023external, Kruzic2021, shan2024fine, berger2016estimating, liu2021sensorless, su2021deep} reaching good results in control optimization and position error detection. 
     
-    \item Prioritizing frontiers based on maximum expected information gain (e.g., entropy, mutual information) enables more informative exploration~\cite{bourgault2002informationbasedadaptiveexploration, Suresh_2024}.
+    Furthermore, TCP external force estimation is used to gain insights into the internal parameters of the payload. In such cases, the contact force at the TCP is differentiated into \(\phi_{\text{gripper}}\) and \(\phi_{\text{payload}}\)~\eqref{eq:rigidEffective}. Both classical estimation methods \cite{Hu2020, Xu2022accurate, kurdas2022online, nadeau2022fast} and neuronal network estimation methods \cite{berger2021feature} are utilized. 
+
+    Since the dynamic force equation~\eqref{eq:robot_dynamics} defines the internal parameters of the robots rigid body \(\phi_{\text{robot}}\) while motion and shows that \(\tau_{\text{motor}}\), especially \(\mathbf{I}\) is the key feature in this estimation approach~\eqref{eq:tau_motor}~\eqref{eq:tau_I}~\eqref{eq:I_payload}, the Newton/Euler equations~\eqref{eq:newtonEuler} give the conditions to calculate the internal parameters of a rigid body \(\phi_{\text{effective}}\)~\eqref{eq:rigidBody} based on the trajectory parameters \(\mathbf{a}\), \(\boldsymbol{\alpha}\), and \(\boldsymbol{\omega}\). The literature has shown that a parameter identification using the Newton/Euler equations leads to valid information of the the rigid body's \(\phi_{\text{robot}}\) \cite{lee2020adaptive, nguyen2008learning, ren2020learning, leon2022parameter, dong2023dynamic, golluccio2021robot, deng2021dynamic}, \(\phi_{\text{effective}}\) \cite{haninger2022model, HANINGER2023104431, beckers2017stable, berger2015learning,blumberg2023estimation, motor_current_estimation, an2023, lu2023external, Kruzic2021, shan2024fine, berger2016estimating, liu2021sensorless, su2021deep} and \(\phi_{\text{payload}}\) \cite{Hu2020, Xu2022accurate, kurdas2022online, nadeau2022fast} while motion. Also GP Regression models show their ability to estimate various parameters in this context ~\cite{haninger2022model, beckers2017stable,nguyen2008learning, HANINGER2023104431,blumberg2023estimation,berger2015learning}, which is why it is chosen to overcome the non-linearity of in the robot dynamics with respect to the motor sensor data and the resulting f/t-measurements at the MF and to isolate \(\phi_{\text{payload}}\) from \(\phi_{\text{effective}}\).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
+    \section{Background}
+    \label{sec:Background}
+
+    Linear Acceleration (\(\mathbf{a}\)), Angular Velocity (\(\boldsymbol{\omega}\)), and Angular Acceleration (\(\boldsymbol{\alpha}\)) can be considered independent features with respect to \(\phi_{\text{effective}}\) as long as the robot can perform the motion without exceeding its physical limits. These kinematic parameters are set by the robot's trajectory planning and remain the same whether a payload is carried or not, assuming the payload does not exceed the robot's capabilities. The robot can execute the same trajectory with the same velocity and acceleration parameters regardless of whether it is carrying a payload \cite{urrea2018parameter}.
     
-    \item Selecting the largest frontier clusters improves stability and continuity in exploration~\cite{stachniss2009efficientexploration}.
+    The motor effort is not independent with respect to \(\phi_{\text{effective}}\) because it is affected by the added inertia and gravitational load when a payload is attached.
     
-    \item These approaches are purely geometric and lack semantic awareness. They are not suitable for open-vocabulary object queries or multi-object search tasks requiring semantic reasoning.
-\end{itemize}
+    The General Joint Torque Equation~\eqref{eq:robot_dynamics} is central to Inverse Dynamics of robots because it determines the joint torques necessary for a given trajectory. In this case, let the robot's rigid body be \(\phi_{\text{robot}}\). Then \(\phi_{\text{robot}} + \phi_{\text{gripper}}\) are reflected as \(\tau_{\text{robot}}\), because both remain the same for every motion \cite{Popov2019}.
+    
+    \begin{equation}
+    \boldsymbol{\tau}_{\text{robot}} = \mathbf{M}(\boldsymbol{q}) \ddot{\boldsymbol{q}} + \mathbf{C}(\boldsymbol{q}, \dot{\boldsymbol{q}}) \dot{\boldsymbol{q}} + \mathbf{G}(\boldsymbol{q})
+    \label{eq:robot_dynamics}
+    \end{equation}
 
-\section{Semantic Multi-Object Search Approaches}
-\begin{itemize}
-    \item Review of methods targeting simultaneous or sequential search for multiple objects in unknown environments.
-    \item Analysis of VLFM, VLMaps, OneMap, GeFF, ObjectNav,\dots regarding:
-    \begin{itemize}
-        \item Success Rate (SR) and Success weighted by Path Length (SPL) as key metrics.
-        \item Real-time capabilities and computational requirements.
-        \item Handling of open-vocabulary queries.
-    \end{itemize}
-    \item Discussion of semantic exploration frameworks combining language models with spatial reasoning.
-    \item Challenges of maintaining semantic context across multiple targets.
-\end{itemize}
+    External forces like human interaction or handling payloads acting on the robot and influence the joint torques necessary for a given trajectory. So \(\tau_{\text{ext}}\) is the vector of external torques at the joints due to external forces acting on the robot. The transpose of the robots Jacobian matrix \(\mathbf{J}^T\) is used to project these external forces back to the joint space, indicating the torques required at each joint to counteract or respond to those forces. \(\vec{F}_{\text{ext}}(\phi)\) is the vector of external forces applied to the robot's end-effector by a payload. \cite{Popov2019, lu2023external}. 
 
-\section{Map Reconstruction and Persistent Semantic Mapping}
-\begin{itemize}
-    \item Overview of approaches to build and update semantic maps during exploration.
-    \item Techniques for fusing sensor data into persistent 2D/3D representations.
-    \item Comparison of representations (Octomaps, point clouds, voxel grids) in terms of:
-    \begin{itemize}
-        \item Memory efficiency.
-        \item Ability to store semantic labels persistently.
-    \end{itemize}
-    \item Discussion of \dots
-    \begin{itemize}
-        \item ConceptGraphs
-        \item ConceptGraph-Online
-        \item OpenFusion
-        \item Clio
-        \item OpenScene
-        \item GeFF
-        \item CLIP-Fields
-        \item ConceptFusion
-        \item VLMaps
-        \item LERF
-    \end{itemize}
-    as examples of global 3D semantic maps.
-    \item Limitations in updating or correcting the map after wrong detections.
-\end{itemize}
+    \begin{equation}
+    \boldsymbol{\tau}_{\text{ext}} = \mathbf{J}^T \vec{F}_{\text{ext}}(\phi)
+    \label{eq:tau_ext}
+    \end{equation}
 
-\section{Object Detection and Promptable Models}
-\begin{itemize}
-    \item Review of traditional and open-vocabulary object detection methods.
-    \item Analysis of grounding-capable detectors and segmentation models for zero-shot tasks.
-    \item Specific evaluation of the following models for their suitability in semantic multi-object search:
-    \begin{itemize}
-        \item YOLOv7
-        \item GroundingDINO
-        \item MobileSAM
-        \item GroundedSAM
-        \item SEEM
-        \item OWL-ViT
-        \item MaskDINO
-    \end{itemize}
-    \item Discussion of promptable vision-language models supporting multi-modal queries (text, image, audio).
-    \item Challenges with false positives in zero-shot settings and their implications for reliable multi-object detection.
-\end{itemize}
+    This leads to the motors required torques to move the robots rigid body and a payload for a given trajectory \cite{liu2021sensorless}.
+    
+    \begin{equation}
+    \boldsymbol{\tau}_{\text{motor}} = \boldsymbol{\tau}_{\text{robot}} + \boldsymbol{\tau}_{\text{ext}}(\phi)
+    \label{eq:tau_motor}
+    \end{equation}
 
+    Since the UR5 robot in this case uses brush less DC motors, the torque-current relationship for electric motors  expresses the linear relationship between the torque \(\tau_{\text{motor}}\) produced by a motor and the current \(\mathbf{I}\) supplied to it \cite{deng2021dynamic,ctms_motor_speed}.
+    
+    \begin{equation}
+    \boldsymbol{\tau}_{\text{motor}} = k_t \cdot \boldsymbol{I} 
+    \label{eq:tau_I}
+    \end{equation}
+
+    Now converting Equation~\eqref{eq:tau_I} to the motor efforts \(\mathbf{I}\) and inserting Equation~\eqref{eq:tau_motor}
+    we see that the joint motor efforts are proportional related to the payload we add at the robots MF, while \(\tau_{\text{robot}}\) remains the same.
+    
+    \begin{equation}
+    \boldsymbol{I} = \frac{\boldsymbol{\tau}_{\text{robot}} + \boldsymbol{\tau}_{\text{ext}}}{k_t}
+    \label{eq:I_payload}
+    \end{equation}
+
+    The resulting motor torques that are applied to move the robot and the rigid body of the payload result in the f/t measurements on the MF. Where the transmission function from the motor torques to the resulting ft measurements at the MF is non-linear due to the complex interactions within the robot's system. This non-linearity arises from the dynamics of joint coupling, friction, and gear reductions that do not scale linearly with torque. Additionally, the influence of the center of mass and the changing inertia properties as the robot moves contribute to this non-linearity~\eqref{eq:tau_motor} and the external torque projection~\eqref{eq:tau_ext} highlight the non-linear dependencies on the joint angles \(\mathbf{q}\), velocities \(\dot{\mathbf{q}}\), and inertial properties \(\phi\). This relationship can be described with:
+    
+    \begin{equation}
+    \vec{F}_{\text{measured}} = f(\tau_{\text{motor}}, \mathbf{q}, \dot{\mathbf{q}}, \phi)
+    \label{eq:f_measured}
+    \end{equation}
+    
+    where \( f(\cdot) \) is a non-linear function that depends on the joint configuration, velocities, and inertial parameters \(\phi\). These factors make the mapping from motor sensor data (effort, position, velocity) to resulting ft measurements at the MF complex and non-linear \cite{liu2019end, blumberg2023estimation}.
+
+    The Motor effort (\(\tau_{\text{motor}}\)~\eqref{eq:tau_motor}) is central to understanding the relationship between motor torques, rigid body motion, and the resulting force/torque (\(\vec{f}\) and \(\vec{\tau}\)) as described by the Newton-Euler equations. \(\tau_{\text{motor}}\) represents the torque produced by the motors, which is applied to move the robot's joints and the connected rigid body. The Newton-Euler equations describe how forces and torques acting on a rigid body are related to its mass properties and motion~\eqref{eq:newtonEuler}. The torque exerted by the motor (\(\tau_{\text{motor}}\)) drives the joints and is responsible for creating motion in the connected rigid body. This torque results in joint accelerations (\(\vec{\alpha}\)), which translate to angular accelerations of the rigid body. The motion described by linear acceleration (\(\vec{a}\)) and angular acceleration (\(\vec{\alpha}\)) depends on the distribution of mass (\(m\)) and the inertia tensor (\(\mathbf{J}_s\)) of the body. When the motors apply more torque (\(\tau_{\text{motor}}\)), they increase the force and torque acting on the rigid body, resulting in higher accelerations (\(\vec{a}\), \(\vec{\alpha}\)) and potentially higher angular velocities (\(\vec{\omega}\)) over time. This means that applying more motor effort translates into faster movement (higher accelerations) and larger force/torque outputs as experienced by the rigid body. The increased motion caused by greater motor effort leads to higher measured force and torque values as captured by an FT sensor mounted on the robot. The Newton-Euler equations show that \(\vec{f}\) and \(\vec{\tau}\) are directly influenced by \(\vec{a}\), \(\vec{\alpha}\), and \(\vec{\omega}\).
+    
+    When the same rigid body is moved with more effort (more torque from the motors), the result is greater accelerations and velocities. This, in turn, leads to higher force and torque measurements because:
+    \begin{equation}
+    \vec{f} \propto m\vec{a}, \quad \vec{\tau} \propto \mathbf{J}_s \vec{\alpha} \text{ and } \vec{\tau} \text{ also influenced by } [\vec{\omega}]^{\times} \mathbf{J}_s \vec{\omega}.
+    \label{eq:f_proportional}
+    \end{equation}
+    Hence, higher motor efforts produce stronger outputs in terms of \(\vec{f}\) and \(\vec{\tau}\), as the system's equations reflect this proportional increase.
+    
+    The joint torques \(\tau_{\text{motor}}\) drive joint motion, leading to increases in \(\vec{a}\), \(\vec{\alpha}\), and \(\vec{\omega}\). The Newton-Euler equations use these motion variables to determine:
+    \begin{itemize}
+        \item \(\vec{f}\) (force) scales with \(m\vec{a}\).
+        \item \(\vec{\tau}\) (torque) scales with \(\mathbf{J}_s \vec{\alpha}\) and includes gyroscopic effects from \([\vec{\omega}]^{\times} \mathbf{J}_s \vec{\omega}\).
+    \end{itemize}
+    
+    Increased effort leads to higher \(\vec{a}\), \(\vec{\alpha}\), and \(\vec{\omega}\), resulting in higher \(\vec{f}\) and \(\vec{\tau}\)~\eqref{eq:f_measured}.    

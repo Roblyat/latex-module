@@ -1,61 +1,160 @@
-\chapter{Methods}
-This chapter details the methods developed for semantic exploration, persistent 3D mapping, promptable object detection, and robust fusion strategies for multi-object search. 
+\section{Methods}
+    The methods provide an overview of the approach used to isolate the force/torque (f/t) measurements arising from the rigid body \(\phi_{\text{gripper}}\) from the actual f/t sensor measurements, thereby leaving only the measurements associated with \(\phi_{\text{payload}}\). This isolation allows for accurate analysis of the forces and torques attributable solely to the payload. At first the data preprocessing from the recorded sensor data to the train and test data is described (Sec.~\ref{subsec:preprocess}). How the sensor data arises is seen in "Practical Implementation" (Sec.~\ref{subsec:practical}). Subsequently the Gaussian Process Models Training and Testing is explained (Sec.~\ref{subsec:gaussian}). 
 
-\section{System Overview}
-\begin{itemize}
-    \item Presentation of the overall architecture of the exploration~(\ref{sec:semantic_frontier}), detection~(\ref{sec:zero_shot_detection}), mapping~(\ref{sec:persistent_mapping}), and fusion~(\ref{sec:fusion_strategy}) pipeline.
-    \item Description of data flow between exploration (frontier evaluation), detection (promptable models), and exploitation (persistent semantic mapping), as shown in Figure~\ref{fig:system_overview}.
-    \item Explanation of how exploration and mapping components interact to progressively build a semantic understanding of the environment.
-\end{itemize}
+    \subsection{Data Preprocessing:}
+    \label{subsec:preprocess}
+    The data provided by the motor sensors of each joint motor and the force/torque-sensor are recorded and result in the Dataset:
+    \begin{equation}
+    \mathcal{D}_{\text{sensors}} = \left\{
+    \begin{array}{l}
+    q^T \in \mathbb{R}^{6}, \; \dot{q}^T \in \mathbb{R}^{6}, \; \ddot{q}^T \in \mathbb{R}^{6}, \\
+    \boldsymbol{I}^T \in \mathbb{R}^{6}, \; \boldsymbol{f}^T \in \mathbb{R}^{3}, \; \boldsymbol{\tau}^T \in \mathbb{R}^{3}
+    \end{array} 
+    \right\}
+    \in \mathbb{R}^{30}
+    \label{eq:dataset_raw}
+    \end{equation}
+    
+    where:
+    \begin{itemize}
+        \item $q$ is the motors' positions,
+        \item $\dot{q}$ is the motors' angular velocities,
+        \item $\ddot{q}$ is the angular accelerations,
+        \item $\boldsymbol{I}$ is the motors' effort,
+        \item $\boldsymbol{f}$ is the force measured by the force/torque sensor (components $x, y, z$),
+        \item $\boldsymbol{\tau}$ is the torque measured by the force/torque sensor (components $x, y, z$).
+    \end{itemize}
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{Images/03_methods/Master_Thesis_Overview.drawio.png}
-    \caption{System architecture}
-    \label{fig:system_overview}
-\end{figure}
+    The data is then preprocessed to train the \(\boldsymbol{GP}_{\text{effort}}\) and \(\boldsymbol{GP}_{\text{wrench}}\) models, with slightly different preprocessing steps for each.
 
-\section{Semantic Frontier Exploration} \label{sec:semantic_frontier}\subsection{Frontier Detection and Calculation}
-\begin{itemize}
-    \item Detection of frontiers on a 2D occupancy grid to identify candidate regions for exploration.
-    \item Application of classical frontier-based exploration algorithms extended with semantic information.
-\end{itemize}
+    However the basis of the preprocessing process equals for both models. 
+    The input feature and output target vectors shape for both models remains the same:
+    \begin{equation}
+    \boldsymbol{x} \in \mathbb{R}^{18} , \boldsymbol{y} \in \mathbb{R}^{6} 
+    \label{eq:basis_input_output_vector}
+    \end{equation}
+    
+    The Dataset \(\mathcal{D}_{\text{sensors}}\) is reorganized for both \(\boldsymbol{GP}_{\text{models}}\) into:
 
-\subsection{Value Map Generation using Vision-Language Models}
-\begin{itemize}
-    \item Computation of value maps by evaluating cosine similarity between multi-modal queries (text, image, audio) and scene observations.
-    \item Use of promptable vision-language models (e.g., SEEM) to assign semantic relevance scores to each region.
-    \item Dynamic update of value maps as new observations are integrated.
-\end{itemize}
+    \begin{equation}
+    \mathcal{D}_{\text{raw}} \in \mathbb{R}^{mx24}
+    \label{eq:D_raw}
+    \end{equation}
 
-\subsection{Navigation to High-Value Frontiers}
-\begin{itemize}
-    \item Selection of the frontier with the highest semantic relevance score.
-    \item Continuous re-evaluation of frontiers during exploration to adapt to changing scene semantics.
-    \item Strategy for balancing exploration efficiency and semantic search goals.
-\end{itemize}
+    where \(m\) is the subsample size, \(n = [0, 17]\) represents the input feature vector \(\boldsymbol{x} \in \mathbb{R}^{18}\), and the output target vector \(\boldsymbol{y} \in \mathbb{R}^{6}\) is represented by \(n = [18, 23]\).
 
-\section{Persistent Semantic 3D Mapping} \label{sec:persistent_mapping}
+    The  \(\mathcal{D}_{\text{train}}\) and \(\mathcal{D}_{\text{test}}\) Datasets for both models be:
+    \begin{equation}
+    \mathcal{D}_{\text{train}} \in \mathbb{R}^{mx24} , \mathcal{D}_{\text{test}} \in \mathbb{R}^{mx24}
+    \label{eq:train_test_data_shape}
+    \end{equation}
 
-\subsection{Global Map Construction with Open-Fusion}
-\begin{itemize}
-    \item Incremental creation of a global semantic point cloud map integrating RGB-D observations over time.
-    \item Registration of observations using robot poses to maintain a consistent world representation.
-    \item Association of semantic labels with 3D points based on query relevance scores.
-\end{itemize}
+    and are processed as follows.
+    \(\mathcal{D}_{\text{raw}}\) includes the corresponding vectors of \(\mathcal{D}_{\text{sensors}}\) to the input feature vector \(\boldsymbol{x} \in \mathbb{R}^{18}\) and output feature \(\boldsymbol{y} \in \mathbb{R}^{6}\) for both \(\boldsymbol{GP}_{\text{models}}\).
+    
+    
+    The index $m$ of \(\mathcal{D}_{\text{raw}}\) is shuffled and \(\mathcal{D}_{\text{raw}}\) is split into \(\mathcal{D}_{\text{train}}\) reflecting 80\% of \(\mathcal{D}_{\text{raw}}\) and \(\mathcal{D}_{\text{test}}\) reflecting 20\% of \(\mathcal{D}_{\text{raw}}\).
 
-\subsection{Semantic Clustering and Graph Node Generation}
-\begin{itemize}
-    \item Clustering of points with similar semantic labels to form object-level hypotheses.
-    \item Construction of semantic graph nodes representing detected object instances with aggregated confidence scores.
-    \item Maintenance of the semantic graph as a persistent memory for multi-object search tasks.
-\end{itemize}
+    Now, \(\mathcal{D}_{\text{train}}\) is standardized column-wise for all \(n = 24\) columns to achieve a mean of 0 and a standard deviation of 1 for each column, using the `StandardScaler` object from `sklearn.preprocessing`. \(\mathcal{D}_{\text{test}}\) is transformed with the \(\boldsymbol{\mu}\) and \(\boldsymbol{\sigma}\) the `StandardScaler` learned while transforming \(\mathcal{D}_{\text{train}}\). This results in \(\mathcal{D}_{\text{test}}\) having a mean close to 0 and a standard deviation close to 1 for each column. Standardizing in this way helps the model perform better when predicting on unseen data.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \vspace{1em}
 
-\section{Promptable Zero-Shot Detection} \label{sec:zero_shot_detection}\begin{itemize}
-    \item tbd
-\end{itemize}
+    \subsection{Gaussian Models:}
+    \label{subsec:gaussian}
+    The Gaussian Process model (GPM) is described by:
+    
+    \begin{equation}
+    f(x) \sim \mathcal{GP} \left( m(x), k(x, x') + \sigma_n^2 I \right)
+    \label{eq:gp_regression}
+    \end{equation}
 
-\section{Fusion Strategy} \label{sec:fusion_strategy}\begin{itemize}
-    \item Formulation of a fusion strategy combining frontier-based semantic relevance with persistent 3D semantic mapping.
-    \item Design of decision-making algorithms leveraging combined semantic information to robustly answer multi-object search queries.
-\end{itemize}
+    
+    
+    where \( f(x) \) is the estimated target vector based on the sensor data. The features are represented by \( x \), and the mean value function \( m(x) \) describes the average relationship between \( x \) and \( f(x) \), assumed to be zero because no prior information about the mean of the process is known. The covariance function \( k(x, x') \) quantifies the correlation of the values of \( f(x) \) at different points \( x \) and \( x' \), and in \( \sigma_n^2 I \) the noise variance of the data is respected. 
+
+    Both models are trained as Gaussian Sparse Regression models.
+
+    \begin{equation}
+    f(x) \approx \mathcal{GP} \left( m(x), k(x, \boldsymbol{Z}) k(\boldsymbol{Z}, \boldsymbol{Z})^{-1} k(\boldsymbol{Z}, x) + \sigma_n^2 I \right)
+    \label{eq:gp_sparse_regression}
+    \end{equation}
+
+     where \(f(x)\), \(x\), \(m(x)\), and \(\sigma_n^2 I\) remain the same as in GP regression. The covariance function \(k(x, \boldsymbol{Z})\) quantifies the correlation between the test point \(x\) and the inducing points \(\boldsymbol{Z}\), while \(k(\boldsymbol{Z}, \boldsymbol{Z})\) is the covariance matrix of the inducing points, and \(k(\boldsymbol{Z}, x)\) represents the covariance between the inducing points and the test point. In sparse GP regression, the inducing points \( \boldsymbol{Z} \) are selected as a subset of the training data or initialized randomly to cover the input space efficiently. These points are then optimized to capture the key structure and variability within the training data. After the optimization, the model is trained using these inducing points, which effectively summarize the broader dataset. This approach enables training on larger data volumes while maintaining computational feasibility and improves prediction accuracy by leveraging a broader representation of the data.
+
+    The RBF kernel \( k_{\text{RBF}}(x, x') \) is used in the GPM, which is described by:
+    
+    \begin{equation}
+    k_{\text{RBF}}(x, x') = \sigma^2 \exp \left( -\frac{\| x - x' \|^2}{2l^2} \right)
+    \label{eq:rbf_kernel}
+    \end{equation}
+    
+    where \( x, x' \) represent the features, \( \sigma^2 \) is the variance of the kernel function, and \( l \) is the lengthscale parameter of the kernel. The RBF kernel is used because it allows an infinite number of turning points in the data and can be well adapted for multidimensional input spaces, which is necessary for four features.
+    
+    A white noise kernel \([1]\) can be added to the RBF kernel to account for sensor noise. This kernel can be used during implementation on a real system to compensate for misbehavior of the GPM trained based on simulation data without sensor noise. Sensor noise can also be generated in the simulation, so the white noise kernel can also be implemented in the simulation if required.
+    
+    \begin{equation}
+    k_{\text{white}}(x, x') = \sigma_n^2 \delta(x, x')
+    \label{eq:white_kernel}
+    \end{equation}
+    
+    \(\sigma_n^2\) is the noise in the white noise kernel itself, and the delta function \( \delta \) ensures that the noise of the different features is uncorrelated.
+
+    \vspace{1em}
+    To train the GPM optimally, the k-fold cross-validation training method is used [37]. The training dataset \(\mathcal{D}_{\text{train}}\)~\eqref{eq:D_raw} is divided into \(k\) equal parts \(\{\mathcal{D}_1, \mathcal{D}_2, \ldots, \mathcal{D}_k\}\). For each iteration \(i\) from 1 to \(k\), one part \(\mathcal{D}_i\) is used as the validation set, while the remaining \(k - 1\) parts \(\mathcal{D} \setminus \mathcal{D}_i\) are used as the training set. The GPM is trained on the training set and evaluated on the validation set, and the process repeats \(k\) times so that each part of the dataset is used as a validation set exactly once. Performance metrics such as Mean Absolute Error (MAE), \(R^2\), Mean Squared Error (MSE), and Root Mean Squared Error (RMSE) are recorded for each fold. Finally, the average of these metrics across all \(k\) folds is computed to assess the model's predictive accuracy and effectiveness.
+
+    \begin{itemize}
+        \item Mean Absolute Error (MAE): Average of the absolute differences between the predicted values and the actual values.
+        \item R-squared (\(R^2\)): Measure of the goodness of fit, indicating how well unknown samples are likely predicted by the model. \(R^2 \in [0,1]\).
+        \item Mean Squared Error (MSE): Average squared difference between the estimated values and the actual values.
+        \item Root Mean Squared Error (RMSE): Measure of how accurately the model predicts the response, expressed in the same unit as the targets of the GPM.
+    \end{itemize}
+
+    \vspace{1em}
+    \textbf{GP effort model:}
+    A Sparse \(\boldsymbol{GP}_{\text{effort}}\)~\eqref{eq:gp_sparse_regression} model is k-fold trained on its dataset \(\mathcal{D}_{\text{train}}\)~\eqref{eq:train_test_data_shape} with the input feature vector:
+    \begin{equation}
+    \boldsymbol{x} = \left\{ q^T \in \mathbb{R}^{6}, \; \dot{q}^T \in \mathbb{R}^{6}, \; \ddot{q}^T \in \mathbb{R}^{6} \right\} \in \mathbb{R}^{18}
+    \label{eq:gp_effort_features_base}
+    \end{equation}
+    and the target vector:
+    \begin{equation}
+    \boldsymbol{y} = \left\{ \boldsymbol{I}^T \in \mathbb{R}^{6} \right\} \in \mathbb{R}^{6}
+    \label{eq:gp_effort_targets}
+    \end{equation}
+    where:
+    \begin{equation}
+    \boldsymbol{x} = \left\{ q^T_1, \; \dot{q}^T_1, \; \ddot{q}^T_1, \; \ldots, \; q^T_6, \; \dot{q}^T_6, \; \ddot{q}^T_6 \right\} \in \mathbb{R}^{18}
+    \label{eq:gp_effort_features_detail}
+    \end{equation}
+
+    and tested with \(\mathcal{D}_{\text{test}}\)~\eqref{eq:train_test_data_shape}.
+    
+    
+    \vspace{1em}
+    \textbf{GP wrench model:}
+    A Sparse \(\boldsymbol{GP}_{\text{wrench}}\)~\eqref{eq:gp_sparse_regression} model is k-fold trained on its dataset \(\mathcal{D}_{\text{train}}\)~\eqref{eq:train_test_data_shape} with the input feature vector:
+    \begin{equation}
+    \boldsymbol{x} = \left\{ q^T \in \mathbb{R}^{6}, \; \ddot{q}^T \in \mathbb{R}^{6}, \; \boldsymbol{I}^T \in \mathbb{R}^{6} \right\} \in \mathbb{R}^{18}
+    \label{eq:gp_wrench_features_base}
+    \end{equation}
+    and the target vector:
+    \begin{equation}
+    \boldsymbol{y} = \left\{ \boldsymbol{f}^T \in \mathbb{R}^{3}, \; \boldsymbol{\tau}^T \in \mathbb{R}^{3} \right\} \in \mathbb{R}^{6}
+    \label{eq:gp_wrench_targets}
+    \end{equation}
+    where:
+    \begin{equation}
+    \boldsymbol{x} = \left\{ q^T_1, \; \ddot{q}^T_1, \; \boldsymbol{I}^T_1, \; \ldots, \; q^T_6, \; \ddot{q}^T_6, \; \boldsymbol{I}^T_6 \right\} \in \mathbb{R}^{18}
+    \label{eq:gp_wrench_features_detail}
+    \end{equation}
+    and tested with \(\mathcal{D}_{\text{test}}\)~\eqref{eq:train_test_data_shape}.
+    
+    \vspace{1em}
+    \textbf{Prediction with both GP models:}
+    To get the prediction that results in the f/t-measurements, that would appear when moving without the payload while carrying a payload, is done by both models. It is very important that the prediction of both models remain at the same timestamp. The \(\boldsymbol{GP}_{\text{effort}}\) model predicts its target vector $\boldsymbol{y} \in \mathbb{R}^{6}$~\eqref{eq:gp_effort_targets}
+
+    then the input vector $\boldsymbol{x} \in \mathbb{R}^{18}$~\eqref{eq:gp_wrench_features_detail} for the \(\boldsymbol{GP}_{\text{wrench}}\) is processed where $q^T \in \mathbb{R}^6$ and $\ddot{q^T} \in \mathbb{R}^6$ are exactly the same features the \(\boldsymbol{GP}_{\text{effort}}\) model predicted the $\boldsymbol{y} \in \mathbb{R}^{6}$~\eqref{eq:gp_effort_targets} with, as this combination is the input feature vector for the \(\boldsymbol{GP}_{\text{effort}}\). The predicted target vector 
+    \[
+    \boldsymbol{y} = \left\{ \boldsymbol{f}^T \in \mathbb{R}^{3}, \; \boldsymbol{\tau}^T \in \mathbb{R}^{3} \right\} \in \mathbb{R}^{6}
+    \]
+    contains the f/t-measurement values that appear by the gripper while the robot executes its trajectory carrying the gripper and a payload.

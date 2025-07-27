@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.7.25)  25 JUL 2025 11:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.7.27)  27 JUL 2025 17:18
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1482,14 +1482,14 @@ Package biblatex Info: Automatic encoding selection.
 \openout7 = `APE.bcf'.
 
 Package biblatex Info: Trying to load bibliographic data...
-Package biblatex Info: ... file 'APE.bbl' found.
+Package biblatex Info: ... file 'APE.bbl' not found.
 
-(build/APE.bbl)
+No file APE.bbl.
 Package biblatex Info: Reference section=0 on input line 14.
 Package biblatex Info: Reference segment=0 on input line 14.
 LaTeX Font Info:    Trying to load font information for U+msa on input line 16.
 
- (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 16.
@@ -1514,214 +1514,1620 @@ Package pdftex.def Info: PICs/fhtw_cover.png  used on input line 16.
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./PICs/fhtw_cover.png>] [-
 8
 
-] (./Sections/0_abstract.tex) [-7
+] (./Sections/0_kurzfassung.tex) [-7
 
-] (./Sections/0_kurzfassung.tex) [-6
+] (./Sections/0_abstract.tex) [-6
 
 ]
 [-5
 
-] (build/APE.toc [-4
-
-])
+]
 \tf@toc=\write8
 \openout8 = `APE.toc'.
 
- [-3] (./Sections/1_introduction.tex
+ [-4
+
+] (./Sections/1_introduction.tex
 chapter 1.
-Package acronym Info: Label `acro:SAR' newly defined as it shall be overridden
-although it is yet undefined on input line 5.
-Package acronym Info: Label `acro:OneMap' newly defined as it shall be overridd
-en
-although it is yet undefined on input line 8.
-Package acronym Info: Label `acro:VLMaps' newly defined as it shall be overridd
-en
-although it is yet undefined on input line 9.
-Package acronym Info: Label `acro:VLFM' newly defined as it shall be overridden
 
-although it is yet undefined on input line 10.
-Package acronym Info: Label `acro:ConceptGraphs' newly defined as it shall be o
-verridden
-although it is yet undefined on input line 11.
-Package acronym Info: Label `acro:SemExp' newly defined as it shall be overridd
-en
-although it is yet undefined on input line 12.
-Package acronym Info: Label `acro:GeFF' newly defined as it shall be overridden
+LaTeX Warning: Reference `eq:rigidBody' on page 1 undefined on input line 3.
 
-although it is yet undefined on input line 13.
-<Images/1_introduction/temp_sota_comparison_common_properties.png, id=137, 683.
-55376pt x 200.75pt>
-File: Images/1_introduction/temp_sota_comparison_common_properties.png Graphic 
-file (type png)
-<use Images/1_introduction/temp_sota_comparison_common_properties.png>
-Package pdftex.def Info: Images/1_introduction/temp_sota_comparison_common_prop
-erties.png  used on input line 18.
-(pdftex.def)             Requested size: 452.9679pt x 133.03145pt.
-<Images/1_introduction/temp_sota_comparison_performance_metrics.png, id=138, 69
-1.58376pt x 244.915pt>
-File: Images/1_introduction/temp_sota_comparison_performance_metrics.png Graphi
-c file (type png)
-<use Images/1_introduction/temp_sota_comparison_performance_metrics.png>
-Package pdftex.def Info: Images/1_introduction/temp_sota_comparison_performance
-_metrics.png  used on input line 25.
-(pdftex.def)             Requested size: 452.9679pt x 160.41487pt.
-Package acronym Info: Label `acro:SR' newly defined as it shall be overridden
-although it is yet undefined on input line 38.
-Package acronym Info: Label `acro:SPL' newly defined as it shall be overridden
-although it is yet undefined on input line 38.
-Package acronym Info: Label `acro:SEEM' newly defined as it shall be overridden
 
-although it is yet undefined on input line 38.
-[1
-
- <./Images/1_introduction/temp_sota_comparison_common_properties.png>])
-(./Sections/2_state_of_the_art.tex
-chapter 2.
-[2 <./Images/1_introduction/temp_sota_comparison_performance_metrics.png>]
-LaTeX Font Info:    Trying to load font information for TS1+phv on input line 7
+LaTeX Warning: Citation 'bai2024sensorless' on page 1 undefined on input line 3
 .
 
+
+LaTeX Warning: Citation 'Popov2019' on page 1 undefined on input line 3.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 1 undefined on input line 3.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 1 undefined on input line 3.
+
+
+
+LaTeX Warning: Citation 'su2021deep' on page 1 undefined on input line 3.
+
+
+LaTeX Warning: Citation 'haninger2022model' on page 1 undefined on input line 3
+.
+
+
+LaTeX Warning: Citation 'HANINGER2023104431' on page 1 undefined on input line 
+3.
+
+
+LaTeX Warning: Reference `eq:rigidBody' on page 1 undefined on input line 23.
+
+
+LaTeX Warning: Reference `eq:newtonEuler' on page 1 undefined on input line 30.
+
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 1 undefined on input line 30
+.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 1 undefined on input line 30.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 1 undefined on input line 30
+.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 1 undefined on input line 30.
+
+[1
+
+]
+
+LaTeX Warning: Citation 'urrea2018parameter' on page 2 undefined on input line 
+36.
+
+
+LaTeX Warning: Reference `sec:Background' on page 2 undefined on input line 36.
+
+
+
+LaTeX Warning: Reference `eq:I_payload' on page 2 undefined on input line 38.
+
+
+LaTeX Warning: Reference `sec:Background' on page 2 undefined on input line 38.
+
+
+
+LaTeX Warning: Reference `eq:tau_motor' on page 2 undefined on input line 40.
+
+
+LaTeX Warning: Reference `eq:dataset_raw' on page 2 undefined on input line 40.
+
+
+
+LaTeX Warning: Reference `eq:tau_motor' on page 2 undefined on input line 40.
+
+
+LaTeX Warning: Reference `eq:f_measured' on page 2 undefined on input line 40.
+
+
+LaTeX Warning: Reference `eq:robot_dynamics' on page 2 undefined on input line 
+40.
+
+
+LaTeX Warning: Reference `eq:f_measured' on page 2 undefined on input line 40.
+
+
+LaTeX Warning: Citation 'liu2019end' on page 2 undefined on input line 40.
+
+
+LaTeX Warning: Citation 'blumberg2023estimation' on page 2 undefined on input l
+ine 40.
+
+
+LaTeX Warning: Reference `eq:rigidBody' on page 2 undefined on input line 44.
+
+
+LaTeX Warning: Reference `eq:newtonEuler' on page 2 undefined on input line 44.
+
+
+
+LaTeX Warning: Reference `sec:Background' on page 2 undefined on input line 44.
+
+
+
+LaTeX Warning: Reference `subsec:gaussian' on page 2 undefined on input line 47
+.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 2 undefined on input line 47
+.
+
+
+LaTeX Warning: Citation 'urrea2018parameter' on page 2 undefined on input line 
+47.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 2 undefined on input line 47
+.
+
+
+LaTeX Warning: Citation 'urrea2018parameter' on page 2 undefined on input line 
+47.
+
+
+LaTeX Warning: Citation 'ur5_robot' on page 2 undefined on input line 49.
+
+
+LaTeX Warning: Citation 'ros_official' on page 2 undefined on input line 49.
+
+
+LaTeX Warning: Citation 'gazebo_ros' on page 2 undefined on input line 49.
+
+) (./Sections/2_state_of_the_art.tex
+chapter 2.
+
+LaTeX Warning: Citation 'bai2024sensorless' on page 2 undefined on input line 4
+.
+
+
+LaTeX Warning: Citation 'Popov2019' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 2 undefined on input line 4.
+
+
+
+LaTeX Warning: Citation 'su2021deep' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Citation 'dong2023dynamic' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Citation 'golluccio2021robot' on page 2 undefined on input line 
+4.
+
+
+LaTeX Warning: Citation 'Xu2022accurate' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 2 undefined on input line 4.
+
+
+
+LaTeX Warning: Citation 'liu2021sensorless' on page 2 undefined on input line 4
+.
+
+
+LaTeX Warning: Citation 'motor_current_estimation' on page 2 undefined on input
+ line 4.
+
+
+LaTeX Warning: Citation 'berger2021feature' on page 2 undefined on input line 4
+.
+
+
+Underfull \hbox (badness 1924) in paragraph at lines 3--5
+\T1/phv/m/n/10.95 men-tum Ob-server [[]]), and Sta-tis-ti-cal Tech-niques (e.g.
+, Kalman Fil-
+ []
+
+[2]
+
+LaTeX Warning: Citation 'ren2020learning' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'su2021deep' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'zeng2019tossingbot' on page 3 undefined on input line 
+6.
+
+
+LaTeX Warning: Citation 'Kruzic2021' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'su2021deep' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'berger2016estimating' on page 3 undefined on input lin
+e 6.
+
+
+LaTeX Warning: Citation 'berger2021feature' on page 3 undefined on input line 6
+.
+
+
+LaTeX Warning: Citation 'Kruzic2021' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'Kruzic2021' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'zeng2019tossingbot' on page 3 undefined on input line 
+6.
+
+
+LaTeX Warning: Citation 'ren2020learning' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'ren2020learning' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'ren2020learning' on page 3 undefined on input line 6.
+
+
+LaTeX Warning: Citation 'rasmussen2006gaussian' on page 3 undefined on input li
+ne 6.
+
+
+LaTeX Warning: Citation 'haninger2022model' on page 3 undefined on input line 6
+.
+
+
+LaTeX Warning: Citation 'beckers2017stable' on page 3 undefined on input line 6
+.
+
+
+LaTeX Warning: Citation 'nguyen2008learning' on page 3 undefined on input line 
+6.
+
+
+LaTeX Warning: Citation 'HANINGER2023104431' on page 3 undefined on input line 
+6.
+
+
+LaTeX Warning: Citation 'blumberg2023estimation' on page 3 undefined on input l
+ine 6.
+
+
+LaTeX Warning: Citation 'berger2016estimating' on page 3 undefined on input lin
+e 6.
+
+
+LaTeX Warning: Citation 'berger2015learning' on page 3 undefined on input line 
+6.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+\T1/phv/m/n/10.95 Gen-er-a-tive Ad-ver-sar-ial
+ []
+
+
+Underfull \hbox (badness 1253) in paragraph at lines 6--7
+\T1/phv/m/n/10.95 Gaus-sian Pro-cess Re-gres-sion (GPR [[]]) [[],
+ []
+
+
+LaTeX Warning: Citation 'lee2020adaptive' on page 3 undefined on input line 8.
+
+
+LaTeX Warning: Citation 'nguyen2008learning' on page 3 undefined on input line 
+8.
+
+
+LaTeX Warning: Citation 'ren2020learning' on page 3 undefined on input line 8.
+
+
+LaTeX Warning: Citation 'leon2022parameter' on page 3 undefined on input line 8
+.
+
+
+LaTeX Warning: Citation 'golluccio2021robot' on page 3 undefined on input line 
+8.
+
+
+LaTeX Warning: Reference `eq:robot_dynamics' on page 3 undefined on input line 
+8.
+
+
+LaTeX Warning: Citation 'dong2023dynamic' on page 3 undefined on input line 8.
+
+
+LaTeX Warning: Citation 'golluccio2021robot' on page 3 undefined on input line 
+8.
+
+
+LaTeX Warning: Citation 'deng2021dynamic' on page 3 undefined on input line 8.
+
+
+LaTeX Warning: Citation 'nguyen2008learning' on page 3 undefined on input line 
+8.
+
+
+LaTeX Warning: Citation 'leon2022parameter' on page 3 undefined on input line 8
+.
+
+
+LaTeX Warning: Citation 'urrea2018parameter' on page 3 undefined on input line 
+8.
+
+
+Underfull \hbox (badness 2050) in paragraph at lines 8--9
+\T1/phv/m/n/10.95 e-ters in robotic con-trol and mo-tion. Es-ti-mat-ing the dy-
+namic model pa-ram-e-ters of
+ []
+
+
+Underfull \hbox (badness 1092) in paragraph at lines 8--9
+\T1/phv/m/n/10.95 di-tion-ally, un-der-stand-ing the in-verse kine-mat-ics [[]]
+ and in-verse dy-nam-
+ []
+
+
+Underfull \hbox (badness 2126) in paragraph at lines 8--9
+\T1/phv/m/n/10.95 ics [[], []] of the robotic sys-tem [] serves as
+ []
+
+
+Underfull \hbox (badness 1910) in paragraph at lines 8--9
+\T1/phv/m/n/10.95 a foun-da-tion for ex-ter-nal con-tact force es-ti-ma-tion. H
+ere clas-si-cal es-ti-ma-tion meth-
+ []
+
+
+Underfull \hbox (badness 1297) in paragraph at lines 8--9
+\T1/phv/m/n/10.95 ods are present[[], [], []], as well
+ []
+
+
+Underfull \hbox (badness 1210) in paragraph at lines 8--9
+\T1/phv/m/n/10.95 as ma-chine learn-ing [[]] and neu-ronal net-work es-ti-ma-ti
+on meth-ods
+ []
+
+[3]
+
+LaTeX Warning: Citation 'Popov2019' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'su2021deep' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'Popov2019' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'su2021deep' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'HANINGER2023104431' on page 4 undefined on input line 
+10.
+
+
+LaTeX Warning: Citation 'haninger2022model' on page 4 undefined on input line 1
+0.
+
+
+LaTeX Warning: Citation 'motor_current_estimation' on page 4 undefined on input
+ line 10.
+
+
+LaTeX Warning: Citation 'Tan2023' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'lu2023external' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'motor_current_estimation' on page 4 undefined on input
+ line 10.
+
+
+LaTeX Warning: Citation 'HANINGER2023104431' on page 4 undefined on input line 
+10.
+
+
+LaTeX Warning: Citation 'haninger2022model' on page 4 undefined on input line 1
+0.
+
+
+LaTeX Warning: Citation 'beckers2017stable' on page 4 undefined on input line 1
+0.
+
+
+LaTeX Warning: Citation 'berger2015learning' on page 4 undefined on input line 
+10.
+
+
+LaTeX Warning: Citation 'blumberg2023estimation' on page 4 undefined on input l
+ine 10.
+
+
+LaTeX Warning: Citation 'Tan2023' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'lu2023external' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'Kruzic2021' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'shan2024fine' on page 4 undefined on input line 10.
+
+
+LaTeX Warning: Citation 'berger2016estimating' on page 4 undefined on input lin
+e 10.
+
+
+LaTeX Warning: Citation 'liu2021sensorless' on page 4 undefined on input line 1
+0.
+
+
+LaTeX Warning: Citation 'su2021deep' on page 4 undefined on input line 10.
+
+
+Underfull \hbox (badness 7832) in paragraph at lines 10--11
+\T1/phv/m/n/10.95 and neu-ronal net-work es-ti-ma-tion mod-els [[], [], [],
+ []
+
+
+LaTeX Warning: Reference `eq:rigidEffective' on page 4 undefined on input line 
+12.
+
+
+LaTeX Warning: Citation 'Hu2020' on page 4 undefined on input line 12.
+
+
+LaTeX Warning: Citation 'Xu2022accurate' on page 4 undefined on input line 12.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 4 undefined on input line 12
+.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 4 undefined on input line 12.
+
+
+LaTeX Warning: Citation 'berger2021feature' on page 4 undefined on input line 1
+2.
+
+
+Underfull \hbox (badness 1168) in paragraph at lines 12--13
+[]\T1/phv/m/n/10.95 Furthermore, TCP ex-ter-nal force es-ti-ma-tion is used to 
+gain in-sights into the in-ter-
+ []
+
+
+LaTeX Warning: Reference `eq:robot_dynamics' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Reference `eq:tau_motor' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Reference `eq:tau_I' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Reference `eq:I_payload' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Reference `eq:newtonEuler' on page 4 undefined on input line 14.
+
+
+
+LaTeX Warning: Reference `eq:rigidBody' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'lee2020adaptive' on page 4 undefined on input line 14.
+
+
+
+LaTeX Warning: Citation 'nguyen2008learning' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Citation 'ren2020learning' on page 4 undefined on input line 14.
+
+
+
+LaTeX Warning: Citation 'leon2022parameter' on page 4 undefined on input line 1
+4.
+
+
+LaTeX Warning: Citation 'dong2023dynamic' on page 4 undefined on input line 14.
+
+
+
+LaTeX Warning: Citation 'golluccio2021robot' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Citation 'deng2021dynamic' on page 4 undefined on input line 14.
+
+
+
+LaTeX Warning: Citation 'haninger2022model' on page 4 undefined on input line 1
+4.
+
+
+LaTeX Warning: Citation 'HANINGER2023104431' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Citation 'beckers2017stable' on page 4 undefined on input line 1
+4.
+
+
+LaTeX Warning: Citation 'berger2015learning' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Citation 'blumberg2023estimation' on page 4 undefined on input l
+ine 14.
+
+
+LaTeX Warning: Citation 'motor_current_estimation' on page 4 undefined on input
+ line 14.
+
+
+LaTeX Warning: Citation 'an2023' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'lu2023external' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'Kruzic2021' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'shan2024fine' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'berger2016estimating' on page 4 undefined on input lin
+e 14.
+
+
+LaTeX Warning: Citation 'liu2021sensorless' on page 4 undefined on input line 1
+4.
+
+
+LaTeX Warning: Citation 'su2021deep' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'Hu2020' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'Xu2022accurate' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'kurdas2022online' on page 4 undefined on input line 14
+.
+
+
+LaTeX Warning: Citation 'nadeau2022fast' on page 4 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'haninger2022model' on page 4 undefined on input line 1
+4.
+
+
+LaTeX Warning: Citation 'beckers2017stable' on page 4 undefined on input line 1
+4.
+
+
+LaTeX Warning: Citation 'nguyen2008learning' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Citation 'HANINGER2023104431' on page 4 undefined on input line 
+14.
+
+
+LaTeX Warning: Citation 'blumberg2023estimation' on page 4 undefined on input l
+ine 14.
+
+
+LaTeX Warning: Citation 'berger2015learning' on page 4 undefined on input line 
+14.
+
+
+Underfull \hbox (badness 2460) in paragraph at lines 14--16
+\T1/phv/m/n/10.95 rigid body $\OML/cmm/m/it/10.95 ^^^[]$ \T1/phv/m/n/10.95 whil
+e mo-tion and shows that $\OML/cmm/m/it/10.95 ^^\[]$\T1/phv/m/n/10.95 , es-pe-c
+ially $\OT1/cmr/bx/n/10.95 I$ \T1/phv/m/n/10.95 is the key fea-
+ []
+
+
+Underfull \hbox (badness 1960) in paragraph at lines 14--16
+\T1/phv/m/n/10.95 on the tra-jec-tory pa-ram-e-ters $\OT1/cmr/bx/n/10.95 a$\T1/
+phv/m/n/10.95 , $[]$, and $[]$. The lit-er-a-ture has shown that a pa-
+ []
+
+
+Underfull \hbox (badness 1946) in paragraph at lines 14--16
+\T1/phv/m/n/10.95 ram-e-ter iden-ti-fi-ca-tion us-ing the New-ton/Euler equa-ti
+ons leads to valid in-for-ma-tion of
+ []
+
+
+Underfull \hbox (badness 2173) in paragraph at lines 14--16
+\T1/phv/m/n/10.95 the the rigid body's $\OML/cmm/m/it/10.95 ^^^[]$ \T1/phv/m/n/
+10.95 [[], [], [],
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--16
+[]\T1/phv/m/n/10.95 , [], [], [],
+ []
+
+
+LaTeX Warning: Citation 'urrea2018parameter' on page 4 undefined on input line 
+19.
+
+[4]
+
+LaTeX Warning: Reference `eq:robot_dynamics' on page 5 undefined on input line 
+23.
+
+
+LaTeX Warning: Citation 'Popov2019' on page 5 undefined on input line 23.
+
+
+LaTeX Warning: Citation 'Popov2019' on page 5 undefined on input line 30.
+
+
+LaTeX Warning: Citation 'lu2023external' on page 5 undefined on input line 30.
+
+
+LaTeX Warning: Citation 'liu2021sensorless' on page 5 undefined on input line 3
+7.
+
+
+LaTeX Warning: Citation 'deng2021dynamic' on page 5 undefined on input line 44.
+
+
+
+LaTeX Warning: Citation 'ctms_motor_speed' on page 5 undefined on input line 44
+.
+
+
+LaTeX Warning: Reference `eq:tau_I' on page 5 undefined on input line 51.
+
+
+LaTeX Warning: Reference `eq:tau_motor' on page 5 undefined on input line 51.
+
+
+LaTeX Warning: Reference `eq:tau_motor' on page 5 undefined on input line 59.
+
+
+LaTeX Warning: Reference `eq:tau_ext' on page 5 undefined on input line 59.
+
+[5]
+
+LaTeX Warning: Citation 'liu2019end' on page 6 undefined on input line 66.
+
+
+LaTeX Warning: Citation 'blumberg2023estimation' on page 6 undefined on input l
+ine 66.
+
+
+LaTeX Warning: Reference `eq:tau_motor' on page 6 undefined on input line 68.
+
+
+LaTeX Warning: Reference `eq:newtonEuler' on page 6 undefined on input line 68.
+
+
+LaTeX Font Info:    Trying to load font information for TS1+phv on input line 7
+9.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1phv.fd
 File: ts1phv.fd 2020/03/25 scalable font definitions for TS1/phv.
 )
-LaTeX Font Info:    Font shape `T1/phv/m/it' in size <10.95> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 9.
- [3] [4])
-(./Sections/3_methods.tex
+
+LaTeX Warning: Reference `eq:f_measured' on page 6 undefined on input line 83.
+
+) (./Sections/3_methods.tex
+
+LaTeX Warning: Reference `subsec:preprocess' on page 6 undefined on input line 
+2.
+
+
+LaTeX Warning: Reference `subsec:practical' on page 6 undefined on input line 2
+.
+
+
+LaTeX Warning: Reference `subsec:gaussian' on page 6 undefined on input line 2.
+
+
+[6] [7] [8]
+
+LaTeX Warning: Reference `eq:D_raw' on page 9 undefined on input line 103.
+
+
+LaTeX Warning: Reference `eq:gp_sparse_regression' on page 9 undefined on input
+ line 114.
+
+
+LaTeX Warning: Reference `eq:train_test_data_shape' on page 9 undefined on inpu
+t line 114.
+
+
+LaTeX Warning: Reference `eq:train_test_data_shape' on page 9 undefined on inpu
+t line 130.
+
+
+LaTeX Warning: Reference `eq:gp_sparse_regression' on page 9 undefined on input
+ line 135.
+
+
+LaTeX Warning: Reference `eq:train_test_data_shape' on page 9 undefined on inpu
+t line 135.
+
+[9]
+
+LaTeX Warning: Reference `eq:train_test_data_shape' on page 10 undefined on inp
+ut line 150.
+
+
+LaTeX Warning: Reference `eq:gp_effort_targets' on page 10 undefined on input l
+ine 154.
+
+
+LaTeX Warning: Reference `eq:gp_wrench_features_detail' on page 10 undefined on
+ input line 156.
+
+
+LaTeX Warning: Reference `eq:gp_effort_targets' on page 10 undefined on input l
+ine 156.
+
+) (./Sections/4_implementation.tex
 chapter 3.
-<Images/03_methods/Master_Thesis_Overview.drawio.png, id=212, 589.20125pt x 583
-.17876pt>
-File: Images/03_methods/Master_Thesis_Overview.drawio.png Graphic file (type pn
-g)
-<use Images/03_methods/Master_Thesis_Overview.drawio.png>
-Package pdftex.def Info: Images/03_methods/Master_Thesis_Overview.drawio.png  u
-sed on input line 13.
-(pdftex.def)             Requested size: 452.9679pt x 448.34604pt.
 
-LaTeX Warning: `!h' float specifier changed to `!ht'.
+LaTeX Warning: Citation 'ros_official' on page 10 undefined on input line 3.
 
-[5] [6 <./Images/03_methods/Master_Thesis_Overview.drawio.png>])
-(./Sections/4_implementation.tex
-chapter 4.
-[7] [8] [9]) (./Sections/5_experimental_results.tex
-chapter 5.
-) (./Sections/6_summary_and_outlook.tex
-chapter 6.
-[10]) (./Utils/bibliography.tex [11]
-chapter without number
+
+LaTeX Warning: Citation 'gazebo_ros' on page 10 undefined on input line 3.
+
+
+LaTeX Warning: Citation 'moveit' on page 10 undefined on input line 3.
+
+
+LaTeX Warning: Citation 'ur5_robot' on page 10 undefined on input line 3.
+
 LaTeX Font Info:    Trying to load font information for T1+pcr on input line 3.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Underfull \hbox (badness 2351) in paragraph at lines 4--4
-[]\T1/phv/m/n/10.95 F. L. Busch, T. Homberger, J. Ortega-Peimbert, Q. Yang, and
- O. An-der-s-son,
- []
+
+LaTeX Warning: Citation 'xacro_docs' on page 10 undefined on input line 3.
 
 
-Overfull \hbox (56.02475pt too wide) in paragraph at lines 4--4
-|   []\T1/phv/m/n/10.95 ,
- []
+LaTeX Warning: Citation 'ros_control' on page 10 undefined on input line 3.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-\T1/phv/m/n/10.95 ga-tion,^^Q in
- []
+LaTeX Warning: Citation 'rospy' on page 10 undefined on input line 4.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-|   []\T1/phv/m/n/10.95 ,
- []
+LaTeX Warning: Citation 'rospy' on page 10 undefined on input line 5.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-[]\T1/phv/m/n/10.95 N. Yokoyama, S. Ha, D. Ba-tra, J. Wang, and
- []
+LaTeX Warning: Reference `eq:dataset_raw' on page 10 undefined on input line 5.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-[]\T1/phv/m/n/10.95 Q. Gu
- []
+
+LaTeX Warning: Reference `subsec:preprocess' on page 10 undefined on input line
+ 5.
 
 
-Underfull \hbox (badness 1210) in paragraph at lines 4--4
-|   []   |   []\T1/phv/m/n/10.95 , |   [],
- []
+LaTeX Warning: Citation 'python_os' on page 10 undefined on input line 5.
 
 
-Underfull \hbox (badness 1533) in paragraph at lines 4--4
-[]\T1/phv/m/n/10.95 R.[]Z. Qiu |   []   |   [], ^^P  Learn-ing gen-er-al-iz-abl
-e fea-ture fields for mo-bile ma-nip-u-la-tion,^^Q
- []
+LaTeX Warning: Citation 'pandas' on page 10 undefined on input line 5.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-\T1/phv/m/n/10.95 ma-tion based adap-tive robotic ex-plo-ration,^^Q
- []
+LaTeX Warning: Citation 'numpy' on page 10 undefined on input line 5.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-\T1/phv/m/n/10.95 vi-ron-ments us-ing a team
- []
+LaTeX Warning: Citation 'scikit_learn' on page 10 undefined on input line 5.
 
-[12
 
-] [13] (build/APE.lof)
+LaTeX Warning: Reference `subsec:gaussian' on page 10 undefined on input line 5
+.
+
+
+LaTeX Warning: Citation 'gpy' on page 10 undefined on input line 5.
+
+
+LaTeX Warning: Citation 'matplotlib' on page 10 undefined on input line 5.
+
+
+LaTeX Warning: Reference `eq:dataset_raw' on page 10 undefined on input line 6.
+
+
+
+LaTeX Warning: Reference `eq:robot_dynamics' on page 10 undefined on input line
+ 6.
+
+[10] [11]
+
+LaTeX Warning: Reference `subsec:preprocess' on page 12 undefined on input line
+ 17.
+
+) (./Sections/5_experimental_results.tex
+chapter 4.
+<Images/1_introduction/temp_sota_comparison_common_properties.png, id=133, 683.
+55376pt x 200.75pt>
+File: Images/1_introduction/temp_sota_comparison_common_properties.png Graphic 
+file (type png)
+<use Images/1_introduction/temp_sota_comparison_common_properties.png>
+Package pdftex.def Info: Images/1_introduction/temp_sota_comparison_common_prop
+erties.png  used on input line 5.
+(pdftex.def)             Requested size: 452.9679pt x 133.03145pt.
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\begingroup' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<let>-command' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@nomath' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\begingroup' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\setbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\thinmuskip' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\medmuskip' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\m@ne' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\thickmuskip' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ne' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\setbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\tw@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<def>-command' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@tempa' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathchoice' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\displaystyle' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\textstyle' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\scriptstyle' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\scriptscriptstyle' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\endgroup' on input line 10.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 10.
+
+<Images/05_results/effort_boxplot_test_non_OC_R^2.png, id=134, 433.62pt x 289.0
+8pt>
+File: Images/05_results/effort_boxplot_test_non_OC_R^2.png Graphic file (type p
+ng)
+<use Images/05_results/effort_boxplot_test_non_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_test_non_OC_R^2.png  
+used on input line 15.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+[12 <./Images/1_introduction/temp_sota_comparison_common_properties.png>]
+<Images/05_results/effort_boxplot_test_non_OC_RMSE.png, id=143, 433.62pt x 289.
+08pt>
+File: Images/05_results/effort_boxplot_test_non_OC_RMSE.png Graphic file (type 
+png)
+<use Images/05_results/effort_boxplot_test_non_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_test_non_OC_RMSE.png 
+ used on input line 22.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+
+[13 <./Images/05_results/effort_boxplot_test_non_OC_R^2.png>]
+! Undefined control sequence.
+l.31     \toprule
+                 
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.33     \midrule
+                 
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.44     \bottomrule
+                    
+? 
+<Images/05_results/effort_boxplot_live_non_OC_R^2.png, id=154, 433.62pt x 289.0
+8pt>
+File: Images/05_results/effort_boxplot_live_non_OC_R^2.png Graphic file (type p
+ng)
+<use Images/05_results/effort_boxplot_live_non_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_live_non_OC_R^2.png  
+used on input line 51.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+[14 <./Images/05_results/effort_boxplot_test_non_OC_RMSE.png>]
+<Images/05_results/effort_boxplot_live_non_OC_RMSE.png, id=162, 433.62pt x 289.
+08pt>
+File: Images/05_results/effort_boxplot_live_non_OC_RMSE.png Graphic file (type 
+png)
+<use Images/05_results/effort_boxplot_live_non_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_live_non_OC_RMSE.png 
+ used on input line 58.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+
+! Undefined control sequence.
+l.66     \toprule
+                 
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.68     \midrule
+                 
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.79     \bottomrule
+                    
+? 
+[15 <./Images/05_results/effort_boxplot_live_non_OC_R^2.png> <./Images/05_resul
+ts/effort_boxplot_live_non_OC_RMSE.png>]
+<Images/05_results/effort_boxplot_test_OC_R^2.png, id=171, 433.62pt x 289.08pt>
+
+File: Images/05_results/effort_boxplot_test_OC_R^2.png Graphic file (type png)
+<use Images/05_results/effort_boxplot_test_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_test_OC_R^2.png  used
+ on input line 87.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+<Images/05_results/effort_boxplot_test_OC_RMSE.png, id=172, 433.62pt x 289.08pt
+>
+File: Images/05_results/effort_boxplot_test_OC_RMSE.png Graphic file (type png)
+
+<use Images/05_results/effort_boxplot_test_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_test_OC_RMSE.png  use
+d on input line 94.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+ [16 <./Images/05_results/effort_boxplot_test_OC_R^2.png>]
+! Undefined control sequence.
+l.102     \toprule
+                  
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.104     \midrule
+                  
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.115     \bottomrule
+                     
+? 
+<Images/05_results/effort_boxplot_live_OC_R^2.png, id=180, 433.62pt x 289.08pt>
+
+File: Images/05_results/effort_boxplot_live_OC_R^2.png Graphic file (type png)
+<use Images/05_results/effort_boxplot_live_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_live_OC_R^2.png  used
+ on input line 122.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+[17 <./Images/05_results/effort_boxplot_test_OC_RMSE.png>]
+<Images/05_results/effort_boxplot_live_OC_RMSE.png, id=188, 433.62pt x 289.08pt
+>
+File: Images/05_results/effort_boxplot_live_OC_RMSE.png Graphic file (type png)
+
+<use Images/05_results/effort_boxplot_live_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/effort_boxplot_live_OC_RMSE.png  use
+d on input line 129.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+
+! Undefined control sequence.
+l.137     \toprule
+                  
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.139     \midrule
+                  
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.150     \bottomrule
+                     
+? 
+[18 <./Images/05_results/effort_boxplot_live_OC_R^2.png> <./Images/05_results/e
+ffort_boxplot_live_OC_RMSE.png>]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\begingroup' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<let>-command' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@nomath' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\begingroup' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\setbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\thinmuskip' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\medmuskip' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\m@ne' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\thickmuskip' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ne' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\setbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\tw@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<def>-command' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@tempa' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathchoice' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\displaystyle' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\textstyle' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\scriptstyle' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\hbox' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\scriptscriptstyle' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\endgroup' on input line 156.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 156.
+
+<Images/05_results/wrench_boxplot_test_non_OC_R^2.png, id=197, 433.62pt x 289.0
+8pt>
+File: Images/05_results/wrench_boxplot_test_non_OC_R^2.png Graphic file (type p
+ng)
+<use Images/05_results/wrench_boxplot_test_non_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_test_non_OC_R^2.png  
+used on input line 161.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+<Images/05_results/wrench_boxplot_test_non_OC_RMSE.png, id=198, 433.62pt x 289.
+08pt>
+File: Images/05_results/wrench_boxplot_test_non_OC_RMSE.png Graphic file (type 
+png)
+<use Images/05_results/wrench_boxplot_test_non_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_test_non_OC_RMSE.png 
+ used on input line 168.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+[19 <./Images/05_results/wrench_boxplot_test_non_OC_R^2.png>]
+! Undefined control sequence.
+l.177     \toprule
+                  
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.179     \midrule
+                  
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.190     \bottomrule
+                     
+? 
+<Images/05_results/wrench_boxplot_live_non_OC_R^2.png, id=208, 433.62pt x 289.0
+8pt>
+File: Images/05_results/wrench_boxplot_live_non_OC_R^2.png Graphic file (type p
+ng)
+<use Images/05_results/wrench_boxplot_live_non_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_live_non_OC_R^2.png  
+used on input line 197.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+[20 <./Images/05_results/wrench_boxplot_test_non_OC_RMSE.png>]
+<Images/05_results/wrench_boxplot_live_non_OC_RMSE.png, id=216, 433.62pt x 289.
+08pt>
+File: Images/05_results/wrench_boxplot_live_non_OC_RMSE.png Graphic file (type 
+png)
+<use Images/05_results/wrench_boxplot_live_non_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_live_non_OC_RMSE.png 
+ used on input line 204.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+ [21 <./Images/05_results/wrench_boxplot_live_non_OC_R^2.png>]
+! Undefined control sequence.
+l.213     \toprule
+                  
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.215     \midrule
+                  
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.226     \bottomrule
+                     
+? 
+<Images/05_results/wrench_boxplot_test_OC_R^2.png, id=223, 433.62pt x 289.08pt>
+
+File: Images/05_results/wrench_boxplot_test_OC_R^2.png Graphic file (type png)
+<use Images/05_results/wrench_boxplot_test_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_test_OC_R^2.png  used
+ on input line 233.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+[22 <./Images/05_results/wrench_boxplot_live_non_OC_RMSE.png>]
+<Images/05_results/wrench_boxplot_test_OC_RMSE.png, id=231, 433.62pt x 289.08pt
+>
+File: Images/05_results/wrench_boxplot_test_OC_RMSE.png Graphic file (type png)
+
+<use Images/05_results/wrench_boxplot_test_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_test_OC_RMSE.png  use
+d on input line 240.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+
+! Undefined control sequence.
+l.248     \toprule
+                  
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.250     \midrule
+                  
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.261     \bottomrule
+                     
+? 
+[23 <./Images/05_results/wrench_boxplot_test_OC_R^2.png> <./Images/05_results/w
+rench_boxplot_test_OC_RMSE.png>]
+<Images/05_results/wrench_boxplot_live_OC_R^2.png, id=240, 433.62pt x 289.08pt>
+
+File: Images/05_results/wrench_boxplot_live_OC_R^2.png Graphic file (type png)
+<use Images/05_results/wrench_boxplot_live_OC_R^2.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_live_OC_R^2.png  used
+ on input line 268.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+<Images/05_results/wrench_boxplot_live_OC_RMSE.png, id=241, 433.62pt x 289.08pt
+>
+File: Images/05_results/wrench_boxplot_live_OC_RMSE.png Graphic file (type png)
+
+<use Images/05_results/wrench_boxplot_live_OC_RMSE.png>
+Package pdftex.def Info: Images/05_results/wrench_boxplot_live_OC_RMSE.png  use
+d on input line 275.
+(pdftex.def)             Requested size: 452.9679pt x 301.99469pt.
+ [24 <./Images/05_results/wrench_boxplot_live_OC_R^2.png>]
+! Undefined control sequence.
+l.284     \toprule
+                  
+? 
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.286     \midrule
+                  
+? 
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.297     \bottomrule
+                     
+? 
+) (./Sections/6_summary_and_outlook.tex
+chapter 5.
+[25 <./Images/05_results/wrench_boxplot_live_OC_RMSE.png>])
+(./Utils/bibliography.tex [26]
+
+LaTeX Warning: Empty bibliography on input line 3.
+
 \tf@lof=\write9
 \openout9 = `APE.lof'.
 
- [14
+[27
 
-] (build/APE.lot)
+
+]
 \tf@lot=\write10
 \openout10 = `APE.lot'.
 
- [15
+ [28
 
-] (build/APE.lol)
+]
 \tf@lol=\write11
 \openout11 = `APE.lol'.
 
- [16
+ [29
 
-])
-(./Utils/appendix.tex
+]) (./Utils/appendix.tex
 chapter A.
-[17
+[30
 
 
 ]
 chapter B.
-) [18
+) [31
 
 ] (build/APE.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package biblatex Warning: Please (re)run Biber on the file:
+(biblatex)                APE
+(biblatex)                and rerun LaTeX afterwards.
+
 Package logreq Info: Writing requests to 'APE.run.xml'.
 \openout1 = `APE.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 41486 strings out of 480171
- 834094 string characters out of 5894489
- 1716131 words of memory out of 5000000
- 58613 multiletter control sequences out of 15000+600000
- 512498 words of font info for 76 fonts, out of 8000000 for 9000
+ 41542 strings out of 480171
+ 836725 string characters out of 5894489
+ 1715614 words of memory out of 5000000
+ 58639 multiletter control sequences out of 15000+600000
+ 524314 words of font info for 114 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 122i,20n,120p,10601b,2505s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 122i,21n,120p,10601b,1877s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucr
-r8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on build/APE.pdf (25 pages, 314540 bytes).
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr
+/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/urw/helvetic/uhvr8a.pfb>
+Output written on build/APE.pdf (37 pages, 496622 bytes).
 PDF statistics:
- 494 PDF objects out of 1000 (max. 8388607)
- 434 compressed objects within 5 object streams
- 114 named destinations out of 1000 (max. 500000)
- 361 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 462 PDF objects out of 1000 (max. 8388607)
+ 355 compressed objects within 4 object streams
+ 120 named destinations out of 1000 (max. 500000)
+ 303 words of extra memory for PDF output out of 10000 (max. 10000000)
 
