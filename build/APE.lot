@@ -1,10 +1,2 @@
 \babel@toc {english}{}\relax 
-\contentsline {table}{\numberline {\small 1\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model metrics on effort \(\mathcal {D}_{\text {Cartesian}}\) test data\relax }}{14}{table.caption.10}%
-\contentsline {table}{\numberline {\small 2\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model live prediction metrics on effort Cartesian trajectories without changing orientation\relax }}{16}{table.caption.13}%
-\contentsline {table}{\numberline {\small 3\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model metrics on effort \(\mathcal {D}_{\text {CartesianOC}}\) test data\relax }}{17}{table.caption.16}%
-\contentsline {table}{\numberline {\small 4\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model live prediction metrics on effort Cartesian trajectories with changing orientation\relax }}{19}{table.caption.19}%
-\contentsline {table}{\numberline {\small 5\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model metrics on effort \(\mathcal {D}_{\text {Cartesian}}\) test data\relax }}{20}{table.caption.22}%
-\contentsline {table}{\numberline {\small 6\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {effort}}\) model live prediction metrics on effort Cartesian trajectories without changing orientation\relax }}{22}{table.caption.25}%
-\contentsline {table}{\numberline {\small 7\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model metrics on effort \(\mathcal {D}_{\text {CartesianOC}}\) test data\relax }}{24}{table.caption.28}%
-\contentsline {table}{\numberline {\small 8\normalsize }{\ignorespaces \(\boldsymbol {GP}_{\text {wrench}}\) model live prediction metrics on wrench Cartesian trajectories with changing orientation\relax }}{25}{table.caption.31}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
