@@ -1,9 +1,0 @@
-\babel@toc {english}{}\relax 
-\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
-\contentsline {chapter}{\numberline {2}State of the Art}{1}{chapter.2}%
-\contentsline {section}{\numberline {2.1}One-page condensed SoA summary for Q1}{1}{section.2.1}%
-\contentsline {chapter}{\nonumberline Bibliography}{3}{chapter*.8}%
-\contentsline {chapter}{\nonumberline List of Figures}{4}{chapter*.9}%
-\contentsline {chapter}{\nonumberline List of Tables}{5}{chapter*.10}%
-\contentsline {chapter}{\nonumberline List of source codes}{6}{chapter*.11}%
-\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
