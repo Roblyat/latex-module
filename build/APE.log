@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.18)  20 NOV 2025 22:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.20)  21 NOV 2025 12:08
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -7,12 +7,8 @@ entering extended mode
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-11-06>
 (./BASE/twbook.cls
-
-LaTeX Warning: You have requested document class `BASE/twbook',
-               but the document class provides `twbook'.
-
-Document Class: twbook 2023/10/24 v3.0 Standard LaTeX Dokumenten-Klasse fuer Do
-kumente der FH Technikum Wien
+Document Class: BASE/twbook 2023/10/24 v3.0 Standard LaTeX Dokumenten-Klasse fu
+er Dokumente der FH Technikum Wien
 (/usr/local/texlive/2025/texmf-dist/tex/latex/koma-script/scrbook.cls
 Document Class: scrbook 2025/09/09 v3.48 KOMA-Script document class (book)
 (/usr/local/texlive/2025/texmf-dist/tex/latex/koma-script/scrkbase.sty
@@ -1535,8 +1531,8 @@ chapter 2.
 [1
 
 ]
-LaTeX Font Info:    Trying to load font information for TS1+phv on input line 2
-1.
+LaTeX Font Info:    Trying to load font information for TS1+phv on input line 5
+4.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ts1phv.fd
 File: ts1phv.fd 2020/03/25 scalable font definitions for TS1/phv.
 ))
@@ -1591,8 +1587,8 @@ Overfull \hbox (18.35674pt too wide) in paragraph at lines 4--4
  [6
 
 ])
-runsystem(latexminted cleantemp  --timestamp 20251120221849Z 85FB93A8EE94404996
-92DA24A1621769)...executed.
+runsystem(latexminted cleantemp  --timestamp 20251121120818 85FB93A8EE944049969
+2DA24A1621769)...executed.
 
  (build/APE.aux)
  ***********
@@ -1606,7 +1602,7 @@ Package logreq Info: Writing requests to 'APE.run.xml'.
 Here is how much of TeX's memory you used:
  43330 strings out of 467538
  898037 string characters out of 5419551
- 1983328 words of memory out of 5000000
+ 1983333 words of memory out of 5000000
  71534 multiletter control sequences out of 15000+600000
  662760 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1616,7 +1612,7 @@ Here is how much of TeX's memory you used:
 /usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></
 usr/local/texlive/2025/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/loc
 al/texlive/2025/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on build/APE.pdf (12 pages, 161630 bytes).
+Output written on build/APE.pdf (12 pages, 161568 bytes).
 PDF statistics:
  167 PDF objects out of 1000 (max. 8388607)
  139 compressed objects within 2 object streams
