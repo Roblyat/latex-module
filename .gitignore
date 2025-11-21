@@ -1,0 +1,5 @@
+# Ignore everything in build/
+build/*
+
+# But NOT APE.pdf
+!build/APE.pdf
