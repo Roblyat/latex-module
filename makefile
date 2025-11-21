@@ -1,10 +1,10 @@
-DOC?=APE
-TEXDIR=.
+DOC ?= APE
+TEXDIR = .
 
 all: build/$(DOC).pdf
 
 build/$(DOC).pdf: $(TEXDIR)/$(DOC).tex
-	latexmk -shell-escape -pdf -outdir=build $(TEXDIR)/$(DOC)
+	latexmk -pdf -shell-escape -outdir=build $(TEXDIR)/$(DOC)
 
 clean:
 	latexmk -C -outdir=build $(TEXDIR)/$(DOC)
