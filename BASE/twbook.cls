@@ -10,7 +10,7 @@
 %% 
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{twbook}[2023/10/24 v3.0 Standard LaTeX Dokumenten-Klasse fuer Dokumente der FH Technikum Wien]
+\ProvidesClass{BASE/twbook}[2023/10/24 v3.0 Standard LaTeX Dokumenten-Klasse fuer Dokumente der FH Technikum Wien]
 
 \newcommand{\sprache}{english}
 \DeclareOption{german}{\renewcommand*{\sprache}{german}}
