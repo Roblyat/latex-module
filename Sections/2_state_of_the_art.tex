@@ -1,4 +1,46 @@
 \chapter{State of the Art}
+\section{Research Strategy}
+
+    \begin{itemize}
+    \item $C_1  =$ Classical / Observers
+    \item $C_2  =$ Gaussian Process (GP)
+    \item $C_3  =$ Deep Sequence Models (MLP / GRU / TCN / Transformer / LSTM)
+    \item $C_4  =$ Physics-Informed / Differentiable
+    \item $C_5  =$ Surveys
+    \item $C_T  =$ Goal \& Domain Terms
+    \begin{itemize}
+        \item $C_{mt} =$ Estimation \& Modeling Terms
+        \item $C_{ct} =$ Robotics Context Terms
+    \end{itemize}
+    \end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\columnwidth]{Images/2_state_of_art/query_logic.drawio.png}
+    \caption[query logic]{Query logic used to categorise the SoA papers. Each category $Q_i$ is formed by combining content clusters $C_i$ with estimation \& modelling terms $C_{mt}$ and robotics context terms $C_{ct}$. 
+        The combined representation $C$ and query set $Q$ are formed by the union of their respective subsets.}\label{fig:query_logic}
+    \end{figure}
+
+    Here is written that the terms of the categories are found in the appendix and why and how this Strategy is executed. Which then leads into the remaining 36 relevant SoA papers in this study.
+
+    \begin{table}[H]
+    \centering
+    \caption{Overview of query results by category.}\label{tab:query-results}
+    \begin{tabular}{lcccc}
+        \toprule
+        Query & Relev.\ SoA & Rigid-body & Payload & Both \\
+        \midrule
+        $\mathbf{Q_1 =}$ Classical / Observers        & 17 & 7  & 7  & 3 \\
+        $\mathbf{Q_2 =}$ Gaussian Process (GP)        &  4 & 4  & 0  & 0 \\
+        $\mathbf{Q_3 =}$ Deep Sequence Models         &  8 & 4  & 4  & 0 \\
+        $\mathbf{Q_4 =}$ Physics-Informed / Diff.\    &  5 & 5  & 0  & 0 \\
+        $\mathbf{Q_5 =}$ Surveys                      &  2 & -- & -- & -- \\ % chktex 8
+        \midrule
+        \textbf{Total}                                & \textbf{36} & \textbf{20} & \textbf{11} & \textbf{3} \\
+        \bottomrule
+    \end{tabular}
+    \end{table}
+
 \section{One-page condensed SoA summary for Q1}\label{sec:Q1_SoA_summary}
 Category Q1 groups classical \textbf{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on \textbf{linearly parameterised rigid-body dynamics (RBD) and LS/WLS regressors}, sometimes combined with observers and Kalman filters.
 Across the papers\cite{Q1_7_10947736}\cite{Q1_8_10944553}\cite{Q1_9_xu2022_double_weighting_payload_id}, \textbf{Least Squares (LS),
@@ -36,7 +78,7 @@ and Q1.17 combine RBD with \textbf{(adaptive) Kalman filters / disturbance
 approaches can yield \textbf{good EE force estimation and collision detection},
 but they are sensitive to model mismatch and friction modelling; Q1.17 reports
 good behaviour without external forces but large errors (up to $\approx
-    9\,\mathrm{Nm}$) under contact. \textbf{Sensorless interaction-force
+    9\,\mathrm{ Nm}$) under contact. \textbf{Sensorless interaction-force
     estimation} is addressed in Q1.3, Q1.12 and Q1.17. Q1.12, for example, uses
 LS-NE identification of $M(q)$, $C(q)$ and $G(q)$, then runs a
 \textbf{High-Order Finite-Time Observer (HOFFTO)} in joint space, using an FT
@@ -54,3 +96,5 @@ In summary, \textbf{Q1 methods show that classical LS-type identification and
     \item \textbf{Inertia} is consistently harder and requires \textbf{carefully designed dynamic excitation}, and still tends to be less accurate or weakly validated.
     \item \textbf{Torque prediction, contact detection and simple EE force estimation} are already at a high level with these methods, but they \textbf{rely on good friction modelling and reasonably accurate dynamics}.
 \end{itemize}
+
+
