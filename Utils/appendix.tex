@@ -108,7 +108,184 @@ $\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}}$ through the dependence on
 $\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega}$.
 
 
-
-
 \clearpage
-\chapter{Appendix B}
+\chapter{Query Categories - Index Terms}
+\label{app:query_categories}
+
+This appendix lists the index terms used to construct the query categories
+illustrated in Fig.~\ref{fig:query_logic}. The original nine term groups were
+consolidated into five content clusters $C_1,\dots,C_5$ and the goal/context
+term sets $C_{mt}$ and $C_{ct}$.
+
+\section*{Content Clusters $C_i$}
+
+\subsubsection*{$C_1$: Classical / Observers}
+
+\begin{itemize}
+  \item momentum observer (MO)
+  \item generalized momentum observer (GMO)
+  \item disturbance observer (DOB)
+  \item reaction force observer (RFOB)
+  \item Kalman filter (KF)
+  \item extended Kalman filter (EKF)
+  \item unscented Kalman filter (UKF)
+  \item state observer
+  \item least squares (LS)
+  \item weighted least squares (WLS)
+  \item iterative reweighted least squares (IRLS)
+  \item recursive least squares (RLS)
+  \item momentum-based observer
+  \item dynamic state observer
+  \item observer
+  \item force observer
+  \item torque observer
+\end{itemize}
+
+\subsubsection*{$C_2$: Gaussian Process (GP)}
+
+\begin{itemize}
+  \item gaussian process regression (GPR)
+  \item sparse gaussian process (SGP, SGPR)
+  \item multi-output gaussian process (MOGP)
+  \item multi-task gaussian process (MTGP)
+  \item gaussian process state space model (GPSSM)
+  \item hybrid gaussian process
+  \item GP residual
+  \item gaussian process dynamics
+  \item GP inverse dynamics
+  \item bayesian nonparametric regression (BNPR)
+\end{itemize}
+
+\subsubsection*{$C_3$: Deep Sequence Models (MLP / GRU / TCN / Transformer / LSTM)}
+
+\begin{itemize}
+  % original deep sequence model terms
+  \item neural network inverse dynamics (NN-ID)
+  \item deep learning
+  \item multi layer perceptron (MLP)
+  \item residual network (ResNet)
+  \item long short-term memory (LSTM)
+  \item gated recurrent unit (GRU)
+  \item temporal convolutional network (TCN)
+  \item causal convolution
+  \item dilated convolution
+  \item transformer model
+  \item attention model
+  \item sequence-to-sequence (seq2seq, S2S)
+  \item sequence GAN (SeqGAN, TimeGAN)
+  \item GAN
+  \item Generative Adversarial Networks
+  % from Hybrid/Residual: network-architecture side
+  \item residual neural network (ResNN)
+  \item residual GAN
+  % from Domain Adaptation / Latent Context
+  \item domain adaptation (DA)
+  \item transfer learning (TL)
+  \item meta learning (ML)
+  \item context variable dynamics
+  \item latent variable model (LVM)
+  \item amortized inference (AI)
+  \item test time adaptation (TTA)
+  \item online adaptation (OA)
+  \item feature invariance
+  \item domain invariant features (DIF)
+  \item few shot learning (FSL)
+  \item zero shot transfer (ZSL)
+  % from Reinforcement Learning
+  \item reinforcement
+  \item reinforcement learning
+  \item Isaac Gym differentiable
+  \item Isaac Lab differentiable
+  \item Isaac Gym
+  \item Isaac Lab
+\end{itemize}
+
+\subsubsection*{$C_4$: Physics-Informed / Differentiable}
+
+\begin{itemize}
+  % from Hybrid / Residual (dynamics-structure side)
+  \item residual learning dynamics
+  \item hybrid model dynamics
+  \item analytical dynamics neural network (ADNN)
+  \item physics residual
+  \item rigid body dynamics residual (RBD residual)
+  \item Newton Euler residual (NE residual)
+  \item nominal dynamics model (NDM)
+  \item neural correction
+  \item learning inverse dynamics residual (ID residual)
+  % original Physics-Informed / Differentiable terms
+  \item physics-informed neural network (PINN)
+  \item differentiable physics
+  \item differentiable simulation (DiffSim)
+  \item differentiable robot model
+  \item differentiable dynamics
+  \item neural ODE (NODE)
+  \item torchdiffeq
+  \item ODE-net
+  \item physics-guided machine learning robotics (PGML)
+\end{itemize}
+
+\subsubsection*{$C_5$: Surveys}
+
+\begin{itemize}
+  \item survey
+  \item benchmarking
+  \item review
+  \item overview
+  \item systematic comparison
+\end{itemize}
+
+\section*{Goal \& Domain Terms $C_T$}
+
+\subsubsection*{$C_{mt}$: Estimation \& Modeling Terms}
+
+\begin{itemize}
+  \item external force
+  \item force measurement
+  \item force estimation
+  \item force/torque estimation
+  \item wrench estimation
+  \item joint torque estimation
+  \item end-effector force
+  \item end-effector torque
+  \item inertial parameters
+  \item inertial parameter identification (IPI)
+  \item online payload identification
+  \item payload identification
+  \item payload estimation
+  \item object parameter estimation
+  \item parameter identification
+  \item inertia tensor
+  \item inertia tensor estimation
+  \item center of mass (CoM)
+  \item rigid body dynamics
+  \item friction approximation
+  \item nonlinear friction model
+  \item external perturbations
+  \item force torque sensor (F/T sensor)
+  \item external force estimation (EFE)
+  \item external torque estimation (ETE)
+  \item torque estimation
+  \item parameter identification differentiable simulation
+  \item payload identification (PI)
+  \item payload estimation (PE)
+  \item contact force
+  % broader, more generic terms used only in combination
+  \item nonlinear systems
+  \item noise
+  \item signal noise
+  \item noise estimation
+\end{itemize}
+
+Note that the last four entries (\emph{nonlinear systems}, \emph{noise}, \emph{signal noise}, \emph{noise estimation}) are generic terms that occur across many physical systems beyond robotic manipulators.
+Including them in the queries significantly increased the number of retrieved results.
+
+\subsubsection*{$C_{ct}$: Robotics Context Terms}
+
+\begin{itemize}
+  \item robotic manipulator
+  \item robotic arm
+  \item robotic manipulation
+  \item robot payload
+\end{itemize}
+\clearpage

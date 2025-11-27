@@ -1,5 +1,7 @@
 \chapter{State of the Art}
-\section{Research Strategy}
+    \section{Research Strategy}
+    The literature search was organised around five content clusters $C_1,\dots,C_5$ and the goal/context term sets $C_{mt}$ and $C_{ct}$. 
+    The clusters capture the main methodological families, while $C_{mt}$ and $C_{ct}$ constrain the queries to estimation-related objectives in robotic manipulation:
 
     \begin{itemize}
     \item $C_1  =$ Classical / Observers
@@ -14,18 +16,27 @@
     \end{itemize}
     \end{itemize}
 
+    The detailed index terms associated with each set are listed in 
+    Appendix~\ref{app:query_categories}. For each content cluster $C_i$, a family of queries $Q_i$ was constructed by combining
+    (disjunctions of) its index terms with estimation \& modelling terms from $C_{mt}$ and robotics context terms from $C_{ct}$.
+    Figure~\ref{fig:query_logic} illustrates this logic schematically as a generalised set intersection over the three term groups.
+
     \begin{figure}[H]
     \centering
     \includegraphics[width=1\columnwidth]{Images/2_state_of_art/query_logic.drawio.png}
-    \caption[query logic]{Query logic used to categorise the SoA papers. Each category $Q_i$ is formed by combining content clusters $C_i$ with estimation \& modelling terms $C_{mt}$ and robotics context terms $C_{ct}$. 
-        The combined representation $C$ and query set $Q$ are formed by the union of their respective subsets.}\label{fig:query_logic}
+    \caption[Query logic]{Query logic used to categorise the SoA papers. 
+        Each category $Q_i$ is formed by combining content clusters $C_i$ with estimation \& modelling terms $C_{mt}$ and robotics context terms $C_{ct}$. 
+        The combined representation $C$ and query set $Q$ are formed by the union of their respective subsets.}
+    \label{fig:query_logic}
     \end{figure}
 
-    Here is written that the terms of the categories are found in the appendix and why and how this Strategy is executed. Which then leads into the remaining 36 relevant SoA papers in this study.
+    This process yielded 36 papers that are directly relevant to robot and payload dynamics, interaction force estimation and related identification problems.
+    Table~\ref{tab:query-results} summarises how these works are distributed across the five query categories and distinguishes whether each paper focuses on robot rigid-body dynamics, payload dynamics, or both.
 
     \begin{table}[H]
     \centering
-    \caption{Overview of query results by category.}\label{tab:query-results}
+    \caption{Overview of query results by category.}
+    \label{tab:query-results}
     \begin{tabular}{lcccc}
         \toprule
         Query & Relev.\ SoA & Rigid-body & Payload & Both \\
@@ -40,6 +51,7 @@
         \bottomrule
     \end{tabular}
     \end{table}
+
 
 \section{One-page condensed SoA summary for Q1}\label{sec:Q1_SoA_summary}
 Category Q1 groups classical \textbf{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on \textbf{linearly parameterised rigid-body dynamics (RBD) and LS/WLS regressors}, sometimes combined with observers and Kalman filters.
