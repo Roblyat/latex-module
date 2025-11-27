@@ -52,61 +52,53 @@
     \end{tabular}
     \end{table}
 
+\section{SoA for Q1}\label{sec:Q1_SoA_summary}
 
-\section{One-page condensed SoA summary for Q1}\label{sec:Q1_SoA_summary}
-Category Q1 groups classical \textbf{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on \textbf{linearly parameterised rigid-body dynamics (RBD) and LS/WLS regressors}, sometimes combined with observers and Kalman filters.
-Across the papers\cite{Q1_7_10947736}\cite{Q1_8_10944553}\cite{Q1_9_xu2022_double_weighting_payload_id}, \textbf{Least Squares (LS),
-    Weighted LS (WLS) and LS-Newton-Euler (LS-NE) regressors} are the dominant
-tools for both \textbf{robot dynamic parameter identification (RDPI)} and
-\textbf{payload dynamic parameter identification (PDPI)}. They are used in
-joint space, in motor-current space and in sensor frames, and provide
-\textbf{strong performance for mass, centre of mass (CoM) and joint-torque
-    prediction} when trajectories are sufficiently exciting.
+Category Q1 groups classical \emph{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on linearly parameterised rigid-body dynamics (RBD) and LS/WLS-type Newton-Euler regressors,
+sometimes combined with observers and Kalman filters~\cite{Q1_1_fast_inertial_id_cobots,Q1_2_online_payload_mo,Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_10_duan_payload_ftsensor,Q1_12_huang_finite_time_observer,Q1_13_dynamic_model_id_swevers2007,Q1_14_long2022sliding_momentum_observer,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024,Q1_17_liu2021sensorless_dob_nn}.
+Across these works, three main lines of research can be distinguished: (i) payload dynamic parameter identification (PDPI) using force/torque (FT) sensing~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor},
+(ii) robot and payload dynamic parameter identification in joint or motor-current space without FT sensors~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024},
+and (iii) observer-based sensorless force/torque estimation and online payload identification using proprioceptive data~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_12_huang_finite_time_observer,Q1_14_long2022sliding_momentum_observer,Q1_17_liu2021sensorless_dob_nn,Q1_2_online_payload_mo}.  
+Across Q1, mass is usually identified accurately, CoM moderately well, and inertia emerges as the hardest quantity to estimate robustly~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024}.
 
-A large subset of works demonstrates that \textbf{neither a nominal CAD-based
-    RBD model nor an FT sensor is strictly necessary}.\cite{Q1_1_fast_inertial_id_cobots},\cite{Q1_15_tang2023wls_rwspo},\cite{Q1_5_payload_estimation_compensation_2025},\cite{Q1_6_hu2025_fdrdi},\cite{Q1_7_10947736}, Q1.5--Q1.8, Q1.13, Q1.15 and Q1.16 build the regressor
-directly from measured joint states and controller torques, sometimes in
-\textbf{fully decoupled formulations} or via \textbf{residual-torque
-    decomposition}. They use \textbf{constant-velocity/acceleration S-curve
-    trajectories, Fourier trajectories or repeated sections} to decorrelate
-parameters and improve conditioning. These approaches typically obtain
-\textbf{very good mass estimates and acceptable CoM}, with \textbf{inertia
-    remaining the weakest part of the identification}, especially for short
-trajectories.
+A first group of methods performs PDPI directly in the FT frame~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor}.
+They typically exploit static poses to identify the payload mass and centre of mass, and then use dedicated dynamic excitation trajectories together with LS or TLS-type Newton-Euler regressors to estimate the inertia tensor.
+Representative works demonstrate that, given a sufficiently informative excitation and an FT sensor rigidly mounted at the flange, payload mass can be recovered very accurately and CoM can be estimated with reasonable
+precision, even for heavy payloads~\cite{Q1_1_fast_inertial_id_cobots,Q1_7_10947736}.  
+However, inertia estimates are systematically more fragile---especially under cobot-typical safety constraints with short trajectories and low accelerations---and in several cases quantitative ground truth for CoM and inertia
+is missing or only partially available (validation is often given in terms of residual gravitational/inertial wrench after compensation rather than direct parameter error)~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor}.  
+Moreover, these approaches require additional FT hardware and considerable experimental effort in the form of carefully designed calibration motions.
 
-Several methods employ \textbf{two-stage pipelines}: static poses for mass and
-CoM, followed by dynamic trajectories for inertia (e.g.\ Q1.5 and Q1.7). Q1.7
-also shows that such schemes scale to \textbf{heavy ($\sim 40\,\mathrm{kg}$)
-    payloads}, and can feed into \textbf{contact force estimation and compensation}
-with moderate batch times ($\approx 10\,\mathrm{s}$ for contact, $\approx
-    40\,\mathrm{s}$ for payload).
+A second group tackles robot dynamic parameter identification (RDPI) and PDPI in joint space or motor-current space without FT sensors~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024}.  
+Here, fully or partially decoupled identification schemes are designed to separate gravitational, frictional and inertial effects, often using families of S-curve or Fourier trajectories executed both with and without
+payload~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007}.  
+Double-weighted WLS and optimisation-enhanced LS methods achieve very accurate joint-torque prediction and good agreement with CAD-based payload models, confirming that classical LS/NE pipelines---as systematised, for example, by Swevers et al.~\cite{Q1_13_dynamic_model_id_swevers2007}---remain a strong baseline
+for RDPI and PDPI~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024}.
+At the same time, most of these methods are offline, rely on repeated execution of long, highly exciting trajectories, and assume that payloads are rigidly mounted and change only between identification runs;
+even in works that introduce an online payload-identification stage~\cite{Q1_16_xu_payload_difference_2024}, the base robot model is still obtained by an offline procedure.
+They therefore provide an excellent commissioning tool, but do not by themselves endow the robot with continuous online awareness of changing tools and payloads during normal task execution.
 
-Where an \textbf{NRB model is available or identified offline}, it is commonly
-combined with \textbf{observers} for external torque and force estimation. Q1.2
-and Q1.3 use LS-NE-based torque prediction together with \textbf{momentum or
-    sliding-mode observers} to estimate external joint torques and EE forces. Q1.4
-and Q1.17 combine RBD with \textbf{(adaptive) Kalman filters / disturbance
-    observers} and explicit friction models (Stribeck or NN-based). These
-approaches can yield \textbf{good EE force estimation and collision detection},
-but they are sensitive to model mismatch and friction modelling; Q1.17 reports
-good behaviour without external forces but large errors (up to $\approx
-    9\,\mathrm{ Nm}$) under contact. \textbf{Sensorless interaction-force
-    estimation} is addressed in Q1.3, Q1.12 and Q1.17. Q1.12, for example, uses
-LS-NE identification of $M(q)$, $C(q)$ and $G(q)$, then runs a
-\textbf{High-Order Finite-Time Observer (HOFFTO)} in joint space, using an FT
-sensor only as ground truth. This yields \textbf{good joint-torque prediction
-    and acceptable EE force estimates}, but still depends on accurate offline
-dynamics. Finally, Q1.14 shows that combining LS-NE predicted torques with
-measured joint torques enables \textbf{robust collision detection and
-    localisation of the collided joint} using simple residual thresholds, again
-assuming a reasonably accurate NRB model.
+A third line of work focuses on sensorless estimation of external joint torques and end-effector wrenches using observers and filters~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_12_huang_finite_time_observer,Q1_14_long2022sliding_momentum_observer,Q1_17_liu2021sensorless_dob_nn}.
+Momentum observers, higher-order sliding-mode observers, adaptive Kalman filters and high-order finite-time observers use a nominal RBD model together with controller torques and joint measurements to reconstruct external forces,
+sometimes with probabilistic covariance information.  
+These methods achieve good performance in collision detection, binary contact decisions and execution monitoring, and some approaches augment classical friction models with learned nonlinear terms such as neural-network
+Stribeck approximations~\cite{Q1_3_external_torque_smo,Q1_14_long2022sliding_momentum_observer,Q1_17_liu2021sensorless_dob_nn}.
+Nevertheless, their accuracy depends critically on the quality of the underlying RBD and friction models, and residual force errors remain significant in highly dynamic phases or around velocity reversals~\cite{Q1_3_external_torque_smo,Q1_12_huang_finite_time_observer,Q1_17_liu2021sensorless_dob_nn}.
+Importantly, most observer-based schemes treat payloads and tools as fixed parts of the nominal model or as lumped disturbances, and do not explicitly estimate payload parameters.
 
-In summary, \textbf{Q1 methods show that classical LS-type identification and
-    observers are mature and effective}:
-\begin{itemize}
-    \item \textbf{Mass and CoM} can be identified very reliably, even \textbf{without NRB and without FT sensors}.
-    \item \textbf{Inertia} is consistently harder and requires \textbf{carefully designed dynamic excitation}, and still tends to be less accurate or weakly validated.
-    \item \textbf{Torque prediction, contact detection and simple EE force estimation} are already at a high level with these methods, but they \textbf{rely on good friction modelling and reasonably accurate dynamics}.
-\end{itemize}
+More recent contributions bridge RDPI/PDPI and observer-based estimation by using proprioceptive data to identify payload parameters online~\cite{Q1_2_online_payload_mo,Q1_16_xu_payload_difference_2024}.
+Momentum-observer-based schemes and parameter-difference methods compute external joint torques as residuals between measured and model-based torques and apply LS/RLS Newton-Euler regressors to recover payload mass, CoM and,
+in some cases, inertia during regular robot operation.  
+These works demonstrate that accurate online PDPI is possible without FT sensors, provided that a reasonably accurate base robot model, friction compensation and sufficiently exciting motions are available~\cite{Q1_2_online_payload_mo,Q1_16_xu_payload_difference_2024}.
+At the same time, they underline several structural limitations: inertia remains the hardest quantity to identify robustly; nonlinear friction, backlash and transmission effects must be modelled or learned carefully (with several authors explicitly noting residual error peaks near motion reversal due to unmodelled friction~\cite{Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo});
+and the resulting estimators still rely on a clear separation between ``robot model'' and ``payload'' rather than providing a unified, continuously updated representation of robot, tool and load.
+
+Taken together, the Q1 literature shows that classical model-based techniques can deliver high-quality RDPI and PDPI, as well as useful sensorless interaction-force estimates, but typically only under carefully controlled
+excitation and with significant offline calibration~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_12_huang_finite_time_observer,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024,Q1_17_liu2021sensorless_dob_nn}.
+From the perspective of this work, the main gaps are the lack of a unified, online notion of dynamic awareness that jointly covers robot, tool and payload; the persistent difficulty of reliably identifying and exploiting
+payload inertia in cobot-safe regimes; and the sensitivity of existing approaches to friction and transmission nonlinearities.
+These limitations directly motivate the methodological choices and objectives formulated in the problem statement and aim of work.
+
+
 
 

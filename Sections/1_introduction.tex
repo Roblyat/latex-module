@@ -81,6 +81,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
     in the literature, thereby motivating the contribution of this work.
 
         \subsection{Kinematic and Dynamic Background of Robot Manipulation and Environment Interaction}
+        \label{sec:robot_dynamics_background}
         The inertial properties of a rigid body are collected in the standard 10-dimensional parameter vector
         \begin{equation}
         \boldsymbol{\phi}^T
@@ -190,7 +191,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         \label{eq:F_measured_regressor}
         \end{equation}
 
-        where $Y(\cdot)$ is the $6\times 10$ Newton--Euler regressor matrix defined in the Appendix. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
+        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
         The motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$ are in turn determined by the joint state and motor torques through the nonlinear dynamics
         \eqref{eq:robot_dynamics}--\eqref{eq:I_payload}.
 
@@ -200,4 +201,25 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         Together, these aspects make dynamic awareness of payload, tool and robot a mathematically demanding inverse problem rather than a straightforward calculation from geometric or sensor data.
 
         \subsection{Limitations of the Current State of the Art}
-    \section{Aim of Work}
+        From the Q1 literature review in Section~\ref{sec:Q1_SoA_summary}, several limitations are particularly relevant for this work:
+        \begin{itemize}
+        \item \textbf{Separate treatment of robot, tool and payload.}
+        Most approaches either perform robot dynamic parameter identification (RDPI) in joint or motor space~\cite{Q1_6_hu2025_fdrdi,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo},
+        payload dynamic parameter identification (PDPI) in the FT frame~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor},
+        or sensorless interaction-force estimation via observers~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_12_huang_finite_time_observer,Q1_14_long2022sliding_momentum_observer,Q1_17_liu2021sensorless_dob_nn},
+        but they rarely provide a unified view of robot, tool and payload dynamics.
+
+        \item \textbf{Payload inertia is hard to identify robustly.}
+        While payload mass (and often CoM) can be estimated accurately, inertia tensors are frequently weakly excited, poorly conditioned or only partially validated,
+        in particular under cobot-safe excitation~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024}.
+
+        \item \textbf{Heavy reliance on dedicated excitation and offline calibration.}
+        Strong RDPI/PDPI results typically require carefully designed, long trajectories executed with and without payload and substantial offline processing~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024},
+        which is at odds with continuous online awareness during everyday collaborative tasks.
+
+        \item \textbf{Sensitivity to friction and transmission nonlinearities.}
+        Observer-based force estimators and classical LS/NE pipelines depend on reasonably accurate friction and transmission models; residual errors increase around velocity reversals and at higher speeds,
+        even when advanced observers or learned friction models are used~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_6_hu2025_fdrdi,Q1_12_huang_finite_time_observer,Q1_15_tang2023wls_rwspo,Q1_17_liu2021sensorless_dob_nn}.
+        \end{itemize}
+
+        These limitations show that, within Q1, there is still no compact, online representation of robot, tool and payload dynamics that is robust to friction and transmission effects and applicable under normal cobot operating conditions.
