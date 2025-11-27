@@ -1,6 +1,114 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Appendix
 \clearpage
 \appendix
-\chapter{Appendix A}
+\chapter{Appendix Kinematic and Dynamic Background of Robot Manipulation and Environment Interaction}
+The external wrench $\vec{F}_{\mathrm{ext}}$ in~\eqref{eq:tau_ext} is a
+6-dimensional vector expressed in the sensor/tool frame $S$,
+\begin{equation}
+  \vec{F}_{\mathrm{ext}}
+  =
+  \begin{bmatrix}
+    \mathbf{f} \\[2pt] \boldsymbol{\tau}
+  \end{bmatrix}
+  \in \mathbb{R}^6,
+\end{equation}
+with $\mathbf{f} \in \mathbb{R}^3$ the linear force and
+$\boldsymbol{\tau} \in \mathbb{R}^3$ the moment about the frame origin.
+For a rigid body with parameters $\boldsymbol{\phi}_{\mathrm{eff}}$
+(mass, CoM and inertia) moving with linear and angular motion
+$(\mathbf{a}, \boldsymbol{\alpha}, \boldsymbol{\omega})$, the Newton--Euler
+equations (cf.~\eqref{eq:newtonEuler}) give
+\begin{equation}
+  \begin{bmatrix}
+    \mathbf{f} \\[2pt] \boldsymbol{\tau}
+  \end{bmatrix}
+  =
+  m
+  \begin{bmatrix}
+    \mathbf{I} & -[\mathbf{c}]^{\times} \\
+    [\mathbf{c}]^{\times} & \mathbf{J}_s
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{a} \\[2pt] \boldsymbol{\alpha}
+  \end{bmatrix}
+  +
+  \begin{bmatrix}
+    m[\boldsymbol{\omega}]^{\times}[\boldsymbol{\omega}]^{\times}\mathbf{c} \\
+    [\boldsymbol{\omega}]^{\times}\mathbf{J}_s\boldsymbol{\omega}
+  \end{bmatrix}.
+\end{equation}
+
+The translational part $\mathbf{f}$ can be written as
+\begin{equation}
+  \mathbf{f}
+  =
+  m\mathbf{a}
+  - m[\mathbf{c}]^{\times}\boldsymbol{\alpha}
+  + m[\boldsymbol{\omega}]^{\times}[\boldsymbol{\omega}]^{\times}\mathbf{c},
+  \label{eq:f_expanded}
+\end{equation}
+where the first term $m\mathbf{a}$ is the familiar inertial force, while
+$- m[\mathbf{c}]^{\times}\boldsymbol{\alpha}$ and
+$m[\boldsymbol{\omega}]^{\times}[\boldsymbol{\omega}]^{\times}\mathbf{c}$
+collect the additional centripetal and Coriolis contributions induced by the angular motion
+$\boldsymbol{\omega}$ and the CoM offset $\mathbf{c}$. 
+Similarly, the rotational part $\boldsymbol{\tau}$ can be written as
+\begin{equation}
+  \boldsymbol{\tau}
+  =
+  m[\mathbf{c}]^{\times}\mathbf{a}
+  +
+  \mathbf{J}_s\boldsymbol{\alpha}
+  +
+  [\boldsymbol{\omega}]^{\times}\mathbf{J}_s\boldsymbol{\omega},
+  \label{eq:tau_expanded}
+\end{equation}
+where $\mathbf{J}_s\boldsymbol{\alpha}$ is the inertial moment due to angular acceleration,
+$m[\mathbf{c}]^{\times}\mathbf{a}$ is the torque induced by the translational acceleration of the offset CoM,
+and $[\boldsymbol{\omega}]^{\times}\mathbf{J}_s\boldsymbol{\omega}$ represents gyroscopic effects associated with the angular velocity $\boldsymbol{\omega}$.
+
+In compact form, for a
+given motion $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$ this can
+be written as
+\begin{equation}
+  \vec{F}_{\mathrm{ext}}
+  =
+  \vec{F}_{\mathrm{dyn}}(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega};
+                         \boldsymbol{\phi}_{\mathrm{eff}})
+  =
+  Y(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})\,
+  \boldsymbol{\phi}_{\mathrm{eff}},
+\end{equation}
+where $Y(\cdot)$ is a $6\times 10$ regressor matrix that is linear in
+$\boldsymbol{\phi}_{\mathrm{eff}}$ but nonlinear in the motion variables.
+Hence, $\vec{F}_{\mathrm{ext}}$ is not simply $m\mathbf{a}$, nor can it be
+written as $\boldsymbol{\phi}_{\mathrm{eff}}\ddot{\mathbf{q}}$; the mapping
+from joint accelerations $\ddot{\mathbf{q}}$ to $\vec{F}_{\mathrm{ext}}$
+passes through the robot kinematics and the Newton--Euler relations.
+
+Once the wrench at the flange is known, the corresponding joint torques are
+obtained via
+\begin{equation}
+  \boldsymbol{\tau}_{\mathrm{ext}}
+  =
+  {}^{S}\!J(\mathbf{q})^{\top}\,\vec{F}_{\mathrm{ext}},
+\end{equation}
+where ${}^{S}\!J(\mathbf{q})$ is the Jacobian of the sensor/tool frame $S$.
+Combining the relations above yields the identification-friendly form
+\begin{equation}
+  \boldsymbol{\tau}_{\mathrm{ext}}
+  =
+  \mathbf{J}^T(\mathbf{q})\,
+  Y(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})\,
+  \boldsymbol{\phi}_{\mathrm{eff}},
+\end{equation}
+which makes explicit that $\boldsymbol{\tau}_{\mathrm{ext}}$ is linear in
+$\boldsymbol{\phi}_{\mathrm{eff}}$, but nonlinear in
+$\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}}$ through the dependence on
+$\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega}$.
+
+
+
+
 \clearpage
 \chapter{Appendix B}
