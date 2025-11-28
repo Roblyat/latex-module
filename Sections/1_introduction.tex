@@ -201,25 +201,66 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         Together, these aspects make dynamic awareness of payload, tool and robot a mathematically demanding inverse problem rather than a straightforward calculation from geometric or sensor data.
 
         \subsection{Limitations of the Current State of the Art}
-        From the Q1 literature review in Section~\ref{sec:Q1_SoA_summary}, several limitations are particularly relevant for this work:
+
+        The SoA analysis in reveals several recurring gaps that are directly relevant for this work:
+
         \begin{itemize}
-        \item \textbf{Separate treatment of robot, tool and payload.}
-        Most approaches either perform robot dynamic parameter identification (RDPI) in joint or motor space~\cite{Q1_6_hu2025_fdrdi,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo},
-        payload dynamic parameter identification (PDPI) in the FT frame~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor},
-        or sensorless interaction-force estimation via observers~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_12_huang_finite_time_observer,Q1_14_long2022sliding_momentum_observer,Q1_17_liu2021sensorless_dob_nn},
-        but they rarely provide a unified view of robot, tool and payload dynamics.
+        \item \textbf{No unified dynamic representation of robot, tool and payload.}
+        Classical methods typically treat robot RDPI in joint or motor space, PDPI in the FT frame, and interaction-force estimation via observers as largely separate problems~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_13_dynamic_model_id_swevers2007,Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_12_han_finite_time_observer,Q1_14_long2022sliding_momentum_observer,Q1_17_liu2021sensorless_dob_nn} %\cite{Q1_1, Q1_5, Q1_6, Q1_7, Q1_13, Q1_3, Q1_4, Q1_12, Q1_14, Q1_17} 
+        GP-based approaches lump robot, tool, payload, friction and contact into a single disturbance term on top of a nominal RBD~\cite{Q2_1_contact_force_gp_observer,Q2_2_contact_force_gpadkf,Q2_3_contact_detection_gp,Q2_4_GIACOMUZZO20231584},
+        and deep sequence models either focus on contact / torque estimation or on payload identification, but not both in a single model~\cite{Q3_1_tao_bll,Q3_2_encoder_attention_payload,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q3_5_contact_localization_cnn,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting}. %~\cite{Q3_1, Q3_2, Q3_3, Q3_4, Q3_5 ,Q3_6, Q3_7, Q3_8}
+        Physics-informed networks provide accurate robot dynamics but assume a fixed tool/payload and contact-free operation~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277,Q4_5_10305255} %\cite{Q4_1, Q4_2, Q4_3, Q4_4, Q4_5}
+        None of these lines yields a compact, measurement-frame representation of the \emph{effective} rigid body (robot+tool+payload) together with its interaction wrench.
 
-        \item \textbf{Payload inertia is hard to identify robustly.}
-        While payload mass (and often CoM) can be estimated accurately, inertia tensors are frequently weakly excited, poorly conditioned or only partially validated,
-        in particular under cobot-safe excitation~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024}.
+        \item \textbf{Weak and fragmentary treatment of payload inertia and effective rigid body.}
+        In Q1, payload mass (and often CoM) can be estimated accurately, but inertia tensors are frequently weakly excited, ill-conditioned or only partially validated, especially in cobot-safe regimes~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024} %\cite{Q1_1, Q1_5, Q1_7, Q1_10, Q1_16}
+        Q2-Q4 largely \emph{assume} fixed tools/payloads and do not identify the full effective rigid body at all~\cite{Q2_1_contact_force_gp_observer,Q2_4_GIACOMUZZO20231584,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277} %\cite{Q2_1, Q2_4, Q3_3, Q3_4, Q4_1, Q4_3, Q4_4}
+        As a result, there is no robust, general mechanism to obtain and maintain an accurate $\boldsymbol{\phi}_{\mathrm{eff}}$ that could be used systematically for tool/gripper compensation and subsequent PDPI.
 
-        \item \textbf{Heavy reliance on dedicated excitation and offline calibration.}
-        Strong RDPI/PDPI results typically require carefully designed, long trajectories executed with and without payload and substantial offline processing~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024},
-        which is at odds with continuous online awareness during everyday collaborative tasks.
+        \item \textbf{Entangled or black-box treatment of friction, transmission and contact effects.}
+        Many observer-based and LS/NE methods in Q1 are highly sensitive to imperfect friction and transmission models; errors grow around velocity reversals and at higher speeds, even with advanced observers or NN friction terms~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_6_hu2025_fdrdi,Q1_12_han_finite_time_observer,Q1_15_tang2023wls_rwspo,Q1_17_liu2021sensorless_dob_nn} %\cite{Q1_3, Q1_4, Q1_6, Q1_12, Q1_15, Q1_17}
+        Q2 explicitly models all unmodelled dynamics, friction and contacts as a single GP disturbance~\cite{Q2_1_contact_force_gp_observer,Q2_2_contact_force_gpadkf,Q2_3_contact_detection_gp}, %\cite{Q2_1, Q2_2, Q2_3}
+        which improves prediction but makes it hard to separate payload, friction and contact contributions in a physics-consistent way.
+        Q3 and Q4 introduce powerful black-box or PINN components, but again focus on reducing torque/current residuals rather than producing explicit, structured estimates of friction and interaction
+        wrenches~\cite{Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_4_10729277}. %\cite{Q3_3, Q3_4, Q4_1, Q4_4}
 
-        \item \textbf{Sensitivity to friction and transmission nonlinearities.}
-        Observer-based force estimators and classical LS/NE pipelines depend on reasonably accurate friction and transmission models; residual errors increase around velocity reversals and at higher speeds,
-        even when advanced observers or learned friction models are used~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_6_hu2025_fdrdi,Q1_12_huang_finite_time_observer,Q1_15_tang2023wls_rwspo,Q1_17_liu2021sensorless_dob_nn}.
+        \item \textbf{Dependence on carefully designed excitation and repeated with/without-payload experiments.}
+        Strong RDPI/PDPI results in Q1 and Q3 typically rely on long, highly exciting trajectories (S-curves, Fourier/RRT paths) and repeated runs with and without payloads, often for each new object~\cite{Q1_1_fast_inertial_id_cobots,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_16_xu_payload_difference_2024,Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting} %\cite{Q1_1, Q1_6, Q1_7, Q1_8, Q1_9, Q1_13, Q1_16, Q3_2, Q3_6, Q3_7, Q3_8}
+        This calibration-style use of offline data is practical for commissioning, but gives limited evidence that a single offline-trained model, once obtained, can provide robust dynamic awareness across diverse everyday
+        motions and payload changes without further re-identification.
+
+        \item \textbf{Limited use of temporal models for physics-consistent PDPI and force estimation.}
+        Deep sequence models (LSTM/GRU/TCN) are used in Q3 either for torque/force prediction~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q3_5_contact_localization_cnn} %\cite{Q3_1, Q3_3, Q3_4, Q3_5}
+        or for payload classification/estimation in largely static mappings~\cite{Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting} %\cite{Q3_2, Q3_6, Q3_7, Q3_8}
+        No existing work combines a sequence model with an explicit effective rigid-body representation to jointly provide accurate joint-torque prediction, tool/gripper compensation and interaction-force estimation in the
+        measurement frame.
         \end{itemize}
 
-        These limitations show that, within Q1, there is still no compact, online representation of robot, tool and payload dynamics that is robust to friction and transmission effects and applicable under normal cobot operating conditions.
+        Overall, the current SoA provides strong ingredients—classical LS/NE regressors, GP residuals, sequence models and physics-informed networks—but does not yet offer a compact, measurement-frame model that endows a
+        manipulator with unified, robust dynamic awareness of its own robot-tool-payload system and its interaction forces under realistic cobot operating conditions.
+
+    \section{Aim of Work}
+
+    The SoA review suggests that the strongest results for robot inverse dynamics and friction modelling are obtained when \emph{physics-structured} networks such as DeLaN/PINN are combined with data-driven residual learners.
+    Extended DeLaN models can capture motor couplings and current–torque relations with high accuracy from encoder and motor data alone~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning},
+    while recent PINN-based approaches demonstrate that adding a learned residual (e.g.\ TCN) on top of a structured dynamics model yields state-of-the-art joint-torque prediction and friction compensation on industrial
+    robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}.
+    These works, however, focus purely on RDPI for a fixed robot-tool configuration and do not provide an explicit, measurement-frame model of the effective rigid body (robot+tool+payload) or its interaction wrench.
+
+    The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that serves as a strong basis for tool/gripper compensation and, ultimately,
+    payload dynamic parameter identification.
+    Concretely, the work pursues the following objectives:
+    \begin{itemize}
+    \item Use a DeLaN-style structured network to learn the nominal robot inverse dynamics from joint states and motor currents, including joint friction and drive-train effects, following the ideas
+          of~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning,Q4_4_10729277}.
+            The model is trained \emph{offline} on carefully designed excitation trajectories (in simulation in this thesis), and then deployed for real-time torque prediction during operation.
+    \item Augment this structured model with a recurrent sequence model (LSTM) that takes joint histories and DeLaN residuals as input and learns to predict the remaining flange wrench in the measurement frame.
+            This separates the well-modelled robot base dynamics from the effective rigid-body contribution of tool and gripper, providing a compact representation of $\boldsymbol{\phi}_{\mathrm{eff}}$–induced effects that
+            is consistent with the kinematic and Newton-Euler background developed in Section~\ref{sec:problem_statement}.
+    \item Evaluate the resulting DeLaN+LSTM architecture as a foundation for PDPI: first by quantifying its ability to compensate tool/gripper dynamics and predict joint torques across diverse trajectories, then by analysing
+          how accurately the inferred effective wrench tracks changes in attached loads.
+    \end{itemize}
+
+    By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this work aims to move from the fragmented, calibration-heavy SoA towards a unified and practically
+    deployable notion of dynamic awareness:
+    a robot that can reliably predict its own joint torques and separate its intrinsic dynamics from tool and payload effects in the measurement frame, under cobot-typical operating conditions.
