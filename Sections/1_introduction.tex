@@ -191,12 +191,12 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         \label{eq:F_measured_regressor}
         \end{equation}
 
-        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
+        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix \ref{app:query_categories}. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
         The motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$ are in turn determined by the joint state and motor torques through the nonlinear dynamics
         \eqref{eq:robot_dynamics}--\eqref{eq:I_payload}.
 
         From an identification viewpoint, this creates two tightly coupled challenges. 
-        First, all available measurements (joint currents, positions, velocities and flange wrench) depend on the \emph{combined} dynamics of robot, tool and load via the nonlinear relationships~\eqref{eq:robot_dynamics}–\eqref{eq:F_measured_regressor}, so the contribution of the load parameters $\boldsymbol{\phi}_{\mathrm{load}}$ cannot be isolated by simple computation or direct measurement. 
+        First, all available measurements (joint currents, positions, velocities and flange wrench) depend on the \emph{combined} dynamics of robot, tool and load via the nonlinear relationships~\eqref{eq:robot_dynamics}-\eqref{eq:F_measured_regressor}, so the contribution of the load parameters $\boldsymbol{\phi}_{\mathrm{load}}$ cannot be isolated by simple computation or direct measurement. 
         Second, accurate payload or load dynamic parameter identification (PDPI) presupposes an equally accurate compensation of the underlying robot–tool dynamics, including unmodelled effects such as friction and joint transmission nonlinearities. 
         Together, these aspects make dynamic awareness of payload, tool and robot a mathematically demanding inverse problem rather than a straightforward calculation from geometric or sensor data.
 
@@ -230,7 +230,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         \end{itemize}
 
         (Overall, the current SoA provides strong ingredients—classical LS/NE regressors, GP residuals, sequence models and physics-informed networks—but does not yet offer a compact, measurement-frame model that endows a
-        manipulator with unified, robust dynamic awarenss of its own robot-tool-payload system and its interaction forces under realistic cobot operating conditions.)
+        manipulator with unified, robust dynamic awarenss of its own robot-tool-payload system under realistic cobot operating conditions.)
 
     \section{Aim of Work}
 
@@ -249,7 +249,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
             The model is trained \emph{offline} on carefully designed excitation trajectories (in simulation in this thesis), and then deployed for real-time torque prediction during operation.
     \item Augment this structured model with a recurrent sequence model (LSTM) that takes joint histories and DeLaN residuals as input and learns to predict the remaining flange wrench in the measurement frame.
             This separates the well-modelled robot base dynamics from the effective rigid-body contribution of tool and gripper, providing a compact representation of $\boldsymbol{\phi}_{\mathrm{eff}}$–induced effects that
-            is consistent with the kinematic and Newton-Euler background developed in Section~\ref{sec:problem_statement}.
+            is consistent with the kinematic and Newton-Euler background developed in Section~\ref{sec:robot_dynamics_background}.
     \item Evaluate the resulting DeLaN+LSTM architecture as a foundation for PDPI: first by quantifying its ability to compensate tool/gripper dynamics and predict joint torques across diverse trajectories, then by analysing
           how accurately the inferred effective wrench tracks changes in attached loads.
     \end{itemize}

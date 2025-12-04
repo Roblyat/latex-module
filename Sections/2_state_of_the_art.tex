@@ -33,7 +33,8 @@
     \vspace{0.75\baselineskip}
 
     This process yielded 36 papers that are directly relevant to robot and payload dynamics, interaction force estimation and related identification problems.
-    Table~\ref{tab:query-results} summarises how these works are distributed across the five query categories and distinguishes whether each paper focuses on robot rigid-body dynamics, payload dynamics, or both.
+    Table~\ref{tab:query-results} summarises how these works are distributed across the five query categories and counts, for each category, how many papers address payload dynamics, robot rigid-body dynamics,
+    and contact-force estimation (papers that treat payload and rigid-body dynamics contribute to both columns); the corresponding relations are visualised in the concept graph in Fig.~\ref{fig:SoA_concept_graph}.
 
     \begin{table}[H]
     \centering
@@ -41,15 +42,15 @@
     \label{tab:query-results}
     \begin{tabular}{lcccc}
         \toprule
-        Query & Relev.\ SoA & Rigid-body & Payload & Both \\
+        Query & Relev.\ SoA & Payload & Rigid-body & Contact Force \\
         \midrule
-        $\mathbf{Q_1 =}$ Classical / Observers        & 17 & 7  & 7  & 3 \\
-        $\mathbf{Q_2 =}$ Gaussian Process (GP)        &  4 & 4  & 0  & 0 \\
-        $\mathbf{Q_3 =}$ Deep Sequence Models         &  8 & 4  & 4  & 0 \\
-        $\mathbf{Q_4 =}$ Physics-Informed / Diff.\    &  5 & 5  & 0  & 0 \\
+        $\mathbf{Q_1 =}$ Classical / Observers        & 17 & 10 & 8 & 3  \\
+        $\mathbf{Q_2 =}$ Gaussian Process (GP)        &  4 & 0  & 1  & 3  \\
+        $\mathbf{Q_3 =}$ Deep Sequence Models         &  8 & 4  & 3  & 1  \\
+        $\mathbf{Q_4 =}$ Physics-Informed / Diff.\    &  5 & 0  & 5  & 0  \\
         $\mathbf{Q_5 =}$ Surveys                      &  2 & -- & -- & -- \\ % chktex 8
         \midrule
-        \textbf{Total}                                & \textbf{36} & \textbf{20} & \textbf{11} & \textbf{3} \\
+        \textbf{Total}                                & \textbf{36} & \textbf{14} & \textbf{17} & \textbf{7} \\
         \bottomrule
     \end{tabular}
     \end{table}
@@ -192,9 +193,12 @@ Thus, Q4 provides strong structured baselines for fixed robot dynamics, but does
 
     \begin{figure}[H]
     \centering
-    \includegraphics[width=1\columnwidth]{Images/2_state_of_art/250926_concept_graph.drawio.png}
-    \caption[Query logic]{Query logic used to categorise the SoA papers. 
-        Each category $Q_i$ is formed by combining content clusters $C_i$ with estimation \& modelling terms $C_{mt}$ and robotics context terms $C_{ct}$. 
-        The combined representation $C$ and query set $Q$ are formed by the union of their respective subsets.}
-    \label{fig:query_logic}
+    \includegraphics[width=1\columnwidth]{Images/2_state_of_art/251202_concept_graph.drawio.png}
+    \caption[Concept graph of the SoA literature]{The Concept graph summarising the reviewed literature. 
+    Green nodes represent method categories Q1–Q4 with node the size proportional to the number of papers in each category. 
+    Blue nodes denote the main estimation goals scaled by how many papers address each goal. 
+    Red nodes correspond to individual references R1–R34; their diameter is proportional to the citation count (clipped at the maximum). 
+    Directed edges indicate that a given reference belongs to a method category and contributes to one or more estimation goals. R1-R34 table in Appendix \ref{soa_references_graph}}
+
+    \label{fig:SoA_concept_graph}
     \end{figure}
