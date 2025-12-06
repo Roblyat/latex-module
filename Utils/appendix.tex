@@ -289,7 +289,7 @@ Including them in the queries significantly increased the number of retrieved re
   \item robot payload
 \end{itemize}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Concept Graph}
 \label{soa_references_graph}
 
@@ -341,3 +341,161 @@ R34 & \cite{Q4_5_10305255}                               & 2023 & IEEE          
 \bottomrule
 \end{tabular}
 \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{DeLaN parameterisation and friction model}
+
+\section{Inertia subnetwork}
+
+Following \cite{Q4_6_HU2026103093}, the symmetric positive-definite inertia
+matrix $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q}) \in \mathbb{R}^{n\times n}$
+is obtained from a learned Cholesky factor.
+We parameterise a lower–triangular matrix
+$\hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)$ and set
+\begin{equation}
+  \mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})
+  =
+  \hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)\,
+  \hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)^{\top}.
+  \label{eq:app_M_from_L}
+\end{equation}
+The factor $\hat{\mathbf{L}}$ is decomposed into a strictly lower–triangular
+part and a diagonal part,
+\begin{equation}
+  \hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)
+  =
+  \mathbf{L}_o(\mathbf{q};\boldsymbol{\theta}_o)
+  +
+  \mathbf{L}_d(\mathbf{q};\boldsymbol{\theta}_d),
+\end{equation}
+where both $\mathbf{L}_o$ and $\mathbf{L}_d$ are represented by multilayer
+perceptrons (MLPs) taking $\mathbf{q}$ as input:
+
+\begin{itemize}
+  \item $\mathbf{L}_o(\mathbf{q};\boldsymbol{\theta}_o)$ is lower–triangular
+        with zero diagonal entries and uses a linear output layer.
+  \item $\mathbf{L}_d(\mathbf{q};\boldsymbol{\theta}_d)$ is diagonal.
+        Its diagonal elements are obtained as
+        \[
+          [\mathbf{L}_d]_{ii}
+          =
+          \mathrm{ReLU}\bigl(h_i(\mathbf{q})\bigr) + \varepsilon,
+        \]
+        where $h_i$ is the $i$-th output of an MLP and $\varepsilon>0$ is a
+        small constant. The ReLU+offset guarantees strictly positive diagonal
+        entries and hence $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q}) \succ 0$
+        for all $\mathbf{q}$.
+\end{itemize}
+
+In practice, all three MLPs ($\mathbf{L}_o$, $\mathbf{L}_d$, and the potential
+network below) use sinusoidal activation functions as suggested
+by~\cite{Q4_6_HU2026103093}, since for revolute manipulators the dynamic
+terms can be written as linear combinations of $\sin(\cdot)$ and
+$\cos(\cdot)$.
+
+\section{Potential and gravity subnetworks}
+
+The conservative part of the dynamics is encoded by a learned
+Lagrangian
+\begin{equation}
+  \mathcal{L}_{\boldsymbol{\theta}}(\mathbf{q},\dot{\mathbf{q}})
+  =
+  \tfrac{1}{2}\,\dot{\mathbf{q}}^{\top}
+  \mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})\,\dot{\mathbf{q}}
+  -
+  V_{\boldsymbol{\theta}_V}(\mathbf{q}),
+\end{equation}
+where $V_{\boldsymbol{\theta}_V}(\mathbf{q})$ is represented by another MLP
+(the “potential” subnetwork) with parameters $\boldsymbol{\theta}_V$.
+Using automatic differentiation we obtain the gravity vector as the
+gradient of the potential,
+\begin{equation}
+  \mathbf{G}_{\boldsymbol{\theta}}(\mathbf{q})
+  =
+  \frac{\partial V_{\boldsymbol{\theta}_V}(\mathbf{q})}{\partial \mathbf{q}}
+  \approx
+  \mathbf{g}(\mathbf{q}).
+\end{equation}
+This is equivalent, up to the choice of parameterisation, to the gravity
+MLP $\hat{\mathbf{g}}(\mathbf{q};\boldsymbol{\psi}_g)$ used
+in~\cite{Q4_6_HU2026103093}, but keeps the explicit Lagrangian structure.
+
+Together with the inertia matrix~\eqref{eq:app_M_from_L}, the conservative
+torques are
+\begin{equation}
+  \boldsymbol{\tau}_{\mathrm{cons}}
+  (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta})
+  =
+  \mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})\,\ddot{\mathbf{q}}
+  +
+  \mathbf{C}_{\boldsymbol{\theta}}(\mathbf{q},\dot{\mathbf{q}})\,\dot{\mathbf{q}}
+  +
+  \mathbf{G}_{\boldsymbol{\theta}}(\mathbf{q}),
+\end{equation}
+with the Coriolis/centrifugal term
+$\mathbf{C}_{\boldsymbol{\theta}}(\mathbf{q},\dot{\mathbf{q}})\dot{\mathbf{q}}$
+obtained from $\mathcal{L}_{\boldsymbol{\theta}}$ by the
+Euler–Lagrange equations.
+
+\section{Friction subnetwork}
+
+Following the improved DeLaN model in~\cite{Q4_6_HU2026103093},
+joint friction is modelled in a physically interpretable way by a
+Coulomb–viscous law,
+\begin{equation}
+  \boldsymbol{\tau}_{\mathrm{fric}}
+  (\dot{\mathbf{q}};\boldsymbol{\psi})
+  =
+  \mathbf{f}_c \,\mathrm{sgn}(\dot{\mathbf{q}})
+  +
+  \mathbf{f}_v \,\dot{\mathbf{q}},
+  \label{eq:app_coulomb_viscous}
+\end{equation}
+where $\mathbf{f}_c,\mathbf{f}_v \in \mathbb{R}^n$ collect the
+joint-wise Coulomb and viscous friction coefficients and
+$\mathrm{sgn}(\cdot)$ is applied element-wise.
+Equation~\eqref{eq:app_coulomb_viscous} corresponds directly to
+Eqs.~(13)–(15) in~\cite{Q4_6_HU2026103093}, where
+\[
+  \tau_f = f_c \,\mathrm{sgn}(\dot{q}) + f_v \dot{q}
+\]
+is added to the DeLaN prediction.%
+\footnote{In preliminary experiments we found that replacing
+the analytic Coulomb–viscous form by a small MLP
+$\boldsymbol{\tau}_{\mathrm{fric}} = f_{\mathrm{fric}}([\dot{\mathbf{q}},\mathrm{sgn}(\dot{\mathbf{q}})];\boldsymbol{\psi})$
+slightly improves training loss but makes the friction parameters harder
+to interpret and more prone to absorbing other modelling errors. Given
+that history-dependent and stick–slip effects are explicitly handled by
+the LSTM residual model in Stage~2, we retain the simpler Coulomb–viscous
+structure in Stage~1.}
+
+\section{Resulting DeLaN inverse-dynamics map}
+
+Combining the inertia, potential/gravity and friction subnetworks, the
+DeLaN inverse-dynamics model used in this thesis is
+\begin{equation}
+  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}
+  (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi})
+  =
+  \boldsymbol{\tau}_{\mathrm{cons}}
+    (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta})
+  +
+  \boldsymbol{\tau}_{\mathrm{fric}}(\dot{\mathbf{q}};\boldsymbol{\psi})
+  =
+  f_{\mathrm{DeLaN}}(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi}),
+\end{equation}
+which is trained in Stage~1 by minimising the loss
+\begin{equation}
+  \mathcal{L}_{\mathrm{DeLaN}}(\boldsymbol{\theta},\boldsymbol{\psi})
+  =
+  \frac{1}{N}\sum_{k=1}^{N}
+  \left\|
+    f_{\mathrm{DeLaN}}
+      (\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k;
+       \boldsymbol{\theta},\boldsymbol{\psi})
+    -
+    \boldsymbol{\tau}_{\mathrm{motor},k}
+  \right\|_2^2,
+\end{equation}
+as described in the main Methods section.
+
