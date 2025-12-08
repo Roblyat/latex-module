@@ -225,31 +225,48 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         measurement frame.
         \end{itemize}
 
-        (Overall, the current SoA provides strong ingredients—classical LS/NE regressors, GP residuals, sequence models and physics-informed networks—but does not yet offer a compact, measurement-frame model that endows a
-        manipulator with unified, robust dynamic awarenss of its own robot-tool-payload system under realistic cobot operating conditions.)
-
     \section{Aim of Work}
 
-    The SoA review suggests that the strongest results for robot inverse dynamics and friction modelling are obtained when \emph{physics-structured} networks such as DeLaN/PINN are combined with data-driven residual learners.
-    Extended DeLaN models can capture motor couplings and current–torque relations with high accuracy from encoder and motor data alone~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning},
-    while recent PINN-based approaches demonstrate that adding a learned residual (e.g.\ TCN) on top of a structured dynamics model yields state-of-the-art joint-torque prediction and friction compensation on industrial
-    robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}.
-    These works, however, focus purely on RDPI for a fixed robot-tool configuration and do not provide an explicit, measurement-frame model of the effective rigid body (robot+tool+payload) or its interaction wrench.
+        The SoA review indicates that the strongest results for robot inverse dynamics and friction modelling are achieved when \emph{physics-structured} networks are combined
+        with data-driven residual learners. Extended DeLaN models can capture motor couplings and current--torque relations from encoder and motor data alone
+        \cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning}, while recent PINN-based approaches augment a structured dynamics model with
+        temporal convolutions to obtain state-of-the-art joint-torque prediction and friction compensation on industrial robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}.
+        However, these works operate purely in joint-torque space for a fixed robot--tool configuration and do not provide an explicit measurement-frame model
+        of the effective rigid body (robot+tool+payload) or its interaction wrench. 
 
-    The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that serves as a strong basis for tool/gripper compensation and, ultimately,
-    payload dynamic parameter identification.
-    Concretely, the work pursues the following objectives:
-    \begin{itemize}
-    \item Use a DeLaN-style structured network to learn the nominal robot inverse dynamics from joint states and motor currents, including joint friction and drive-train effects, following the ideas
-          of~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning,Q4_4_10729277}.
-            The model is trained \emph{offline} on carefully designed excitation trajectories (in simulation in this thesis), and then deployed for real-time torque prediction during operation.
-    \item Augment this structured model with a recurrent sequence model (LSTM) that takes joint histories and DeLaN residuals as input and learns to predict the remaining flange wrench in the measurement frame.
-            This separates the well-modelled robot base dynamics from the effective rigid-body contribution of tool and gripper, providing a compact representation of $\boldsymbol{\phi}_{\mathrm{eff}}$–induced effects that
-            is consistent with the kinematic and Newton-Euler background developed in Section~\ref{sec:robot_dynamics_background}.
-    \item Evaluate the resulting DeLaN+LSTM architecture as a foundation for PDPI: first by quantifying its ability to compensate tool/gripper dynamics and predict joint torques across diverse trajectories, then by analysing
-          how accurately the inferred effective wrench tracks changes in attached loads.
-    \end{itemize}
+        The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that
+        (i) can be trained using only encoder and motor-current data, (ii) yields an accurate nominal model of the robot--gripper joint torques, and (iii) can be
+        consistently interpreted as a flange-wrench model in the force/torque sensor frame, thereby providing a basis for tool/gripper compensation and, ultimately,
+        payload dynamic parameter identification (PDPI) as formulated in Section~\ref{sec:robot_dynamics_background}. Concretely, the work pursues the following objectives:
+        \begin{itemize}
+        \item Design and train a DeLaN-style structured inverse-dynamics model in the spirit of DeLaN-Motor~\cite{Q4_1_extended_delan_motor}, which learns the
+                nominal robot--gripper dynamics from joint states and motor currents. The model combines a learned inertia and potential parameterisation
+                with an explicit Coulomb--viscous joint-friction law and is trained \emph{offline} on carefully designed excitation trajectories (in
+                simulation in this thesis) by regressing joint torques computed from motor currents.
+        \item Augment this structured model with a recurrent sequence model (LSTM), inspired by the residual-compensation strategy of Hu et al.~\cite{Q4_4_10729277},
+                that takes joint-state histories and DeLaN torque predictions as input and learns to predict residual joint torques in a fixed history window.
+                This separates the well-modelled nominal robot--gripper dynamics from remaining history-dependent effects (e.g.\ backlash, small nonlinear friction),
+                and yields a compact, history-aware joint-torque model whose output can be mapped to the measurement frame via the Jacobian.
+        \item Evaluate the resulting DeLaN+LSTM architecture both in joint space and in the force/torque sensor frame, quantifying its ability to reproduce
+                the nominal robot--gripper wrench across diverse trajectories and to provide a consistent basis for subsequent PDPI experiments with varying payloads.
+        \end{itemize}
 
-    By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this work aims to move from the fragmented, calibration-heavy SoA towards a unified and practically
-    deployable notion of dynamic awareness:
-    a robot that can reliably predict its own joint torques and separate its intrinsic dynamics from tool and payload effects in the measurement frame, under cobot-typical operating conditions.
+        In this work, a 6D force/torque sensor is used primarily as a \emph{research instrument} to validate the joint-space modelling in the end-effector frame.
+        During data collection, the sensor provides flange-wrench measurements $\vec{F}_{\mathrm{meas}}$ that are used to assess the accuracy of the Stage~1 DeLaN
+        model and the combined DeLaN+LSTM model after mapping their torque predictions into the sensor frame via the Jacobian. Crucially, both the structured
+        inverse-dynamics model and the sequence model are formulated and trained purely in joint space using encoder and motor-current data; the mapping to the
+        measurement frame is applied only for evaluation.
+
+        Conceptually, this means that the proposed architecture does not \emph{structurally} require an FT sensor. Once consistency between predicted and
+        measured flange wrenches has been demonstrated, a practitioner could in principle follow the same pipeline without flange sensing: train the DeLaN
+        inverse-dynamics model and the sequence model on joint states and motor torques alone, operate the robot without any FT hardware, and perform payload
+        identification purely from joint-space residuals that are subsequently mapped into the tool frame.
+
+        By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this thesis aims to move from the
+        calibration-heavy, fragmented SoA towards a unified and practically deployable notion of dynamic awareness: a cobot that can reliably predict its own joint
+        torques, reproduce its nominal flange wrench in the measurement frame, and separate intrinsic robot--gripper dynamics from payload-induced effects under
+        realistic operating conditions.
+
+
+
+

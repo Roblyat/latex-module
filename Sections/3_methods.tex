@@ -54,7 +54,7 @@ Coulomb--viscous friction model, following the improved DeLaN design
 of Hu et al.~\cite{Q4_6_HU2026103093}.
 For each joint $i$ we adopt
 \begin{equation}
-  \boldsymbol{\tau}_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
+  \tau_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
   =
   f_{c,i}\,\operatorname{sgn}(\dot q_i)
   +
@@ -118,33 +118,20 @@ force/torque sensor is not required for fitting the DeLaN model.
 
 After training, the DeLaN parameters are frozen and the model serves as a
 data-driven nominal inverse-dynamics model of the robot--gripper system.
-For later use in the measurement frame, the corresponding nominal flange
-wrench is obtained by mapping joint torques through the Jacobian of the
-sensor frame $S$,
-\begin{equation}
-\hat{\vec{F}}_{\mathrm{DeLaN},k}
-  =
-  {}^{S}\!J(\mathbf{q}_k)^{-\top}\,
-  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k},
-  \label{eq:delan_wrench}
-\end{equation}
-assuming a square, invertible Jacobian for the considered configuration
-(or using the least-squares solution if redundant).
 
-\subsection{Stage~2: Sequence model for residual flange wrench}
+\subsection{Stage~2: Sequence model for residual joint torques}
 
 In the second stage, we model history-dependent effects that are not captured
 by the structured DeLaN model, such as backlash and fine-grained nonlinear
 friction. Using the same robot--gripper dataset (still without payload and
-without contact), we first compute the nominal flange wrench for each sample
-via~\eqref{eq:delan_wrench} and define the residual wrench
+without contact), we first compute the joint-space residual torques
 \begin{equation}
-  \vec{r}_{F,k}
+  \boldsymbol{r}_{\tau,k}
   =
-  \vec{F}_{\mathrm{meas},k}
+  \boldsymbol{\tau}_{\mathrm{motor},k}
   -
-  \hat{\vec{F}}_{\mathrm{DeLaN},k}.
-  \label{eq:wrench_residual}
+  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}.
+  \label{eq:tau_residual}
 \end{equation}
 
 Let $H$ denote the sequence length (number of time steps in the history
@@ -166,46 +153,54 @@ $\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}$.
 This construction stacks the last $H$ joint states together with the
 corresponding DeLaN torque predictions into a single sequence feature vector $\mathbf{x}_k$.
 
-
 An LSTM with parameters $\boldsymbol{\varphi}$ maps this sequence to a
-residual-wrench prediction
+residual-torque prediction
 \begin{equation}
-  \hat{\vec{r}}_{F,k}
+  \hat{\boldsymbol{r}}_{\tau,k}
   =
   f_{\mathrm{LSTM}}(\mathbf{x}_k;\boldsymbol{\varphi})
-  \in \mathbb{R}^6.
+  \in \mathbb{R}^n.
 \end{equation}
-
 The LSTM is trained to minimise the mean-squared error between predicted and
-true residual wrenches,
+true residual torques,
 \begin{equation}
   \mathcal{L}_{\mathrm{LSTM}}(\boldsymbol{\varphi})
   =
   \frac{1}{N_H}
   \sum_{k=H}^{N}
   \left\|
-    \hat{\vec{r}}_{F,k}
+    \hat{\boldsymbol{r}}_{\tau,k}
     -
-    \vec{r}_{F,k}
+    \boldsymbol{r}_{\tau,k}
   \right\|_2^2,
   \label{eq:lstm_loss}
 \end{equation}
 where $N_H = N-H+1$ is the number of valid sequences.
 
-The combined flange-wrench model for the robot--gripper system is then
+The combined joint-space model for the robot--gripper system is then
+\begin{equation}
+  \hat{\boldsymbol{\tau}}_{\mathrm{RG},k}
+  =
+  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}
+  +
+  \hat{\boldsymbol{r}}_{\tau,k}.
+  \label{eq:combined_torque_rg}
+\end{equation}
+For evaluation in the sensor frame, the corresponding combined flange wrench is
+obtained via the Jacobian mapping
 \begin{equation}
   \hat{\vec{F}}_{\mathrm{RG},k}
   =
-  \hat{\vec{F}}_{\mathrm{DeLaN},k}
-  +
-  \hat{\vec{r}}_{F,k}.
+  {}^{S}\!J(\mathbf{q}_k)^{-\top}\,
+  \hat{\boldsymbol{\tau}}_{\mathrm{RG},k}.
   \label{eq:combined_wrench_rg}
 \end{equation}
 Since both stages are trained exclusively on data without payload and without
-environment contact, $\hat{\vec{F}}_{\mathrm{RG},k}$ represents a
-high-fidelity, history-aware model of the nominal robot--gripper wrench.
-In later stages, deviations between this model and the measured wrench can be
-attributed to the effective rigid-body contribution of additional payloads.
+environment contact, $\hat{\boldsymbol{\tau}}_{\mathrm{RG},k}$ and
+$\hat{\vec{F}}_{\mathrm{RG},k}$ represent a high-fidelity, history-aware model
+of the nominal robot--gripper dynamics. In later stages, deviations between
+this model and the measured joint torques or flange wrenches can be attributed
+to the effective rigid-body contribution of additional payloads and contacts.
 
 \begin{figure}[H]
 \centering
@@ -218,3 +213,6 @@ outputs to learn the residual flange wrench, yielding a history-aware
 model of the nominal robot--gripper wrench.}
 \label{fig:methods_pipeline}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
