@@ -16,7 +16,7 @@ with $\mathbf{f} \in \mathbb{R}^3$ the linear force and
 $\boldsymbol{\tau} \in \mathbb{R}^3$ the moment about the frame origin.
 For a rigid body with parameters $\boldsymbol{\phi}_{\mathrm{eff}}$
 (mass, CoM and inertia) moving with linear and angular motion
-$(\mathbf{a}, \boldsymbol{\alpha}, \boldsymbol{\omega})$, the Newton--Euler
+$(\mathbf{a}, \boldsymbol{\alpha}, \boldsymbol{\omega})$, the Newton-Euler
 equations (cf.~\eqref{eq:newtonEuler}) give
 \begin{equation}
   \begin{bmatrix}
@@ -84,7 +84,7 @@ $\boldsymbol{\phi}_{\mathrm{eff}}$ but nonlinear in the motion variables.
 Hence, $\vec{F}_{\mathrm{ext}}$ is not simply $m\mathbf{a}$, nor can it be
 written as $\boldsymbol{\phi}_{\mathrm{eff}}\ddot{\mathbf{q}}$; the mapping
 from joint accelerations $\ddot{\mathbf{q}}$ to $\vec{F}_{\mathrm{ext}}$
-passes through the robot kinematics and the Newton--Euler relations.
+passes through the robot kinematics and the Newton-Euler relations.
 
 Once the wrench at the flange is known, the corresponding joint torques are
 obtained via
@@ -109,8 +109,8 @@ $\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega}$.
 
 
 \clearpage
-\chapter{Query Categories - Index Terms}
-\label{app:query_categories}
+
+\chapter{Query Categories-Index Terms}~\label{app:query_categories}
 
 This appendix lists the index terms used to construct the query categories
 illustrated in Fig.~\ref{fig:query_logic}. The original nine term groups were
@@ -301,50 +301,112 @@ Including them in the queries significantly increased the number of retrieved re
 \toprule
 \textbf{Reference} & \textbf{Cite} & \textbf{Year} & \textbf{Database} & \textbf{Citations} \\
 \midrule
-R1  & \cite{Q1_1_fast_inertial_id_cobots}                & 2022 & IEEE          & 13  \\
-R2  & \cite{Q1_2_online_payload_mo}                      & 2022 & IEEE          & 16  \\
-R3  & \cite{Q1_3_external_torque_smo}                    & 2022 & IEEE          & 47  \\
-R4  & \cite{Q1_4_contact_force_kf}                       & 2021 & ScienceDirect & 34  \\
-R5  & \cite{Q1_5_payload_estimation_compensation_2025}   & 2025 & IEEE          & 0   \\
-R6  & \cite{Q1_6_hu2025_fdrdi}                           & 2025 & IEEE          & 2   \\
-R7  & \cite{Q1_7_10947736}                               & 2025 & IEEE          & 1   \\
-R8  & \cite{Q1_8_10944553}                               & 2025 & IEEE          & 0   \\
-R9  & \cite{Q1_9_xu2022_double_weighting_payload_id}     & 2022 & Cambridge     & 10  \\
-R10 & \cite{Q1_10_duan_payload_ftsensor}                 & 2022 & MPDI          & 27  \\
-R11 & \cite{Q1_11_wei_composite_filter}                  & 2025 & IEEE          & 2   \\
-R12 & \cite{Q1_12_han_finite_time_observer}              & 2022 & IEEE          & 57  \\
-R13 & \cite{Q1_13_dynamic_model_id_swevers2007}          & 2007 & IEEE          & 303 \\
-R14 & \cite{Q1_14_long2022sliding_momentum_observer}     & 2022 & MPDI          & 17  \\
-R15 & \cite{Q1_15_tang2023wls_rwspo}                     & 2023 & MPDI          & 16  \\
-R16 & \cite{Q1_16_xu_payload_difference_2024}            & 2024 & Cambridge     & 2   \\
-R17 & \cite{Q1_17_liu2021sensorless_dob_nn}              & 2021 & ScienceDirect & 100 \\
+R1  &~\cite{Q1_1_fast_inertial_id_cobots}                & 2022 & IEEE          & 13  \\
+R2  &~\cite{Q1_2_online_payload_mo}                      & 2022 & IEEE          & 16  \\
+R3  &~\cite{Q1_3_external_torque_smo}                    & 2022 & IEEE          & 47  \\
+R4  &~\cite{Q1_4_contact_force_kf}                       & 2021 & ScienceDirect & 34  \\
+R5  &~\cite{Q1_5_payload_estimation_compensation_2025}   & 2025 & IEEE          & 0   \\
+R6  &~\cite{Q1_6_hu2025_fdrdi}                           & 2025 & IEEE          & 2   \\
+R7  &~\cite{Q1_7_10947736}                               & 2025 & IEEE          & 1   \\
+R8  &~\cite{Q1_8_10944553}                               & 2025 & IEEE          & 0   \\
+R9  &~\cite{Q1_9_xu2022_double_weighting_payload_id}     & 2022 & Cambridge     & 10  \\
+R10 &~\cite{Q1_10_duan_payload_ftsensor}                 & 2022 & MPDI          & 27  \\
+R11 &~\cite{Q1_11_wei_composite_filter}                  & 2025 & IEEE          & 2   \\
+R12 &~\cite{Q1_12_han_finite_time_observer}              & 2022 & IEEE          & 57  \\
+R13 &~\cite{Q1_13_dynamic_model_id_swevers2007}          & 2007 & IEEE          & 303 \\
+R14 &~\cite{Q1_14_long2022sliding_momentum_observer}     & 2022 & MPDI          & 17  \\
+R15 &~\cite{Q1_15_tang2023wls_rwspo}                     & 2023 & MPDI          & 16  \\
+R16 &~\cite{Q1_16_xu_payload_difference_2024}            & 2024 & Cambridge     & 2   \\
+R17 &~\cite{Q1_17_liu2021sensorless_dob_nn}              & 2021 & ScienceDirect & 100 \\
 \midrule
-R18 & \cite{Q2_1_contact_force_gp_observer}              & 2022 & IEEE          & 3   \\
-R19 & \cite{Q2_2_contact_force_gpadkf}                   & 2024 & IEEE          & 19  \\
-R20 & \cite{Q2_3_contact_detection_gp}                   & 2022 & IEEE          & 2   \\
-R21 & \cite{Q2_4_GIACOMUZZO20231584}                     & 2023 & ScienceDirect & 2   \\
+R18 &~\cite{Q2_1_contact_force_gp_observer}              & 2022 & IEEE          & 3   \\
+R19 &~\cite{Q2_2_contact_force_gpadkf}                   & 2024 & IEEE          & 19  \\
+R20 &~\cite{Q2_3_contact_detection_gp}                   & 2022 & IEEE          & 2   \\
+R21 &~\cite{Q2_4_GIACOMUZZO20231584}                     & 2023 & ScienceDirect & 2   \\
 \midrule
-R22 & \cite{Q3_1_tao_bll}                                & 2025 & Cambridge     & 1   \\
-R23 & \cite{Q3_2_encoder_attention_payload}              & 2023 & IEEE          & 3   \\
-R24 & \cite{Q3_3_lstm_force_estimation}                  & 2021 & MPDI          & 10  \\
-R25 & \cite{Q3_4_asgrnn_force_observer}                  & 2023 & ScienceDirect & 9   \\
-R26 & \cite{Q3_5_contact_localization_cnn}               & 2021 & IEEE          & 5   \\
-R27 & \cite{Q3_6_payload_id_incremental_ensemble}        & 2024 & IEEE          & 1   \\
-R28 & \cite{Q3_7_payload_id_online_ensemble}             & 2024 & IEEE          & 13  \\
-R29 & \cite{Q3_8_payload_id_catastrophic_forgetting}     & 2024 & Frontiersin   & 0   \\
+R22 &~\cite{Q3_1_tao_bll}                                & 2025 & Cambridge     & 1   \\
+R23 &~\cite{Q3_2_encoder_attention_payload}              & 2023 & IEEE          & 3   \\
+R24 &~\cite{Q3_3_lstm_force_estimation}                  & 2021 & MPDI          & 10  \\
+R25 &~\cite{Q3_4_asgrnn_force_observer}                  & 2023 & ScienceDirect & 9   \\
+R26 &~\cite{Q3_5_contact_localization_cnn}               & 2021 & IEEE          & 5   \\
+R27 &~\cite{Q3_6_payload_id_incremental_ensemble}        & 2024 & IEEE          & 1   \\
+R28 &~\cite{Q3_7_payload_id_online_ensemble}             & 2024 & IEEE          & 13  \\
+R29 &~\cite{Q3_8_payload_id_catastrophic_forgetting}     & 2024 & Frontiersin   & 0   \\
 \midrule
-R30 & \cite{Q4_1_extended_delan_motor}                   & 2025 & IEEE          & 0   \\
-R31 & \cite{Q4_2_lutter2023combiningphysicsdeeplearning} & 2023 & ArXiv         & -   \\
-R32 & \cite{Q4_3_residual_pinns_dynamics_id}             & 2025 & IEEE          & 0   \\
-R33 & \cite{Q4_4_10729277}                               & 2024 & IEEE          & 10  \\
-R34 & \cite{Q4_5_10305255}                               & 2023 & IEEE          & 27  \\
+R30 &~\cite{Q4_1_extended_delan_motor}                   & 2025 & IEEE          & 0   \\
+R31 &~\cite{Q4_2_lutter2023combiningphysicsdeeplearning} & 2023 & ArXiv         & -   \\
+R32 &~\cite{Q4_3_residual_pinns_dynamics_id}             & 2025 & IEEE          & 0   \\
+R33 &~\cite{Q4_4_10729277}                               & 2024 & IEEE          & 10  \\
+R34 &~\cite{Q4_5_10305255}                               & 2023 & IEEE          & 27  \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{longtable}{llllr}
+% \caption{Overview of selected references by category, source and citation count. (accessed 2025-11-30T18:53:00 [YYYY-MM-DDTHH:mm:ss])}
+% \label{tab:soa_references}\\
+% \toprule
+% \textbf{Reference} & \textbf{Cite} & \textbf{Year} & \textbf{Database} & \textbf{Citations} \\
+% \midrule
+% \endfirsthead
+
+% \caption[]{Overview of selected references by category, source and citation count (continued)}\\
+% \toprule
+% \textbf{Reference} & \textbf{Cite} & \textbf{Year} & \textbf{Database} & \textbf{Citations} \\
+% \midrule
+% \endhead
+
+% \midrule
+% \multicolumn{5}{r}{\textit{Continued on next page}}\\
+% \midrule
+% \endfoot
+
+% \bottomrule
+% \endlastfoot
+
+% R1  &~\cite{Q1_1_fast_inertial_id_cobots}                & 2022 & IEEE          & 13  \\
+% R2  &~\cite{Q1_2_online_payload_mo}                      & 2022 & IEEE          & 16  \\
+% R3  &~\cite{Q1_3_external_torque_smo}                    & 2022 & IEEE          & 47  \\
+% R4  &~\cite{Q1_4_contact_force_kf}                       & 2021 & ScienceDirect & 34  \\
+% R5  &~\cite{Q1_5_payload_estimation_compensation_2025}   & 2025 & IEEE          & 0   \\
+% R6  &~\cite{Q1_6_hu2025_fdrdi}                           & 2025 & IEEE          & 2   \\
+% R7  &~\cite{Q1_7_10947736}                               & 2025 & IEEE          & 1   \\
+% R8  &~\cite{Q1_8_10944553}                               & 2025 & IEEE          & 0   \\
+% R9  &~\cite{Q1_9_xu2022_double_weighting_payload_id}     & 2022 & Cambridge     & 10  \\
+% R10 &~\cite{Q1_10_duan_payload_ftsensor}                 & 2022 & MPDI          & 27  \\
+% R11 &~\cite{Q1_11_wei_composite_filter}                  & 2025 & IEEE          & 2   \\
+% R12 &~\cite{Q1_12_han_finite_time_observer}              & 2022 & IEEE          & 57  \\
+% R13 &~\cite{Q1_13_dynamic_model_id_swevers2007}          & 2007 & IEEE          & 303 \\
+% R14 &~\cite{Q1_14_long2022sliding_momentum_observer}     & 2022 & MPDI          & 17  \\
+% R15 &~\cite{Q1_15_tang2023wls_rwspo}                     & 2023 & MPDI          & 16  \\
+% R16 &~\cite{Q1_16_xu_payload_difference_2024}            & 2024 & Cambridge     & 2   \\
+% R17 &~\cite{Q1_17_liu2021sensorless_dob_nn}              & 2021 & ScienceDirect & 100 \\
+% \midrule
+% R18 &~\cite{Q2_1_contact_force_gp_observer}              & 2022 & IEEE          & 3   \\
+% R19 &~\cite{Q2_2_contact_force_gpadkf}                   & 2024 & IEEE          & 19  \\
+% R20 &~\cite{Q2_3_contact_detection_gp}                   & 2022 & IEEE          & 2   \\
+% R21 &~\cite{Q2_4_GIACOMUZZO20231584}                     & 2023 & ScienceDirect & 2   \\
+% \midrule
+% R22 &~\cite{Q3_1_tao_bll}                                & 2025 & Cambridge     & 1   \\
+% R23 &~\cite{Q3_2_encoder_attention_payload}              & 2023 & IEEE          & 3   \\
+% R24 &~\cite{Q3_3_lstm_force_estimation}                  & 2021 & MPDI          & 10  \\
+% R25 &~\cite{Q3_4_asgrnn_force_observer}                  & 2023 & ScienceDirect & 9   \\
+% R26 &~\cite{Q3_5_contact_localization_cnn}               & 2021 & IEEE          & 5   \\
+% R27 &~\cite{Q3_6_payload_id_incremental_ensemble}        & 2024 & IEEE          & 1   \\
+% R28 &~\cite{Q3_7_payload_id_online_ensemble}             & 2024 & IEEE          & 13  \\
+% R29 &~\cite{Q3_8_payload_id_catastrophic_forgetting}     & 2024 & Frontiersin   & 0   \\
+% \midrule
+% R30 &~\cite{Q4_1_extended_delan_motor}                   & 2025 & IEEE          & 0   \\
+% R31 &~\cite{Q4_2_lutter2023combiningphysicsdeeplearning} & 2023 & ArXiv         & -   \\
+% R32 &~\cite{Q4_3_residual_pinns_dynamics_id}             & 2025 & IEEE          & 0   \\
+% R33 &~\cite{Q4_4_10729277}                               & 2024 & IEEE          & 10  \\
+% R34 &~\cite{Q4_5_10305255}                               & 2023 & IEEE          & 27  \\
+% \end{longtable}
+
+% \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{DeLaN parameterisation and friction model}
-\label{ch:appendix_delan}
+\chapter{DeLaN parameterisation and friction model}~\label{ch:appendix_delan}
 
 This appendix details the specific neural parameterisation of the Deep Lagrangian
 Network (DeLaN) used in Stage~1 of the proposed architecture, i.e.\ the
@@ -353,14 +415,13 @@ together implement the inverse-dynamics mapping
 $f_{\mathrm{DeLaN}}(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi})$
 described in Section~\ref{sec:methods}.
 
-\section{Inertia subnetwork}
-\label{sec:app_inertia}
+\section{Inertia subnetwork}~\label{sec:app_inertia}
 
 Following the improved DeLaN formulation of~\cite{Q4_6_HU2026103093} and its PINN-based extension to industrial robots in~\cite{Q4_4_10729277},
 the symmetric positive-definite inertia matrix
 $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q}) \in \mathbb{R}^{n\times n}$ is
 obtained from a learned Cholesky factor.
-We parameterise a lower–triangular matrix
+We parameterise a lower-triangular matrix
 $\hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)$ and set
 \begin{equation}
   \mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})
@@ -369,7 +430,7 @@ $\hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)$ and set
   \hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)^{\top}.
   \label{eq:app_M_from_L}
 \end{equation}
-The factor $\hat{\mathbf{L}}$ is decomposed into a strictly lower–triangular
+The factor $\hat{\mathbf{L}}$ is decomposed into a strictly lower-triangular
 part and a diagonal part,
 \begin{equation}
   \hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)
@@ -382,7 +443,7 @@ where both $\mathbf{L}_o$ and $\mathbf{L}_d$ are represented by multilayer
 perceptrons (MLPs) taking $\mathbf{q}$ as input:
 
 \begin{itemize}
-  \item $\mathbf{L}_o(\mathbf{q};\boldsymbol{\theta}_o)$ is lower–triangular
+  \item $\mathbf{L}_o(\mathbf{q};\boldsymbol{\theta}_o)$ is lower-triangular
         with zero diagonal entries and uses a linear output layer.
   \item $\mathbf{L}_d(\mathbf{q};\boldsymbol{\theta}_d)$ is diagonal.
         Its diagonal elements are obtained as
@@ -403,8 +464,7 @@ in~\cite{Q4_4_10729277,Q4_6_HU2026103093}, since for revolute manipulators the e
 $\mathbf{M}(\mathbf{q})$ can be written as linear combinations of
 $\sin(\cdot)$ and $\cos(\cdot)$.
 
-\section{Potential and gravity subnetworks}
-\label{sec:app_potential}
+\section{Potential and gravity subnetworks}~\label{sec:app_potential}
 
 The conservative part of the dynamics is encoded by a learned Lagrangian
 \begin{equation}
@@ -448,13 +508,12 @@ $\mathbf{C}_{\boldsymbol{\theta}}(\mathbf{q},\dot{\mathbf{q}})\dot{\mathbf{q}}$
 obtained from $\mathcal{L}_{\boldsymbol{\theta}}$ via the Euler–Lagrange
 equations.
 
-\section{Friction subnetwork}
-\label{sec:app_friction}
+\section{Friction subnetwork}~\label{sec:app_friction}
 
 Joint friction and other non-conservative effects are modelled in a physically
-interpretable way by a Coulomb–viscous law, following the improved DeLaN
+interpretable way by a Coulomb-viscous law, following the improved DeLaN
 formulation in~\cite{Q4_6_HU2026103093} and empirical studies on UR robots
-with Coulomb–viscous friction~\cite{QM_2_Coulomb_viscous_friction_ur5_10610737}.
+with Coulomb-viscous friction~\cite{QM_2_Coulomb_viscous_friction_ur5_10610737}.
 For each joint $i$ we use
 \begin{equation}
   \tau_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
@@ -489,8 +548,7 @@ term in~\cite{Q4_6_HU2026103093}, where
 $\tau_f = f_c \,\mathrm{sgn}(\dot{q}) + f_v \dot{q}$ is added to the DeLaN
 prediction.
 
-\section{Resulting DeLaN inverse-dynamics map}
-\label{sec:app_delan_map}
+\section{Resulting DeLaN inverse-dynamics map}~\label{sec:app_delan_map}
 
 Combining the inertia, potential/gravity and friction subnetworks, the DeLaN
 inverse-dynamics model used in this thesis is

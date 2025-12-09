@@ -77,7 +77,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
     in the literature, thereby motivating the contribution of this work.
 
         \subsection{Kinematic and Dynamic Background of Robot Manipulation}
-        \label{sec:robot_dynamics_background}
+        ~\label{sec:robot_dynamics_background}
         The inertial properties of a rigid body are collected in the standard 10-dimensional parameter vector
         \begin{equation}
         \boldsymbol{\phi}^T
@@ -187,7 +187,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         \label{eq:F_measured_regressor}
         \end{equation}
 
-        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix \ref{app:query_categories}. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
+        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix~\ref{app:query_categories}. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
         The motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$ are in turn determined by the joint state and motor torques through the nonlinear dynamics\eqref{eq:robot_dynamics}-\eqref{eq:I_payload}.
 
         From an identification viewpoint, this creates two tightly coupled challenges. 

@@ -27,7 +27,7 @@
     \caption[Query logic]{Query logic used to categorise the SoA papers. 
         Each category $Q_i$ is formed by combining content clusters $C_i$ with estimation \& modelling terms $C_{mt}$ and robotics context terms $C_{ct}$. 
         The combined representation $C$ and query set $Q$ are formed by the union of their respective subsets.}
-    \label{fig:query_logic}
+    ~\label{fig:query_logic}
     \end{figure}
 
     \vspace{0.75\baselineskip}
@@ -39,7 +39,7 @@
     \begin{table}[H]
     \centering
     \caption{Overview of query results by category.}
-    \label{tab:query-results}
+    ~\label{tab:query-results}
     \begin{tabular}{lcccc}
         \toprule
         Query & Relev.\ SoA & Payload & Rigid-body & Contact Force \\
@@ -55,9 +55,28 @@
     \end{tabular}
     \end{table}
 
-% \clearpage
+    \vspace{0.75\baselineskip}
 
 \section{Literature}\label{sec:literature}
+In the context of robotic manipulator dynamics and payload identification, existing methods largely fall into the four methodological families reproduced by Lutter et al.~\cite{Q4_2_lutter2023combiningphysicsdeeplearning} and
+illustrated in Figure~\ref{fig:approach_landscape}.
+
+
+\vspace{0.75\baselineskip}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{Images/2_state_of_art/Q4_2_Method_overview_grafic.png}
+  \caption[Overview of modelling paradigms]{Overview of modelling paradigms for robot dynamics
+  (reproduced by Lutter et al.~\cite{Q4_2_lutter2023combiningphysicsdeeplearning}). The four panels correspond
+  to the approaches discussed in this SoA: classical rigid-body model engineering and system
+  identification (Category~Q1), physics-inspired networks such as DeLaN/PINNs (Category~Q4), and
+  black-box model learning with deep networks (Category~Q3). Gaussian-process residual models
+  (Category~Q2) sit between system identification and black-box learning.}
+  ~\label{fig:approach_landscape}
+\end{figure}
+
+\clearpage
 
 \textbf{Category Q1} groups classical \emph{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on linearly parameterised rigid-body dynamics (RBD) and LS/WLS-type Newton-Euler regressors,
 sometimes combined with observers and Kalman filters~\cite{Q1_1_fast_inertial_id_cobots,Q1_2_online_payload_mo,Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_10_duan_payload_ftsensor,Q1_12_han_finite_time_observer,Q1_13_dynamic_model_id_swevers2007,Q1_14_long2022sliding_momentum_observer,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024,Q1_17_liu2021sensorless_dob_nn}.
@@ -190,15 +209,27 @@ complex when scaling beyond low-DoF setups or single joints.
 Thus, Q4 provides strong structured baselines for fixed robot dynamics, but does not yet realise an online, unified dynamic awareness of robot, tool and payload with explicit force estimation, as targeted in this work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{0.75\baselineskip}
+
+\textbf{Overall}, the literature spans the full spectrum in Fig.~\ref{fig:approach_landscape}: from classical model engineering and system identification (Q1), through GP residual models (Q2), to black-box deep learning (Q3) and
+physics-inspired networks (Q4). Classical RBD+LS/observer pipelines in Q1 provide strong RDPI/PDPI under carefully designed calibration trajectories, but remain sensitive to friction and payload changes and rarely yield a
+unified, online notion of the effective rigid body. GP and deep black-box methods in Q2-Q3 model unmodelled dynamics and contact well, yet largely treat friction, payload and interaction forces as a single residual and
+do not produce a physics-consistent wrench model in the measurement frame. Physics-informed DeLaN/PINN approaches in Q4 bridge these extremes by embedding Lagrangian structure and achieving joint-torque
+prediction from proprioception alone, but are typically trained for fixed tools and evaluated only in joint space. This thesis therefore positions itself in the “physics-inspired networks” quadrant of
+Fig.~\ref{fig:approach_landscape}, combining a DeLaN-style backbone with an LSTM residual model to obtain a single joint-space inverse-dynamics model that also serves as a reliable nominal wrench model in the measurement
+frame and a basis for PDPI.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     \begin{figure}[H]
     \centering
     \includegraphics[width=1\columnwidth]{Images/2_state_of_art/251202_concept_graph.drawio.png}
     \caption[Concept graph of the SoA literature]{The Concept graph summarising the reviewed literature. 
-    Green nodes represent method categories Q1–Q4 with node the size proportional to the number of papers in each category. 
+    Green nodes represent method categories Q1-Q4 with node the size proportional to the number of papers in each category. 
     Blue nodes denote the main estimation goals scaled by how many papers address each goal. 
-    Red nodes correspond to individual references R1–R34; their diameter is proportional to the citation count (clipped at the maximum). 
+    Red nodes correspond to individual references R1-R34; their diameter is proportional to the citation count (clipped at the maximum). 
     Directed edges indicate that a given reference belongs to a method category and contributes to one or more estimation goals. R1-R34 table in Appendix \ref{soa_references_graph}}
 
-    \label{fig:SoA_concept_graph}
+    ~\label{fig:SoA_concept_graph}
     \end{figure}

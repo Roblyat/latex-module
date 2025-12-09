@@ -1,15 +1,15 @@
-\section{Methods}
+\chapter{Methods}~\label{sec:methods}
 
 Quick overview of what is found in methods (DeLaN + LSTM)-> May start with general DeLaN / LSTM explanation -> moves on with my pipeline mathematics -> then implementation of my pipeline, especially Dataset
 and input-/output vector dimentions here, also dataset recording offline training online execution.
 
 Do i have to explain how DeLaN and LSTM work? ->~\cite{Q4_4_10729277,Q4_6_HU2026103093} show DeLaN (also with figures) 
-and~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation} show LSTM (also with figures). I could also do on figure each, very short explain these two and cite with the given above and DeLaN / LSTM base paper. 
+and~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation} show LSTM (also with figures). I could also do one figure each, very short explain these two and cite with the given above and DeLaN / LSTM base paper. 
 
-\subsection{Stage~1: Structured inverse dynamics for robot + fixed gripper}
+\section{Stage~1: Structured inverse dynamics for robot + fixed gripper}~\label{subsec:stage1}
 
 In a first step, we learn a nominal inverse-dynamics model for the
-robot--gripper system without payload and without contact.
+robot-gripper system without payload and without contact.
 From the synchronised dataset we obtain
 \[
 \bigl\{
@@ -21,13 +21,13 @@ where $\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k \in \mathbb{R}^n$ are
 joint position, velocity and acceleration, $\boldsymbol{I}_k \in \mathbb{R}^n$
 are motor currents, and $\vec{F}_{\mathrm{meas},k} \in \mathbb{R}^6$ is the
 measured flange wrench in the sensor frame $S$.
-For brushless DC motors with torque constant $k_t$ \cite{QM_1_ur3_ur5_torque_constant}, the measured motor torques are
+For brushless DC motors with torque constant $k_t$~\cite{QM_1_ur3_ur5_torque_constant}, the measured motor torques are
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{motor},k} = k_t\,\boldsymbol{I}_k.
 \end{equation}
 
-The nominal robot--gripper dynamics are parameterised by a Deep Lagrangian
-Network (DeLaN) \cite{Q4_6_HU2026103093} with parameters $\boldsymbol{\theta}$ for the conservative
+The nominal robot-gripper dynamics are parameterised by a Deep Lagrangian
+Network (DeLaN)~\cite{Q4_6_HU2026103093} with parameters $\boldsymbol{\theta}$ for the conservative
 dynamics and $\boldsymbol{\psi}$ for friction and other non-conservative terms.
 The network implements a Lagrangian
 \begin{equation}
@@ -37,11 +37,12 @@ The network implements a Lagrangian
   \mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})\,\dot{\mathbf{q}}
   -
   V_{\boldsymbol{\theta}}(\mathbf{q}),
+  \label{eq:lagrangian}
 \end{equation}
 with positive-definite inertia matrix $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})$
-(e.g.\ represented via a Cholesky-factor network) and potential
-$V_{\boldsymbol{\theta}}(\mathbf{q})$ represented by a neural network.\cite{Q4_1_extended_delan_motor,Q4_4_10729277,Q4_6_HU2026103093}
-Using the Euler--Lagrange equations yields the conservative joint torques
+(e.g.\ represented via a Cholesky-factor network~(\ref{sec:app_inertia})) and potential
+$V_{\boldsymbol{\theta}}(\mathbf{q})$~(\ref{sec:app_potential}) represented by a neural network.\cite{Q4_1_extended_delan_motor,Q4_4_10729277,Q4_6_HU2026103093}
+Using the Euler-Lagrange equations yields the conservative joint torques
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{cons}}
   (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta})
@@ -56,8 +57,8 @@ where $\mathbf{C}_{\boldsymbol{\theta}}$ and $\mathbf{G}_{\boldsymbol{\theta}}$ 
 implicitly defined by $\mathcal{L}_{\boldsymbol{\theta}}$ \cite{Q4_4_10729277,Q4_6_HU2026103093}.
 
 Joint friction and other non-conservative effects are captured by a
-Coulomb--viscous friction model, following the improved DeLaN design
-of \cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}.
+Coulomb-viscous friction model, following the improved DeLaN design
+of~\cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}.
 For each joint $i$ we adopt
 \begin{equation}
   \tau_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
@@ -75,7 +76,7 @@ In vector form this can be written compactly as
   f_{\mathrm{fric}}\bigl([\dot{\mathbf{q}},\operatorname{sgn}(\dot{\mathbf{q}})];\boldsymbol{\psi}\bigr),
 \end{equation}
 where $f_{\mathrm{fric}}$ denotes the joint-wise affine map implementing
-the Coulomb--viscous law.
+the Coulomb-viscous law~(\ref{sec:app_friction}).
 
 The DeLaN torque prediction is the sum of conservative and frictional parts,
 \begin{equation}
@@ -105,7 +106,7 @@ so that for sample $k$
 \end{equation}
 
 The parameters $(\boldsymbol{\theta},\boldsymbol{\psi})$ are trained offline by
-minimising a joint-space regression loss \cite{Q4_4_10729277,Q4_6_HU2026103093}
+minimising a joint-space regression loss~\cite{Q4_4_10729277,Q4_6_HU2026103093}
 \begin{equation}
   \mathcal{L}_{\mathrm{DeLaN}}(\boldsymbol{\theta},\boldsymbol{\psi})
   =
@@ -123,13 +124,13 @@ Note that this training objective uses only joint states and motor torques; the
 force/torque sensor is not required for fitting the DeLaN model.
 
 After training, the DeLaN parameters are frozen and the model serves as a
-data-driven nominal inverse-dynamics model of the robot--gripper system.
+data-driven nominal inverse-dynamics model of the robot-gripper system.
 
-\subsection{Stage~2: Sequence model for residual joint torques}
+\section{Stage~2: Sequence model for residual joint torques}~\label{subsec:stage2}
 
 In the second stage, we model history-dependent effects that are not captured
 by the structured DeLaN model, such as backlash and fine-grained nonlinear
-friction. Using the same robot--gripper dataset (still without payload and
+friction. Using the same robot-gripper dataset (still without payload and
 without contact), we first compute the joint-space residual torques
 \begin{equation}
   \boldsymbol{r}_{\tau,k}
@@ -183,7 +184,7 @@ true residual torques,
 \end{equation}
 where $N_H = N-H+1$ is the number of valid sequences.
 
-The combined joint-space model for the robot--gripper system is then
+The combined joint-space model for the robot-gripper system is then
 \begin{equation}
   \hat{\boldsymbol{\tau}}_{\mathrm{RG},k}
   =
@@ -204,20 +205,22 @@ obtained via the Jacobian mapping
 Since both stages are trained exclusively on data without payload and without
 environment contact, $\hat{\boldsymbol{\tau}}_{\mathrm{RG},k}$ and
 $\hat{\vec{F}}_{\mathrm{RG},k}$ represent a high-fidelity, history-aware model
-of the nominal robot--gripper dynamics. In later stages, deviations between
+of the nominal robot-gripper dynamics. In later stages, deviations between
 this model and the measured joint torques or flange wrenches can be attributed
 to the effective rigid-body contribution of additional payloads and contacts.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\columnwidth]{Images/3_methods/method_figure.drawio.png}
-\caption{Two-stage learning pipeline for the robot--gripper nominal dynamics.
+\includegraphics[width=1\columnwidth]{Images/3_methods/251209_pipeline.drawio.png}
+\caption{Two-stage learning pipeline for the nominal robot-gripper dynamics.
 Stage~1 learns a structured inverse-dynamics model (DeLaN) in joint space from
-encoder and motor-current data and maps its torque predictions to the sensor
-frame. Stage~2 uses a sequence model (LSTM) on joint histories and DeLaN
-outputs to learn the residual flange wrench, yielding a history-aware
-model of the nominal robot--gripper wrench.}
-\label{fig:methods_pipeline}
+encoder and motor-current data and is trained by regressing motor torques.
+In Stage~2, a recurrent sequence model (LSTM) takes joint-state histories and
+DeLaN torque predictions as input and learns residual joint torques over a
+fixed history window. The combined joint-space model is then mapped through the
+Jacobian to obtain the nominal flange wrench in the force/torque sensor frame,
+which is compared against the measured wrench for evaluation.}
+~\label{fig:methods_pipeline}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
