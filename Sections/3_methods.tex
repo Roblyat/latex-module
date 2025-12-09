@@ -1,5 +1,11 @@
 \section{Methods}
 
+Quick overview of what is found in methods (DeLaN + LSTM)-> May start with general DeLaN / LSTM explanation -> moves on with my pipeline mathematics -> then implementation of my pipeline, especially Dataset
+and input-/output vector dimentions here, also dataset recording offline training online execution.
+
+Do i have to explain how DeLaN and LSTM work? ->~\cite{Q4_4_10729277,Q4_6_HU2026103093} show DeLaN (also with figures) 
+and~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation} show LSTM (also with figures). I could also do on figure each, very short explain these two and cite with the given above and DeLaN / LSTM base paper. 
+
 \subsection{Stage~1: Structured inverse dynamics for robot + fixed gripper}
 
 In a first step, we learn a nominal inverse-dynamics model for the
@@ -15,7 +21,7 @@ where $\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k \in \mathbb{R}^n$ are
 joint position, velocity and acceleration, $\boldsymbol{I}_k \in \mathbb{R}^n$
 are motor currents, and $\vec{F}_{\mathrm{meas},k} \in \mathbb{R}^6$ is the
 measured flange wrench in the sensor frame $S$.
-For brushless DC motors with torque constant $k_t$, the measured motor torques are
+For brushless DC motors with torque constant $k_t$ \cite{QM_1_ur3_ur5_torque_constant}, the measured motor torques are
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{motor},k} = k_t\,\boldsymbol{I}_k.
 \end{equation}
@@ -34,7 +40,7 @@ The network implements a Lagrangian
 \end{equation}
 with positive-definite inertia matrix $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})$
 (e.g.\ represented via a Cholesky-factor network) and potential
-$V_{\boldsymbol{\theta}}(\mathbf{q})$ represented by a neural network.
+$V_{\boldsymbol{\theta}}(\mathbf{q})$ represented by a neural network.\cite{Q4_1_extended_delan_motor,Q4_4_10729277,Q4_6_HU2026103093}
 Using the Euler--Lagrange equations yields the conservative joint torques
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{cons}}
@@ -47,11 +53,11 @@ Using the Euler--Lagrange equations yields the conservative joint torques
   \mathbf{G}_{\boldsymbol{\theta}}(\mathbf{q}),
 \end{equation}
 where $\mathbf{C}_{\boldsymbol{\theta}}$ and $\mathbf{G}_{\boldsymbol{\theta}}$ are
-implicitly defined by $\mathcal{L}_{\boldsymbol{\theta}}$.
+implicitly defined by $\mathcal{L}_{\boldsymbol{\theta}}$ \cite{Q4_4_10729277,Q4_6_HU2026103093}.
 
 Joint friction and other non-conservative effects are captured by a
 Coulomb--viscous friction model, following the improved DeLaN design
-of Hu et al.~\cite{Q4_6_HU2026103093}.
+of \cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}.
 For each joint $i$ we adopt
 \begin{equation}
   \tau_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
@@ -99,7 +105,7 @@ so that for sample $k$
 \end{equation}
 
 The parameters $(\boldsymbol{\theta},\boldsymbol{\psi})$ are trained offline by
-minimising a joint-space regression loss
+minimising a joint-space regression loss \cite{Q4_4_10729277,Q4_6_HU2026103093}
 \begin{equation}
   \mathcal{L}_{\mathrm{DeLaN}}(\boldsymbol{\theta},\boldsymbol{\psi})
   =

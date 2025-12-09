@@ -344,12 +344,22 @@ R34 & \cite{Q4_5_10305255}                               & 2023 & IEEE          
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{DeLaN parameterisation and friction model}
+\label{ch:appendix_delan}
+
+This appendix details the specific neural parameterisation of the Deep Lagrangian
+Network (DeLaN) used in Stage~1 of the proposed architecture, i.e.\ the
+construction of the inertia, potential/gravity and friction subnetworks that
+together implement the inverse-dynamics mapping
+$f_{\mathrm{DeLaN}}(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi})$
+described in Section~\ref{sec:methods}.
 
 \section{Inertia subnetwork}
+\label{sec:app_inertia}
 
-Following \cite{Q4_6_HU2026103093}, the symmetric positive-definite inertia
-matrix $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q}) \in \mathbb{R}^{n\times n}$
-is obtained from a learned Cholesky factor.
+Following the improved DeLaN formulation of~\cite{Q4_6_HU2026103093} and its PINN-based extension to industrial robots in~\cite{Q4_4_10729277},
+the symmetric positive-definite inertia matrix
+$\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q}) \in \mathbb{R}^{n\times n}$ is
+obtained from a learned Cholesky factor.
 We parameterise a lower–triangular matrix
 $\hat{\mathbf{L}}(\mathbf{q};\boldsymbol{\theta}_M)$ and set
 \begin{equation}
@@ -387,16 +397,16 @@ perceptrons (MLPs) taking $\mathbf{q}$ as input:
         for all $\mathbf{q}$.
 \end{itemize}
 
-In practice, all three MLPs ($\mathbf{L}_o$, $\mathbf{L}_d$, and the potential
-network below) use sinusoidal activation functions as suggested
-by~\cite{Q4_6_HU2026103093}, since for revolute manipulators the dynamic
-terms can be written as linear combinations of $\sin(\cdot)$ and
-$\cos(\cdot)$.
+In practice, all MLPs in the DeLaN core (the two inertia subnetworks and the
+potential network below) use sinusoidal activation functions as suggested
+in~\cite{Q4_4_10729277,Q4_6_HU2026103093}, since for revolute manipulators the elements of
+$\mathbf{M}(\mathbf{q})$ can be written as linear combinations of
+$\sin(\cdot)$ and $\cos(\cdot)$.
 
 \section{Potential and gravity subnetworks}
+\label{sec:app_potential}
 
-The conservative part of the dynamics is encoded by a learned
-Lagrangian
+The conservative part of the dynamics is encoded by a learned Lagrangian
 \begin{equation}
   \mathcal{L}_{\boldsymbol{\theta}}(\mathbf{q},\dot{\mathbf{q}})
   =
@@ -407,8 +417,8 @@ Lagrangian
 \end{equation}
 where $V_{\boldsymbol{\theta}_V}(\mathbf{q})$ is represented by another MLP
 (the “potential” subnetwork) with parameters $\boldsymbol{\theta}_V$.
-Using automatic differentiation we obtain the gravity vector as the
-gradient of the potential,
+Using automatic differentiation we obtain the gravity term as the gradient of
+the potential,
 \begin{equation}
   \mathbf{G}_{\boldsymbol{\theta}}(\mathbf{q})
   =
@@ -416,12 +426,13 @@ gradient of the potential,
   \approx
   \mathbf{g}(\mathbf{q}).
 \end{equation}
-This is equivalent, up to the choice of parameterisation, to the gravity
-MLP $\hat{\mathbf{g}}(\mathbf{q};\boldsymbol{\psi}_g)$ used
-in~\cite{Q4_6_HU2026103093}, but keeps the explicit Lagrangian structure.
+This DeLaN-style representation of the potential and its gradient follows the
+improved formulations proposed in~\cite{Q4_6_HU2026103093,Q4_4_10729277}, where
+the potential is modelled by a neural network and the gravity vector is
+obtained as its configuration-space gradient.
 
 Together with the inertia matrix~\eqref{eq:app_M_from_L}, the conservative
-torques are
+torques are given by
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{cons}}
   (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta})
@@ -434,14 +445,27 @@ torques are
 \end{equation}
 with the Coriolis/centrifugal term
 $\mathbf{C}_{\boldsymbol{\theta}}(\mathbf{q},\dot{\mathbf{q}})\dot{\mathbf{q}}$
-obtained from $\mathcal{L}_{\boldsymbol{\theta}}$ by the
-Euler–Lagrange equations.
+obtained from $\mathcal{L}_{\boldsymbol{\theta}}$ via the Euler–Lagrange
+equations.
 
 \section{Friction subnetwork}
+\label{sec:app_friction}
 
-Following the improved DeLaN model in~\cite{Q4_6_HU2026103093},
-joint friction is modelled in a physically interpretable way by a
-Coulomb–viscous law,
+Joint friction and other non-conservative effects are modelled in a physically
+interpretable way by a Coulomb–viscous law, following the improved DeLaN
+formulation in~\cite{Q4_6_HU2026103093} and empirical studies on UR robots
+with Coulomb–viscous friction~\cite{QM_2_Coulomb_viscous_friction_ur5_10610737}.
+For each joint $i$ we use
+\begin{equation}
+  \tau_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
+  =
+  f_{c,i}\,\mathrm{sgn}(\dot q_i)
+  +
+  f_{v,i}\,\dot q_i,
+\end{equation}
+where $f_{c,i}$ and $f_{v,i}$ are the Coulomb and viscous friction
+coefficients for joint $i$. Collecting these in vectors
+$\mathbf{f}_c,\mathbf{f}_v \in \mathbb{R}^n$ yields the compact vector form
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{fric}}
   (\dot{\mathbf{q}};\boldsymbol{\psi})
@@ -451,28 +475,25 @@ Coulomb–viscous law,
   \mathbf{f}_v \,\dot{\mathbf{q}},
   \label{eq:app_coulomb_viscous}
 \end{equation}
-where $\mathbf{f}_c,\mathbf{f}_v \in \mathbb{R}^n$ collect the
-joint-wise Coulomb and viscous friction coefficients and
-$\mathrm{sgn}(\cdot)$ is applied element-wise.
-Equation~\eqref{eq:app_coulomb_viscous} corresponds directly to
-Eqs.~(13)–(15) in~\cite{Q4_6_HU2026103093}, where
+with $\mathrm{sgn}(\cdot)$ applied element-wise. This can be interpreted as
+a joint-wise affine map
 \[
-  \tau_f = f_c \,\mathrm{sgn}(\dot{q}) + f_v \dot{q}
+  \boldsymbol{\tau}_{\mathrm{fric}}
+  =
+  f_{\mathrm{fric}}\bigl([\dot{\mathbf{q}},\mathrm{sgn}(\dot{\mathbf{q}})];\boldsymbol{\psi}\bigr),
 \]
-is added to the DeLaN prediction.%
-\footnote{In preliminary experiments we found that replacing
-the analytic Coulomb–viscous form by a small MLP
-$\boldsymbol{\tau}_{\mathrm{fric}} = f_{\mathrm{fric}}([\dot{\mathbf{q}},\mathrm{sgn}(\dot{\mathbf{q}})];\boldsymbol{\psi})$
-slightly improves training loss but makes the friction parameters harder
-to interpret and more prone to absorbing other modelling errors. Given
-that history-dependent and stick–slip effects are explicitly handled by
-the LSTM residual model in Stage~2, we retain the simpler Coulomb–viscous
-structure in Stage~1.}
+consistent with the main Methods section.
+
+Equation~\eqref{eq:app_coulomb_viscous} corresponds directly to the friction
+term in~\cite{Q4_6_HU2026103093}, where
+$\tau_f = f_c \,\mathrm{sgn}(\dot{q}) + f_v \dot{q}$ is added to the DeLaN
+prediction.
 
 \section{Resulting DeLaN inverse-dynamics map}
+\label{sec:app_delan_map}
 
-Combining the inertia, potential/gravity and friction subnetworks, the
-DeLaN inverse-dynamics model used in this thesis is
+Combining the inertia, potential/gravity and friction subnetworks, the DeLaN
+inverse-dynamics model used in this thesis is
 \begin{equation}
   \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}
   (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi})
@@ -484,7 +505,7 @@ DeLaN inverse-dynamics model used in this thesis is
   =
   f_{\mathrm{DeLaN}}(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi}),
 \end{equation}
-which is trained in Stage~1 by minimising the loss
+which is trained in Stage~1 by minimising the joint-space loss
 \begin{equation}
   \mathcal{L}_{\mathrm{DeLaN}}(\boldsymbol{\theta},\boldsymbol{\psi})
   =
@@ -497,5 +518,7 @@ which is trained in Stage~1 by minimising the loss
     \boldsymbol{\tau}_{\mathrm{motor},k}
   \right\|_2^2,
 \end{equation}
-as described in the main Methods section.
-
+with $\boldsymbol{\tau}_{\mathrm{motor},k} = k_t \boldsymbol{I}_k$ as defined
+in~\eqref{eq:tau_motor}. The trained DeLaN then serves as the nominal
+inverse-dynamics backbone that is subsequently refined by the residual LSTM
+in Stage~2, as described in Section~\ref{sec:methods}.
