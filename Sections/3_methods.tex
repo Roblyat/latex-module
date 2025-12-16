@@ -225,3 +225,324 @@ which is compared against the measured wrench for evaluation.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Data preprocessing and dataset construction}
+\label{sec:data_preprocessing}
+
+The starting point is a long-format log of robot measurements, exported as a CSV
+with columns
+\[
+  \texttt{Time},\;
+  \texttt{Joint Name},\;
+  \texttt{Position},\;
+  \texttt{Velocity},\;
+  \texttt{Acceleration},\;
+  \texttt{Effort}.
+\]
+Each row corresponds to a single joint at a given timestamp. In this first
+iteration, the joint velocities and accelerations are taken directly from the
+controller without additional filtering, and the joint effort is interpreted as
+a torque-like quantity. The precise mapping from motor currents to joint
+torques is introduced later via the torque constant $k_t$
+(cf.~Section~\ref{sec:methods}).
+
+\paragraph{Joint selection (UR5 arm).}
+From the full log we select only the six UR5 joints
+\[
+  \mathcal{J}
+  =
+  \bigl\{
+    \texttt{ur5\_shoulder\_pan\_joint},\,
+    \texttt{ur5\_shoulder\_lift\_joint},\,
+    \texttt{ur5\_elbow\_joint},\,
+    \texttt{ur5\_wrist\_1\_joint},\,
+    \texttt{ur5\_wrist\_2\_joint},\,
+    \texttt{ur5\_wrist\_3\_joint}
+  \bigr\},
+\]
+which defines $n_{\mathrm{dof}} = 6$ for all subsequent processing. For each
+timestamp $t$ we thus obtain a 6-dimensional joint configuration, velocity,
+acceleration and effort vector.
+
+\paragraph{Frame-wise representation and trajectory segmentation.}
+Let $\{t_f\}_{f=1}^{F}$ denote the sorted set of unique timestamps in the log.
+For each frame index $f$ and each joint $j \in \mathcal{J}$ we collect
+\[
+  q_{f,j},\quad
+  \dot q_{f,j},\quad
+  \ddot q_{f,j},\quad
+  \tau^{\mathrm{eff}}_{f,j},
+\]
+where $\tau^{\mathrm{eff}}_{f,j}$ denotes the measured joint effort.
+Stacking over joints yields frame-wise vectors
+\[
+  \mathbf{q}_f,\ \dot{\mathbf{q}}_f,\ \ddot{\mathbf{q}}_f,\ 
+  \boldsymbol{\tau}^{\mathrm{eff}}_f \in \mathbb{R}^{6}.
+\]
+
+To obtain multiple trajectories from a single continuous log, we segment the
+frames into fixed-length windows. For a chosen number of frames per trajectory,
+$T_{\mathrm{seg}}$, we define a trajectory index
+\[
+  \mathrm{traj}(f)
+  =
+  \left\lfloor \frac{f-1}{T_{\mathrm{seg}}} \right\rfloor,
+\]
+and group all frames with the same $\mathrm{traj}(f)$ into one trajectory.
+
+For trajectory $i$ this yields a time series of length $T_i$ with
+\begin{align}
+  \mathbf{t}^{(i)} &= \bigl(t^{(i)}_1,\dots,t^{(i)}_{T_i}\bigr) \in \mathbb{R}^{T_i}, \\
+  \mathbf{Q}^{(i)} &= 
+    \begin{bmatrix}
+      \mathbf{q}^{(i)}_1{}^\top \\
+      \vdots \\
+      \mathbf{q}^{(i)}_{T_i}{}^\top
+    \end{bmatrix}
+    \in \mathbb{R}^{T_i \times 6}, \\
+  \dot{\mathbf{Q}}^{(i)} &=
+    \begin{bmatrix}
+      \dot{\mathbf{q}}^{(i)}_1{}^\top \\
+      \vdots \\
+      \dot{\mathbf{q}}^{(i)}_{T_i}{}^\top
+    \end{bmatrix}
+    \in \mathbb{R}^{T_i \times 6}, \\
+  \ddot{\mathbf{Q}}^{(i)} &=
+    \begin{bmatrix}
+      \ddot{\mathbf{q}}^{(i)}_1{}^\top \\
+      \vdots \\
+      \ddot{\mathbf{q}}^{(i)}_{T_i}{}^\top
+    \end{bmatrix}
+    \in \mathbb{R}^{T_i \times 6}, \\
+  \mathbf{T}^{(i)} &=
+    \begin{bmatrix}
+      \boldsymbol{\tau}^{\mathrm{eff},(i)}_1{}^\top \\
+      \vdots \\
+      \boldsymbol{\tau}^{\mathrm{eff},(i)}_{T_i}{}^\top
+    \end{bmatrix}
+    \in \mathbb{R}^{T_i \times 6}.
+\end{align}
+In short, each trajectory $i$ is represented by
+\[
+  \bigl(\mathbf{t}^{(i)},\mathbf{Q}^{(i)},\dot{\mathbf{Q}}^{(i)},
+        \ddot{\mathbf{Q}}^{(i)},\mathbf{T}^{(i)}\bigr),
+\]
+with shapes
+\[
+  \mathbf{t}^{(i)} \in \mathbb{R}^{T_i},\quad
+  \mathbf{Q}^{(i)},\dot{\mathbf{Q}}^{(i)},\ddot{\mathbf{Q}}^{(i)},\mathbf{T}^{(i)}
+  \in \mathbb{R}^{T_i \times 6}.
+\]
+
+\paragraph{Train/test split by trajectory.}
+Let $\mathcal{I} = \{1,\dots,N_{\mathrm{traj}}\}$ denote the set of all
+trajectory indices.
+We randomly permute $\mathcal{I}$ and partition it into disjoint training and
+test index sets,
+\[
+  \mathcal{I}_{\mathrm{train}} \cup \mathcal{I}_{\mathrm{test}} = \mathcal{I},
+  \qquad
+  \mathcal{I}_{\mathrm{train}} \cap \mathcal{I}_{\mathrm{test}} = \emptyset,
+\]
+such that a given trajectory is entirely in either the training or the test
+set. This avoids leakage of near-identical neighbouring samples across splits.
+
+\paragraph{NPZ dataset structure.}
+For efficient loading during model training, the trajectory-wise data are stored
+in a NumPy \texttt{.npz} archive with the following keys:
+\begin{align}
+  &\texttt{train\_labels},\ 
+   \texttt{train\_t},\ 
+   \texttt{train\_q},\ 
+   \texttt{train\_qd},\ 
+   \texttt{train\_qdd},\ 
+   \texttt{train\_tau}, \\
+  &\texttt{test\_labels},\ 
+   \texttt{test\_t},\ 
+   \texttt{test\_q},\ 
+   \texttt{test\_qd},\ 
+   \texttt{test\_qdd},\ 
+   \texttt{test\_tau}.
+\end{align}
+Each of the trajectory-wise arrays is stored as a one-dimensional object array.
+For example,
+\[
+  \texttt{train\_q}[i]
+  \;\widehat{=}\;
+  \mathbf{Q}^{(i)} \in \mathbb{R}^{T_i \times 6},
+\]
+and analogously for $\texttt{train\_qd}$, $\texttt{train\_qdd}$ and
+$\texttt{train\_tau}$.
+Thus, if there are $N_{\mathrm{train}}$ training trajectories, we have
+\[
+  \texttt{train\_q} \in \mathbb{R}^{N_{\mathrm{train}}}_{\text{object}},\quad
+  \texttt{train\_q}[i] \in \mathbb{R}^{T_i \times 6},
+\]
+and likewise for the test set.
+
+In the current implementation the \texttt{Effort} column is used to populate
+$\mathbf{T}^{(i)}$; the conversion to motor torques via
+$\boldsymbol{\tau}_{\mathrm{motor},k} = k_t\,\boldsymbol{I}_k$ is applied
+later in the training pipeline (cf.~\eqref{eq:tau_motor}).
+
+\paragraph{Flattening trajectories for DeLaN training.}
+On the DeLaN side, the trajectory-wise arrays are flattened into a single pool
+of samples for stochastic optimisation.
+Denoting concatenation along the time dimension by $\mathrm{vstack}(\cdot)$,
+the training set becomes
+\begin{align}
+  \tilde{\mathbf{Q}}_{\mathrm{train}}
+    &= \mathrm{vstack}\bigl(\texttt{train\_q}[i]\bigr)
+     \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6}, \\
+  \dot{\tilde{\mathbf{Q}}}_{\mathrm{train}}
+    &= \mathrm{vstack}\bigl(\texttt{train\_qd}[i]\bigr)
+     \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6}, \\
+  \ddot{\tilde{\mathbf{Q}}}_{\mathrm{train}}
+    &= \mathrm{vstack}\bigl(\texttt{train\_qdd}[i]\bigr)
+     \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6}, \\
+  \tilde{\mathbf{T}}_{\mathrm{train}}
+    &= \mathrm{vstack}\bigl(\texttt{train\_tau}[i]\bigr)
+     \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6},
+\end{align}
+where
+\[
+  N_{\mathrm{train,tot}} = \sum_{i \in \mathcal{I}_{\mathrm{train}}} T_i
+\]
+is the total number of training time steps across all trajectories.
+An analogous flattening is performed for the test set.
+
+All arrays are cast to a floating-point dtype (e.g.\ \texttt{float32}) to
+avoid \texttt{dtype=object} issues in the JAX-based DeLaN implementation.
+
+\vspace{0.75\baselineskip}
+
+\section{DeLaN training setup}
+\label{sec:delan_training_setup}
+
+Given the flattened dataset
+\[
+  \mathcal{D}_{\mathrm{train}}
+  =
+  \bigl\{
+    (\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k,
+     \boldsymbol{\tau}_{\mathrm{motor},k})
+  \bigr\}_{k=1}^{N_{\mathrm{train,tot}}},
+\]
+the DeLaN model $f_{\mathrm{DeLaN}}$ is trained as described in
+Section~\ref{sec:methods}. Here we summarise the main implementation details
+used in this work.
+
+\paragraph{Feature transform on joint positions.}
+Instead of feeding the raw joint angles $\mathbf{q}_k$ directly into the
+DeLaN subnetworks, we use a bounded, trigonometric feature map
+\begin{equation}
+  \boldsymbol{\phi}(\mathbf{q}_k)
+  =
+  \begin{bmatrix}
+    \mathbf{q}_k \\
+    \sin(\mathbf{q}_k) \\
+    \cos(\mathbf{q}_k)
+  \end{bmatrix}
+  \in \mathbb{R}^{3n_{\mathrm{dof}}},
+\end{equation}
+where the sine and cosine are applied element-wise.
+This follows the common practice in DeLaN/PINN-based models of encoding
+revolute joints through periodic features, which mitigates angle wrap-around
+and keeps the network inputs well scaled.
+The feature vector $\boldsymbol{\phi}(\mathbf{q}_k)$ is used as input to the
+inertia MLPs and the potential network described in
+Appendix~\ref{ch:appendix_delan}.
+
+\paragraph{Per-joint loss normalisation.}
+To prevent joints with large torque magnitudes from dominating the optimisation,
+we employ a per-joint normalisation in the inverse-dynamics loss.
+Let
+\begin{equation}
+  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}
+  =
+  f_{\mathrm{DeLaN}}
+    (\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k;
+     \boldsymbol{\theta},\boldsymbol{\psi})
+\end{equation}
+denote the DeLaN torque prediction for sample $k$.
+
+We compute empirical variances of the training torques
+\begin{equation}
+  \boldsymbol{\sigma}^2_{\tau}
+  =
+  \mathrm{Var}\bigl(
+    \tilde{\mathbf{T}}_{\mathrm{train}}
+  \bigr)
+  \in \mathbb{R}^{6},
+\end{equation}
+
+and define a diagonal weighting matrix
+
+\begin{equation}
+  \mathbf{W}_{\tau}
+  =
+  \mathrm{diag}\bigl( \boldsymbol{\sigma}^{-1}_{\tau} \bigr)
+  \in \mathbb{R}^{6 \times 6},
+\end{equation}
+where the inverse is taken element-wise.
+The training objective can then be written as
+\begin{equation}
+  \mathcal{L}_{\mathrm{DeLaN}}(\boldsymbol{\theta},\boldsymbol{\psi})
+  =
+  \frac{1}{N_{\mathrm{train,tot}}}
+  \sum_{k=1}^{N_{\mathrm{train,tot}}}
+  \bigl\|
+    \mathbf{W}_{\tau}
+    \bigl(
+      \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}
+      -
+      \boldsymbol{\tau}_{\mathrm{motor},k}
+    \bigr)
+  \bigr\|_2^2,
+\end{equation}
+which corresponds to a per-joint normalisation of the squared torque error.
+In practice, additional factors derived from $\ddot{\mathbf{q}}$ may be
+included analogously, but the essential idea is that the loss is balanced
+across joints.
+
+\paragraph{Replay buffer and random mini-batch sampling.}
+All training samples are stored in a replay buffer $\mathcal{M}$, which
+supports random-access mini-batch sampling.
+At each optimisation step, a mini-batch index set
+$S \subset \{1,\dots,N_{\mathrm{train,tot}}\}$ with $|S| = B$ is drawn (e.g.\
+by taking a random permutation of indices and slicing), and the corresponding
+batch
+\[
+  \mathcal{B}
+  =
+  \bigl\{
+    (\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k,
+     \boldsymbol{\tau}_{\mathrm{motor},k})
+  \bigr\}_{k \in S}
+\]
+is used to evaluate $\mathcal{L}_{\mathrm{DeLaN}}$ and its gradients.
+This renders the optimisation effectively i.i.d.\ over the flattened pool of
+samples; the original trajectory grouping is retained only for the train/test
+split and for later sequence-based models and visualisations.
+
+\paragraph{Importance of constant sampling time.}
+Throughout the preprocessing and training pipeline, we assume a (approximately)
+constant sampling interval
+\[
+  \Delta t_k = t_{k+1} - t_k \approx \Delta t,\qquad \forall k,
+\]
+as is standard for robot control logs.
+A fixed sampling period is crucial for:
+\begin{itemize}
+  \item interpreting measured joint velocities $\dot{\mathbf{q}}_k$ and
+        accelerations $\ddot{\mathbf{q}}_k$ as consistent derivatives of
+        $\mathbf{q}_k$,
+  \item applying finite-difference schemes or filtering to reconstruct
+        $\dot{\mathbf{q}}_k$ and $\ddot{\mathbf{q}}_k$ from position data,
+  \item ensuring that the DeLaN model learns a time-homogeneous mapping from
+        $(\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k)$ to
+        $\boldsymbol{\tau}_{\mathrm{motor},k}$.
+\end{itemize}
+In the present work, the raw controller velocities and accelerations are used
+directly, but enforcing a constant sampling time and applying dedicated
+filtering to $\dot{\mathbf{q}}_k$ and $\ddot{\mathbf{q}}_k$ constitutes a
+straightforward extension of the preprocessing pipeline.
