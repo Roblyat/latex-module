@@ -546,3 +546,97 @@ In the present work, the raw controller velocities and accelerations are used
 directly, but enforcing a constant sampling time and applying dedicated
 filtering to $\dot{\mathbf{q}}_k$ and $\ddot{\mathbf{q}}_k$ constitutes a
 straightforward extension of the preprocessing pipeline.
+
+\section{Stage~2 dataset for the LSTM}
+
+After training Stage~1, the DeLaN parameters $(\boldsymbol{\theta},\boldsymbol{\psi})$
+are frozen and the model is evaluated on all training samples
+$(\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k)$,
+$k=1,\dots,N_{\mathrm{train,tot}}$.
+This yields joint-torque predictions
+\begin{equation}
+  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}
+  =
+  f_{\mathrm{DeLaN}}
+    (\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k;
+     \boldsymbol{\theta},\boldsymbol{\psi}),
+\end{equation}
+which we stack into a matrix
+\begin{equation}
+  \hat{\mathbf{T}}_{\mathrm{DeLaN,train}}
+  =
+  \begin{bmatrix}
+    \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},1}{}^\top \\
+    \vdots \\
+    \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},N_{\mathrm{train,tot}}}{}^\top
+  \end{bmatrix}
+  \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6}.
+\end{equation}
+
+Using the corresponding motor torques
+$\boldsymbol{\tau}_{\mathrm{motor},k}$, we define the joint-space residual
+torques for all training samples as
+\begin{equation}
+  \boldsymbol{r}_{\tau,k}
+  =
+  \boldsymbol{\tau}_{\mathrm{motor},k}
+  -
+  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k},
+  \qquad k = 1,\dots,N_{\mathrm{train,tot}},
+\end{equation}
+and collect them in
+\begin{equation}
+  \mathbf{R}_{\tau,\mathrm{train}}
+  =
+  \begin{bmatrix}
+    \boldsymbol{r}_{\tau,1}{}^\top \\
+    \vdots \\
+    \boldsymbol{r}_{\tau,N_{\mathrm{train,tot}}}{}^\top
+  \end{bmatrix}
+  \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6}.
+\end{equation}
+
+Let $H$ denote the history length (sequence length) used in Stage~2.
+From the flattened arrays
+$\tilde{\mathbf{Q}}_{\mathrm{train}},
+ \dot{\tilde{\mathbf{Q}}}_{\mathrm{train}},
+ \ddot{\tilde{\mathbf{Q}}}_{\mathrm{train}},
+ \hat{\mathbf{T}}_{\mathrm{DeLaN,train}}$
+we then construct overlapping sequences with a sliding window.
+For each time index $k \geq H$ we define the LSTM input sequence
+\begin{equation}
+  \mathbf{x}_k
+  =
+  \Bigl[
+    \mathbf{q}_{k-H+1:k},\,
+    \dot{\mathbf{q}}_{k-H+1:k},\,
+    \ddot{\mathbf{q}}_{k-H+1:k},\,
+    \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k-H+1:k}
+  \Bigr],
+\end{equation}
+where, as in the main Methods section,
+$\mathbf{q}_{a:b}$ denotes the stacked joint vectors
+$(\mathbf{q}_a,\dots,\mathbf{q}_b)$ and analogously for
+$\dot{\mathbf{q}}$, $\ddot{\mathbf{q}}$ and
+$\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}$.
+The corresponding target for each sequence is chosen as the residual torque
+at the final time step,
+\begin{equation}
+  \mathbf{y}_k = \boldsymbol{r}_{\tau,k} \in \mathbb{R}^6.
+\end{equation}
+
+Stacking all valid windows yields the Stage~2 training dataset
+\begin{align}
+  \mathbf{X}^{\mathrm{LSTM}}_{\mathrm{train}}
+    &= \bigl\{\mathbf{x}_k\bigr\}_{k=H}^{N_{\mathrm{train,tot}}}, \\
+  \mathbf{Y}^{\mathrm{LSTM}}_{\mathrm{train}}
+    &= \bigl\{\mathbf{y}_k\bigr\}_{k=H}^{N_{\mathrm{train,tot}}},
+\end{align}
+with $N_H = N_{\mathrm{train,tot}} - H + 1$ sequences in total.
+In implementation, $\mathbf{X}^{\mathrm{LSTM}}_{\mathrm{train}}$ is stored as
+a tensor of shape $(N_H, H, d_{\mathrm{in}})$, where
+$d_{\mathrm{in}} = 4n_{\mathrm{dof}}$ corresponds to
+$(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}})$
+per time step, and
+$\mathbf{Y}^{\mathrm{LSTM}}_{\mathrm{train}} \in \mathbb{R}^{N_H \times 6}$.
+A completely analogous construction is used for the test split.
