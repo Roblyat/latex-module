@@ -1,16 +1,199 @@
-\chapter{Discussion and Results}
+\chapter{Experimental and Results}
 
-    \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\columnwidth]{Images/05_results/delan_ur5_A__delan_struct_s4_ep200__DeLaN_Torque.png}
-    \caption[Concept graph of the SoA literature]{The Concept graph summarising the reviewed literature. 
-    Green nodes represent method categories Q1-Q4 with node the size proportional to the number of papers in each category. 
-    Blue nodes denote the main estimation goals scaled by how many papers address each goal. 
-    Red nodes correspond to individual references R1-R34; their diameter is proportional to the citation count (clipped at the maximum). 
-    Directed edges indicate that a given reference belongs to a method category and contributes to one or more estimation goals. R1-R34 table in Appendix \ref{soa_references_graph}}
+\section{Model Visualizations}
+This section gathers the recorded figures for the DeLaN, LSTM, and evaluation pipelines so that the developments in model behavior can be followed from training-specific diagnostics to end-to-end validation artifacts.
 
-    ~\label{fig:SoA_concept_graph}
-    \end{figure}
+\textbf{The DeLaN seed determines the character assignment between train and test set, which is comparable to a k-fold evaluation.}
+
+\subsection{DeLaN Prediction Diagnostics}
+\paragraph{Torque predictions across training stages.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/delan_UR3_Load0_combined_26__A__delan_jax_struct_s0_ep150__DeLaN_Torque.png}
+\caption{DeLaN torque prediction after structural stage s0 at epoch 150.}
+\label{fig:delan_torque_s0}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/delan_UR3_Load0_combined_26__A__delan_jax_struct_s1_ep250__DeLaN_Torque.png}
+\caption{Torque evolution following refinement at structural stage s1 (eppoch 250).}
+\label{fig:delan_torque_s1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/delan_UR3_Load0_combined_26__A__delan_jax_struct_s2_ep400__DeLaN_Torque.png}
+\caption{Final torque trace for structural stage s2 after epoch 400.}
+\label{fig:delan_torque_s2}
+\end{figure}
+
+\paragraph{Kinematics and loss breakdown.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/delan_UR3_Load0_combined_26__A__delan_jax_struct_s2_ep400__elbow_train_vs_test.png}
+\caption{Comparison of elbow articulation during training and test data at the final structural stage.}
+\label{fig:delan_elbow_train_test}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/delan_UR3_Load0_combined_26__A__delan_jax_struct_s2_ep400__loss_components.png}
+\caption{Architectural loss components tracked across the final training stage.}
+\label{fig:delan_loss_components}
+\end{figure}
+
+\paragraph{RMSE grids grouped by DeLaN tag.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/box/delan_joint_rmse_grid_by_delan_tag.png}
+\caption{Joint RMSE grid separated by DeLaN tag.}
+\label{fig:delan_rmse_grid}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/delan/box/delan_torque_rmse_by_delan_tag.png}
+\caption{Torque RMSE grid sorted by the DeLaN tag.}
+\label{fig:delan_torque_rmse}
+\end{figure}
+
+\subsection{LSTM Feature Ablations}
+\paragraph{Feature-mode statistics.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/lstm/box/lstm_best_val_loss_vs_rmse_total.png}
+\caption{Best validation loss plotted against total RMSE for each feature mode.}
+\label{fig:lstm_loss_vs_rmse}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/lstm/box/lstm_joint_rmse_grid_by_feature_mode.png}
+\caption{Grid of joint RMSE values organized by feature extraction mode.}
+\label{fig:lstm_joint_rmse_grid}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/lstm/box/lstm_overfit_ratio_by_feature_mode.png}
+\caption{Overfit ratio measured per feature mode.}
+\label{fig:lstm_overfit_ratio}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/lstm/box/lstm_residual_rmse_by_feature_mode.png}
+\caption{Residual RMSE dissected by feature mode.}
+\label{fig:lstm_residual_rmse}
+\end{figure}
+
+\paragraph{Training diagnostics in the LSTM box folder.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/lstm/loss_curve.png}
+\caption{Loss curve tracked during LSTM optimization.}
+\label{fig:lstm_loss_curve}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/lstm/residual_gt_vs_pred.png}
+\caption{Residuals of ground truth versus prediction curves on the validation split.}
+\label{fig:lstm_residual_gt_pred}
+\end{figure}
+
+\subsection{Evaluation Residuals}
+\paragraph{Sensor residual analysis for trajectory H25 and H50.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/residual_gt_vs_pred_test_H25.png}
+\caption{Residual comparison on the H25 trajectory test set.}
+\label{fig:eval_residual_H25}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/residual_gt_vs_pred_test_H50.png}
+\caption{Residual comparison on the H50 trajectory test set.}
+\label{fig:eval_residual_H50}
+\end{figure}
+
+\paragraph{Metric box plots from the evaluation box folder.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/box/box_delan_rmse_by_delan_id.png}
+\caption{Delan RMSE distribution per identifier in the evaluation set.}
+\label{fig:eval_box_delan_rmse}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/box/box_gain_by_feature_mode.png}
+\caption{Gain values stratified by feature mode.}
+\label{fig:eval_box_gain}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/box/box_gain_ratio_by_feature_mode.png}
+\caption{Gain ratio comparison over the evaluated feature sets.}
+\label{fig:eval_box_gain_ratio}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/box/box_res_rmse_by_feature_mode.png}
+\caption{Residual RMSE per feature mode documented as box plots.}
+\label{fig:eval_box_res_rmse}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/box/box_rg_rmse_by_feature_mode.png}
+\caption{RG RMSE values grouped by feature mode.}
+\label{fig:eval_box_rg_rmse}
+\end{figure}
+
+\subsection{Evaluation Scatter Comparisons}
+\paragraph{Gain versus RMSE curves.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/scatter/scatter_delan_rmse_vs_gain.png}
+\caption{Scatter of Delan RMSE versus gain.}
+\label{fig:eval_scatter_rmse_vs_gain}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/scatter/scatter_delan_rmse_vs_gain_ratio.png}
+\caption{Delan RMSE plotted against gain ratio.}
+\label{fig:eval_scatter_rmse_vs_gain_ratio}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/scatter/scatter_delan_rmse_vs_gain_ratio__jax.png}
+\caption{Gain ratio comparison for the JAX implementation.}
+\label{fig:eval_scatter_rmse_vs_gain_ratio_jax}
+\end{figure}
+
+\paragraph{Residual gain comparisons.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/scatter/scatter_delan_rmse_vs_rg_rmse.png}
+\caption{Delan RMSE versus RG RMSE scatter.}
+\label{fig:eval_scatter_rmse_vs_rg_rmse}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{Images/05_results/evaluation/scatter/scatter_res_rmse_vs_rg_rmse.png}
+\caption{Residual RMSE against RG RMSE to emphasize the estimation gap.}
+\label{fig:eval_scatter_res_rmse_vs_rg_rmse}
+\end{figure}
+
+
 
 % \section{Results}
 % 
