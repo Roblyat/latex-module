@@ -4,6 +4,8 @@
 This section gathers the recorded figures for the DeLaN, LSTM, and evaluation pipelines so that the developments in model behavior can be followed from training-specific diagnostics to end-to-end validation artifacts.
 
 \textbf{The DeLaN seed determines the character assignment between train and test set, which is comparable to a k-fold evaluation.}
+Since the dataset situation, this is tested for this dataset in current precision [dataport dataset with paper Juan H.]
+And on Torque Prediction for X != 6 dof
 
 \subsection{DeLaN Prediction Diagnostics}
 \paragraph{Torque predictions across training stages.}
@@ -17,7 +19,7 @@ This section gathers the recorded figures for the DeLaN, LSTM, and evaluation pi
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{Images/05_results/delan/delan_UR3_Load0_combined_26__A__delan_jax_struct_s1_ep250__DeLaN_Torque.png}
-\caption{Torque evolution following refinement at structural stage s1 (eppoch 250).}
+\caption{Torque evolution following refinement at structural stage s1 (epoch 250).}
 \label{fig:delan_torque_s1}
 \end{figure}
 
