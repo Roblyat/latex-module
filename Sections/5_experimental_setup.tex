@@ -148,6 +148,69 @@ fixed number of bins; median $\pm$ IQR is then computed per progress bin.
 
 \subsection{Best Model Approch}
 
+\textbf{Motivation.}
+The K-domination sweep shows that once a sufficiently large number of trajectories is available,
+the DeLaN training dynamics become comparable across $K$ and the remaining variance is dominated
+by (i) which trajectories end up in the train/validation/test split (dataset seed) and (ii) the
+network initialisation (DeLaN seed).
+This effect is visible in the collapse of the median learning curves for $K\geq 32$
+(Figures~\ref{fig:kdom_delan_train_loss_by_k} and~\ref{fig:kdom_delan_val_mse_by_k}), while the
+dispersion and occasional outliers remain seed-dependent, especially for the progress-aligned
+torque RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}).
+
+\textbf{Objective.}
+To obtain a reliable basis for the second experiment, we therefore fix $K=84$ and select a DeLaN
+hyperparameter preset within the stable $K$ regime.
+Since Algorithm~\ref{alg:best_model_approach} performs validation-based checkpoint selection, the
+hyperparameters should (i) reduce seed sensitivity (tight IQR with few or no catastrophic runs),
+(ii) reach low validation error quickly and consistently (stable early-stopping behaviour), and
+(iii) generalise such that the validation-based ranking correlates with test performance.
+Accordingly, we do not select the setting with the lowest median validation error alone, but the
+setting that achieves a favourable accuracy--robustness trade-off across dataset and initialisation
+seeds.
+
+\textbf{Robust DeLaN score for hyperparameter selection.}
+For each DeLaN preset $h$, we aggregate validation RMSE across DeLaN seeds (and then across dataset
+seeds) and compute a robustness-aware selection score
+\begin{equation}
+  \mathrm{score}(h)
+  =
+  \mathrm{median}\!\left(\mathrm{RMSE}_{\mathrm{val}}\right)
+  + \lambda \cdot \mathrm{IQR}\!\left(\mathrm{RMSE}_{\mathrm{val}}\right)
+  + P \cdot \mathbf{1}\!\left\{\text{diverged run under } h\right\}.
+\end{equation}
+We use $\lambda=0.5$ and $P=10$ (in current units [A]).
+Here, the median term captures typical validation accuracy, the IQR term penalises sensitivity to
+dataset and initialisation seeds, and the penalty term excludes hyperparameter settings that exhibit
+numerical divergence (e.g., NaNs or exploding loss) for any seed.
+Lower values of $\mathrm{score}(h)$ therefore indicate both high accuracy and high reliability.
+
+\textbf{Aggregate scatter plots.}
+In addition to the scalar score, we report two aggregated scatter plots for comparing presets $h$:
+(i) median validation RMSE versus IQR of validation RMSE, and (ii) median validation RMSE versus
+median test RMSE.
+In both cases, statistics are computed across DeLaN seeds for each dataset seed first, and then
+aggregated across dataset seeds, such that each point reflects the combined accuracy--robustness
+behaviour under the dominant seed variability identified by K-domination.
+The bottom-left region of the median--IQR plot corresponds to accurate and stable settings, while
+the validation--test plot directly assesses whether validation error is a reliable selector for
+test performance in the sense required by Algorithm~\ref{alg:best_model_approach}.
+
+\textbf{DeLaN presets ($|\mathcal{H}_{\mathrm{DeLaN}}|=5$).}
+Guided by the stable ``Lutter-like'' regime observed in the K-domination results for $K\geq 32$
+(Figures~\ref{fig:kdom_delan_train_loss_by_k}--\ref{fig:kdom_delan_rmse_per_joint}), we evaluate the
+following five presets at fixed $K=84$:
+\begin{enumerate}
+    \item \textbf{Baseline (Lutter-like):} SoftPlus, batch size $1024$, learning rate $10^{-4}$, weight decay $10^{-5}$, width $256$, depth $2$.
+    \item \textbf{Smaller capacity:} baseline with width $128$, depth $2$.
+    \item \textbf{Deeper network:} baseline with width $256$, depth $3$.
+    \item \textbf{More regularisation:} baseline with weight decay $10^{-4}$.
+    \item \textbf{Lower step size:} baseline with learning rate $5\cdot 10^{-5}$.
+\end{enumerate}
+This best-model study thus fixes $K=84$ and asks: \emph{within the stable regime}, which
+hyperparameters provide the best accuracy--robustness trade-off across dataset splits and DeLaN
+initialisations?
+
 \begin{algorithm}[H]
 \caption{Best-model selection for the DeLaN+LSTM pipeline}\label{alg:best_model_approach}
 \begin{algorithmic}
