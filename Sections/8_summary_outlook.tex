@@ -1,50 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Stage 1 (DeLaN): learning dynamics. Figures 6 and 7 summarise the Stage 1 optimisation
-as a function of the number of trajectories K. Small trajectory sets lead to substantially higher
-training loss and validation error, and also to markedly larger variability across dataset seeds.
-In contrast, for K ≥ 32 the curves collapse quickly, indicating both faster convergence and
-improved generalisation
-
-&
-
-Stage 1 (DeLaN): torque error as a function of motion progress. Figure 8 reports the
-torque RMSE along the normalised trajectory progress. The smallest setting (K = 8) exhibits
-pronounced error spikes and large IQR, highlighting sensitivity to the selected trajectory sub-
-set. Increasing K substantially reduces both the typical error level and its variability, and the
-curves stabilise for large K
-
-----> discussion = The DeLaN seed determines the character assignment between train and test set, which is comparable to a k-fold evaluation.
-At low K, that shows some folds are not learnable, resulting in higher training loss and validation error.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Stage 1 (DeLaN): per-joint error. Figure 9 reports per-joint torque RMSE for a represen-
-tative subset of K values. For small K, individual joints can dominate the overall error (here,
-notably joints 3 and 5), whereas larger K leads to consistently low errors across all joints and
-reduced dispersion 
-----> higher K leads into storngly more equal rmse per joint, because per joint normalization via loss
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \chapter{Summary and Outlook}
-
-\section{Discussion and Outlook}
-\label{sec:discussion_outlook}
 
     The results in this thesis can be interpreted as a first step towards a more
     general notion of \emph{dynamic awareness} for collaborative manipulators.
@@ -127,5 +81,6 @@ reduced dispersion
     insight into which dynamic effects the robot actually relies on in practice, and would offer a
     transparent counterpart to the high–capacity DeLaN+LSTM model used in the present work.%
 
-
+    % \textbf{Slow movment ISO Norms in Dataset paper signal to noise ration, good pipeline performance on collaboration trajectories
+    % check that statement in the dataset paper}
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
