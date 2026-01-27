@@ -1,95 +1,131 @@
-\chapter{Experimental and Results}
-In \texttt{run\_sweep\_1.py}, training is organized as a controlled sweep over data regime and random seeds with (i) stabilized DeLaN training, (ii) explicit DeLaN model selection by validation error, and (iii) residual learning only for the selected baseline, followed by unified end-to-end evaluation.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{itemize}
-    \item \textbf{Outer sweep (data regime).} For each trajectory budget $K$ in the configured list (subsampled from the available training trajectories), DeLaN and LSTM training are executed under fixed hyperparameter regimes; in contrast to \texttt{run\_full\_sweep.py}, the epoch budgets are \emph{decoupled} from $K$.
+Stage 1 (DeLaN): learning dynamics. Figures 6 and 7 summarise the Stage 1 optimisation
+as a function of the number of trajectories K. Small trajectory sets lead to substantially higher
+training loss and validation error, and also to markedly larger variability across dataset seeds.
+In contrast, for K ≥ 32 the curves collapse quickly, indicating both faster convergence and
+improved generalisation
 
-    \item \textbf{Split sweep.} For each test fraction $t_f$ in the configured set (typically fixed to $t_f=0.2$) and validation fraction fixed to $v_f=0.1$, an independent experimental branch is executed.
+&
 
-    \item \textbf{Dataset replication.} For each dataset seed $s$, the raw CSV data is preprocessed into an NPZ dataset specific to $(K,t_f,v_f,s)$, defining train/validation/test partitions and derived signals (including acceleration filtering in the improved pipeline).
+Stage 1 (DeLaN): torque error as a function of motion progress. Figure 8 reports the
+torque RMSE along the normalised trajectory progress. The smallest setting (K = 8) exhibits
+pronounced error spikes and large IQR, highlighting sensitivity to the selected trajectory sub-
+set. Increasing K substantially reduces both the typical error level and its variability, and the
+curves stabilise for large K
 
-    \item \textbf{DeLaN replication and selection.} For each DeLaN seed $s_d$ in the configured set (e.g., $s_d\in\{0,1,2,3,4\}$), a structured DeLaN (JAX implementation) is trained on the same NPZ split using a fixed ``Lutter-like'' hyperparameter preset. The best DeLaN is then \emph{selected by validation torque RMSE} across $s_d$, and only this selected model is used for subsequent residual export.
+----> discussion = The DeLaN seed determines the character assignment between train and test set, which is comparable to a k-fold evaluation.
+At low K, that shows some folds are not learnable, resulting in higher training loss and validation error.
 
-    \item \textbf{Residual-model grid (restricted).} For the selected DeLaN, the script exports torque residuals and enumerates only window lengths $H \in \{100,150\}$ under a fixed feature mode (\texttt{full}). For each $H$, it (i) builds supervised LSTM windows, (ii) trains an LSTM residual predictor (with early stopping and best-checkpoint selection), and (iii) evaluates the recombined model (DeLaN + residual correction) using a unified evaluation routine, writing per-run metrics and plots.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    \item \textbf{Centralized summary logging.} In addition to per-run artifacts, the sweep appends DeLaN-, LSTM-, and end-to-end metrics to consolidated summary files (JSONL/CSV), enabling aggregate analysis across $(K,s,s_d,H)$ without directory scanning.
-\end{itemize}
+Stage 1 (DeLaN): per-joint error. Figure 9 reports per-joint torque RMSE for a represen-
+tative subset of K values. For small K, individual joints can dominate the overall error (here,
+notably joints 3 and 5), whereas larger K leads to consistently low errors across all joints and
+reduced dispersion 
+----> higher K leads into storngly more equal rmse per joint, because per joint normalization via loss
 
-\paragraph{Summary of sweep-1 metrics (DeLaN, LSTM, and end-to-end evaluation).}
-The sweep-1 experiment evaluates a physics-first baseline (DeLaN) and a learned residual corrector (LSTM) under a fixed feature configuration
-(\texttt{full}) and two temporal window lengths ($H \in \{100,150\}$). For each dataset split (indexed by trajectory budget $K$ and dataset seed),
-multiple DeLaN instances are trained with different DeLaN seeds; the best-performing DeLaN is selected by validation torque RMSE and subsequently
-used to export residual targets for LSTM training. The reported metrics therefore reflect (i) DeLaN generalization as a function of data regime,
-(ii) residual predictability under increasing data, and (iii) the compounded end-to-end performance when recombining baseline and residual
-prediction.
 
-\paragraph{DeLaN baseline: data-regime dominated generalization.}
-Across all runs, DeLaN validation and test errors decrease strongly with increasing trajectory budget $K$. In the low-data regime (e.g., $K=8$),
-DeLaN exhibits large errors and high variance across seeds, indicating that the learned inverse dynamics is not reliably identifiable under limited
-excitation coverage. As $K$ increases, the baseline rapidly stabilizes: intermediate budgets (e.g., $K\approx 32$) reduce the error into a
-substantially lower regime, while higher budgets (e.g., $K\ge 64$) yield tightly clustered test RMSE values. This behavior confirms that the
-baseline physics learner is primarily limited by dataset richness rather than by optimizer noise, and that seed sensitivity is predominantly a
-low-data phenomenon.
 
-\paragraph{Residual learning (LSTM): improved predictability with larger $K$.}
-The LSTM residual predictor shows the same overarching trend: residual test RMSE decreases markedly with increasing $K$, transitioning from a
-difficult and unstable regime at very low $K$ to a low-variance, consistently learnable regime at higher $K$. Early stopping is effective in 
-practice: the number of epochs run varies by difficulty, with challenging low-$K$ cases tending to train longer and high-$K$ cases converging
-earlier. Comparing temporal contexts ($H=100$ versus $H=150$) reveals modest differences that are not strictly monotonic across budgets,
-suggesting that both contexts are viable and that the optimal window length is data-dependent rather than universally fixed.
 
-\paragraph{End-to-end recombination: substantial relative gains once the baseline is stable.}
-The combined evaluation reports DeLaN baseline torque RMSE on the valid region ($k\ge H{-}1$) and the recombined model error after adding the
-predicted residual. Since the recombined torque error satisfies
-\[
-\tau_{\mathrm{gt}} - \tau_{\mathrm{rg}} 
-= \big(\tau_{\mathrm{gt}} - \tau_{\mathrm{DeLaN}}\big) - \hat{r}
-= r_{\mathrm{gt}} - \hat{r},
-\]
-the recombined torque RMSE is numerically equivalent to the residual prediction RMSE under the evaluation protocol. Consequently, improvements in 
-residual estimation translate directly into improvements in final torque prediction. In the high-data regimes,
-the gain ratio $\mathrm{RMSE}_{\mathrm{rg}}/\mathrm{RMSE}_{\mathrm{DeLaN}}$ consistently falls well below one,
-indicating strong relative improvement of the residual-corrected model over the physics baseline. Conversely,
-in the low-data regime, gains are present but less reliable due to instability in both the baseline and the residual predictor.
 
-\paragraph{Interpretation and implications for subsequent runs.}
-Overall, the sweep-1 metrics support three conclusions. First, the dominant factor governing performance is the trajectory budget $K$: below a
-minimum data regime the learned inverse dynamics is not consistently identifiable, whereas sufficiently large $K$ yields stable DeLaN baselines.
-Second, residual learning provides consistent additional benefit once the baseline has entered the stable regime, demonstrating that the residual
-component captures systematic structure not modeled by the physics network alone. Third, the remaining design choices examined here
-(temporal context $H$ and additional $\ddot{q}$ lowpass toggling) have secondary influence relative to $K$ and do not dominate the observed performance.
-These findings motivate concentrating subsequent compute budget on the higher-$K$ regimes and robust seed replication, while keeping the residual
-model configuration fixed (\texttt{full} features, $H\in\{100,150\}$) to enable clean, interpretable comparisons.
 
-\textbf{The DeLaN seed determines the character assignment between train and test set, which is comparable to a k-fold evaluation.}
-Since the dataset situation, this is tested for this dataset in current precision [dataport dataset with paper Juan H.]
-And on Torque Prediction for X != 6 dof
 
-\paragraph{DeLaN baseline quality and generalization.}
-For the selected DeLaN (chosen by minimum validation torque RMSE across DeLaN seeds), we first assess generalization behavior and qualitative fit. 
-The training curve in Fig.~\ref{fig:delan_elbow_train_test} contrasts the optimization trajectory (training loss) against validation error and 
-serves as an overfitting/underfitting sanity check for the chosen baseline. Qualitative agreement between predicted and ground-truth torques is 
-then illustrated in Fig.~\ref{fig:delan_torque_vs_gt}, demonstrating that the physics model captures the dominant temporal structure of the inverse 
-dynamics. Quantitatively, the remaining baseline error is summarized over time in Fig.~\ref{fig:delan_torque_rmse_time} and decomposed per joint in 
-Fig.~\ref{fig:delan_torque_rmse_per_joint}. Together, these figures characterize both when (time-localized) and where (joint-localized) the 
-baseline DeLaN remains limited, providing the reference point for residual correction.
 
-\paragraph{Residual learnability (LSTM) and overfitting diagnostics.}
-Given the exported residual target $r_{\mathrm{gt}}=\tau_{\mathrm{gt}}-\tau_{\mathrm{DeLaN}}$, the LSTM is trained to predict $\hat{r}$ from 
-windowed inputs under the fixed \texttt{full} feature representation. The training dynamics are summarized by the loss curves in 
-Fig.~\ref{fig:lstm_loss_curve}, where the evolution of training loss and validation loss motivates early stopping and best-checkpoint selection. 
-A qualitative comparison of predicted and ground-truth residuals on the test split is shown in Fig.~\ref{fig:lstm_residual_gt_pred_test},
-indicating that the model captures the dominant residual trends while leaving localized discrepancies during sharper transients.
-The residual error is further summarized as a time-resolved average in Fig.~\ref{fig:lstm_residual_rmse_time} and as a per-joint decomposition
-in Fig.~\ref{fig:lstm_residual_rmse_per_joint}. These plots establish that the residual is not purely noise but contains predictable structure
-that can be learned consistently in the stable data regimes.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{End-to-end recombination and torque improvement.}
-The end-to-end effect of residual learning is evaluated by recombining the baseline and residual prediction via
-$\tau_{\mathrm{rg}}=\tau_{\mathrm{DeLaN}}+\hat{r}$. Figure~\ref{fig:eval_torque_gt_delan_combined_test} provides the primary qualitative result: 
-the recombined torque trace is visibly closer to the ground truth than the DeLaN baseline, particularly in segments where the baseline exhibits
-systematic mismatch. This improvement is quantified over time in Fig.~\ref{fig:eval_torque_rmse_time_test}, and per joint in
-Fig.~\ref{fig:eval_torque_rmse_per_joint_grouped}, demonstrating that gains are not uniformly distributed across joints but tend to align with 
-joints exhibiting larger baseline error. Finally, Fig.~\ref{fig:eval_lstm_residual_gt_vs_pred_test} links the end-to-end torque improvement 
-directly to residual predictability: since $\tau_{\mathrm{gt}}-\tau_{\mathrm{rg}} = r_{\mathrm{gt}}-\hat{r}$ under the evaluation protocol,
-improvements in residual estimation translate one-to-one into improvements in final torque RMSE.
+
+\chapter{Summary and Outlook}
+
+\section{Discussion and Outlook}
+\label{sec:discussion_outlook}
+
+    The results in this thesis can be interpreted as a first step towards a more
+    general notion of \emph{dynamic awareness} for collaborative manipulators.
+    Several conceptual implications and natural extensions are worth highlighting.
+
+    \paragraph{Online torque awareness for safety–critical control.}
+    Once the DeLaN+LSTM architecture has been trained and deployed, the robot
+    possesses an accurate estimate of its joint torques
+    $\hat{\boldsymbol{\tau}}_{\mathrm{RG},k}$ at every time step, and---via the
+    Jacobian---of the corresponding end–effector wrench
+    $\hat{\vec{F}}_{\mathrm{RG},k}$ in the measurement frame. In principle, this
+    enables model–predictive controllers and safety monitors to operate directly on
+    end–effector torque or wrench limits, for example those prescribed for
+    collaborative operation, rather than relying on conservative joint–space
+    bounds. By exploiting the available torque margin more tightly, such a
+    controller could realise higher velocity and acceleration profiles while
+    remaining within certified interaction–force constraints.
+
+    \paragraph{Beyond joint space: evaluation of end–effector wrench prediction.}
+    The present thesis restricts training and quantitative evaluation to joint
+    space: the DeLaN+LSTM model is trained on joint states and motor torques, and
+    its quality is assessed primarily via joint–torque prediction errors. A
+    natural next step is a systematic evaluation of end–effector wrench prediction
+    against ground–truth FT data at the flange. One promising route is to combine
+    IsaacSim–based data generation (with and without domain randomisation and
+    sensor noise) with real–robot experiments using the same excitation families
+    as in this work. This would allow a comprehensive comparison between
+    \emph{(i)} models trained purely in simulation and tested on the real robot,
+    \emph{(ii)} models trained on real data and tested on held–out real
+    trajectories, and \emph{(iii)} hybrid training schemes that mix simulated and
+    measured data. Such an evaluation pipeline would provide strong evidence for
+    the robustness of the joint–space training strategy when viewed in the
+    measurement frame. Once this consistency between Jacobian–mapped model predictions 
+    and ground–truth flange wrenches has been demonstrated, the same DeLaN+LSTM architecture 
+    can, in principle, be trained and deployed using proprioceptive data alone, without
+    requiring an FT sensor in the loop.
+
+    \paragraph{Tool/gripper calibration as a third learning stage.}
+    In the current experiments, the LSTM residual model in Stage~2 reduces the
+    joint–torque error on the nominal robot–only configuration to near zero. When
+    a fixed gripper is mounted, one could either re–record the entire dataset with
+    the gripper attached or, more interestingly, treat the gripper as an additional
+    structured disturbance to be learned. Conceptually, this suggests a
+    third learning stage in which a small network (e.g.\ another LSTM) takes the
+    residual error of Stage~2 as input and learns a tool–specific compensation
+    term. From a closed–loop viewpoint, the robot would then iteratively refine
+    its internal model when a new tool is attached, realising a form of transfer
+    learning for tool calibration without rebuilding the entire inverse–dynamics
+    model from scratch.
+
+    \paragraph{Towards payload identification from residual wrenches.}
+    Once tool/gripper effects are compensated, remaining discrepancies between the
+    nominal robot–gripper wrench model and the measured flange wrench can be
+    attributed primarily to external interaction and payload dynamics. Mapping the
+    Stage~2/Stage~3 residuals into the end–effector frame via the Jacobian yields
+    an estimate of the interaction wrench along and around the $x/y/z$ axes. In
+    combination with the corresponding end–effector linear and angular velocities
+    and accelerations, this opens the door to a further stage in which a dedicated
+    estimator recovers the payload dynamic parameters
+    $\boldsymbol{\phi}_{\mathrm{payload}} = (m,\mathbf{c},\mathbf{I}) \in \mathbb{R}^{10}$
+    from these residual wrenches in a Newton–Euler framework. In other words, the
+    same DeLaN+LSTM backbone that currently provides accurate joint–space
+    prediction could serve, after appropriate extensions, as the core of an
+    online PDPI pipeline that incrementally refines the effective rigid–body model
+    (robot + tool + payload) during everyday manipulation tasks.
+
+    \paragraph{Interpretable sparse models via SINDy.}
+    The DeLaN+LSTM architecture used in this thesis is deliberately expressive but remains a
+    largely black–box regression model: the Lagrangian network and the recurrent residual model
+    jointly fit the data, yet they do not expose which physical effects are actually dominant in the
+    identified dynamics. A complementary avenue for future work is to apply sparse identification
+    of nonlinear dynamics (SINDy)%~\cite{SOA_SINDy} 
+    to the same joint–space data. In such a
+    setting, the candidate function library could explicitly include standard rigid–body torque
+    models (e.g.\ Newton–Euler and Lagrangian terms), nonlinear Coriolis and gravity terms, and
+    parametric friction models, together with a small number of additional generic nonlinear
+    features. SINDy would then select a parsimonious subset of these terms that best explains the
+    observed motor torques, potentially yielding an interpretable model in which a few physically
+    meaningful contributions account for most of the variance in the data. This would provide
+    insight into which dynamic effects the robot actually relies on in practice, and would offer a
+    transparent counterpart to the high–capacity DeLaN+LSTM model used in the present work.%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

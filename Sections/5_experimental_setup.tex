@@ -2,12 +2,191 @@
 
 \section{Dataset of Collaborative Robots}
 
+\textbf{Dataset source and scope.}
+All experiments are based on the publicly available ``Dataset of Collaborative Robots for
+Energy Consumption Modeling'' released via IEEE DataPort~\cite{Dataset_Dataport} and
+documented in~\cite{Q_Dataset_Paper}.
+The dataset contains measurements from two Universal Robots platforms (UR3e and UR10e)
+recorded both without load and with an external payload.
+
+\textbf{Recorded signals.}
+Each log sample provides a time stamp $t$ and a trajectory identifier, and includes joint-space
+signals (joint positions $\mathbf{q}$, joint velocities $\dot{\mathbf{q}}$) together with electrical
+measurements (per-joint motor currents $\mathbf{i}$, motor voltages, motor torques, as well as
+robot-level current and voltage).
+In addition, the dataset provides end-effector quantities such as Cartesian position and the
+measured wrench (force and moment) at the end effector.
+In the remainder of this thesis, motor current is treated as the central measured actuation signal.
+
+\textbf{Data collection protocol.}
+To excite the robot dynamics across a wide range of operating conditions, the robots execute
+sinusoidal joint motions with varying amplitudes, frequencies, and initial conditions~\cite{Q_Dataset_Paper}:
+\begin{equation}
+  q_i(t) = q_{i0} + A_i \cos\!\bigl(2\pi f_i t + \varphi_i\bigr),
+\end{equation}
+where $q_i$, $q_{i0}$, $A_i$, $f_i$ and $\varphi_i$ denote the desired joint position, initial
+position, amplitude, oscillation frequency, and phase of joint $i$, respectively.
+The experiments were conducted for UR3e and UR10e under two load conditions: without load
+and with an attached payload (hammer $1.5\,\mathrm{kg}$ and RobotiQ 2F-85 gripper $1\,\mathrm{kg}$)~\cite{Q_Dataset_Paper}.
+
+\textbf{Sampling and dataset size.}
+The signals are recorded at $100\,\mathrm{Hz}$.
+For each robot (and load condition), the dataset provides $50{,}000$ samples for training and
+$5{,}000$ samples for testing~\cite{Q_Dataset_Paper}.
+Since the underlying dynamics are time-invariant, the published dataset is formed by combining
+multiple shorter recordings into one consistent dataset, without treating discontinuities as
+separate experiments~\cite{Q_Dataset_Paper}.
+
 \section{DeLaN + LSTM - Learning Curve Stroy}
 
-\textbf{K-Domination}
+\textbf{Key findings.}
+The learning-curve study shows that trajectory quantity $K$ is a primary driver of stability and generalisation for both stages: small subsets lead to higher dispersion and occasional failure modes, whereas sufficiently large $K$ yields consistent convergence and low per-joint errors.
+In this regime, freezing the best DeLaN and learning residual dynamics with an LSTM provides an additional systematic reduction of the remaining modelling error.
 
-\textbf{DeLaN Hyperparameter}
+\subsection{K-Domination}
 
-\textbf{LSTM Hyperparameter/Windows/Feature Modes}
+\textbf{Motivation and experimental protocol.}
+The purpose of the K-domination study is to quantify how the number of available
+demonstration trajectories influences the complete two-stage pipeline
+(Stage~1 DeLaN and Stage~2 residual LSTM).
+To this end, we construct multiple training sets by drawing $K$ trajectories
+from a fixed pool, train the full pipeline for each set under identical
+hyperparameters, and evaluate performance as a function of $K$.
 
-\section{Best Model Approch}
+\textbf{Trajectory pool and signals.}
+The base dataset consists of $122$ trajectories, each identified by a trajectory
+ID.
+For each trajectory, we use joint position $\mathbf{q}$, joint velocity
+$\dot{\mathbf{q}}$, and motor current $\mathbf{i}$.
+All logs are recorded at approximately $100\,\mathrm{Hz}$.
+Since trajectory durations vary substantially (roughly $5$--$40\,\mathrm{s}$),
+all filtering and preprocessing steps are applied per trajectory.
+
+\textbf{Per-trajectory low-pass filtering.}
+To attenuate sensor noise while avoiding temporal misalignment, we apply a
+4th-order Butterworth low-pass filter with cutoff frequency
+$f_c = 10\,\mathrm{Hz}$.
+The filter is applied in zero-phase form (forward--backward filtering), thereby
+preventing phase shifts in $\mathbf{q}$, $\dot{\mathbf{q}}$ and $\mathbf{i}$.
+Joint accelerations $\ddot{\mathbf{q}}$ are derived from the filtered velocities
+via numerical differentiation and, if filtering is enabled, are filtered
+analogously.
+
+\textbf{Subsampling by $K$.}
+From the trajectory pool, we draw subsets of size
+\[
+  K \in \{8,\,16,\,32,\,48,\,64,\,84,\,122\},
+\]
+using three independent dataset seeds.
+For each $(K,\mathrm{seed})$, a fixed trajectory split is created with
+test fraction $0.2$ and validation fraction $0.1$ at the level of complete
+trajectories (i.e., trajectories are never split across subsets).
+
+\textbf{Stage~1 (DeLaN) configuration and model selection.}
+For each $(K,\mathrm{seed})$ subset, we train five DeLaN initialisations
+(seeds $s\in\{0,\dots,4\}$) and select the best DeLaN by validation error
+(validation torque RMSE, equivalently MSE).
+All DeLaN runs use the structured JAX implementation and a fixed hyperparameter
+preset \texttt{lutter\_like\_256} (Table 1~\cite{Q4_2_lutter2023combiningphysicsdeeplearning}):
+softplus activation, width $256$, depth $2$, mini-batch size $1024$,
+learning rate $10^{-4}$ and weight decay $10^{-5}$.
+Training is run for at most $200$ epochs with early stopping (patience $10$,
+monitored on validation MSE) to avoid overfitting and to ensure that changes in
+performance are attributable to $K$ rather than excessive training time.
+
+\textbf{Stage~2 (LSTM) configuration.}
+After selecting the best DeLaN, we freeze it and export residuals for each
+trajectory.
+Stage~2 uses a history length $H=100$ and feature mode \texttt{full}, i.e.,
+each LSTM input time step concatenates
+$(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}})$.
+The residual LSTM is trained with two stacked LSTM layers (units $128$), dropout
+$0.2$, batch size $64$, and a validation split of $0.1$.
+Training runs for at most $120$ epochs and employs early stopping on validation
+loss (patience $20$, warm-up $5$ epochs), again fixing hyperparameters across
+all $K$ to isolate the effect of trajectory quantity.
+
+\begin{algorithm}[H]
+\caption{K-domination experiment protocol for the DeLaN+LSTM pipeline}\label{alg:k_domination_protocol}
+\begin{algorithmic}
+\Require Trajectory pool $\mathcal{T}$ with $|\mathcal{T}|=122$ at $100\,\mathrm{Hz}$
+\Require $K \in \{8,16,32,48,64,84,122\}$, dataset seeds $\mathcal{D}=\{0,1,2\}$
+\Require DeLaN seeds $\mathcal{S}_{\mathrm{DeLaN}}=\{0,\dots,4\}$, LSTM seeds $\mathcal{S}_{\mathrm{LSTM}}=\{0,\dots,4\}$
+\Ensure Aggregated learning curves and per-joint RMSE as a function of $K$
+
+\State Low-pass filter each trajectory ($4^{\mathrm{th}}$-order Butterworth, $f_c=10\,\mathrm{Hz}$, zero-phase)
+\ForAll{$K$}
+    \ForAll{$d \in \mathcal{D}$}
+        \State Sample $K$ trajectories from $\mathcal{T}$ using seed $d$
+        \State Split into train/val/test trajectories (fixed fractions, no within-trajectory splitting)
+        \ForAll{$s \in \mathcal{S}_{\mathrm{DeLaN}}$}
+            \State Train DeLaN with fixed hyperparameters \Comment{max 200 epochs; early stop (patience 10)}
+            \State Record train loss and validation MSE/RMSE
+        \EndFor
+        \State Select best DeLaN by validation error and freeze its parameters
+        \State Export residuals per trajectory
+        \ForAll{$s \in \mathcal{S}_{\mathrm{LSTM}}$}
+            \State Build residual windows ($H=100$) and train LSTM \Comment{max 120 epochs; early stop (patience 20)}
+            \State Record train/validation loss and residual RMSE
+        \EndFor
+    \EndFor
+    \State Aggregate across seeds: median $\pm$ IQR learning curves and progress-aligned errors
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Aggregation and reporting.}
+For each $K$, we aggregate results across the three dataset seeds.
+Reported learning curves (train loss, validation loss) are shown as median
+curves with interquartile ranges (IQR, $25$--$75$ percentile) across the 5 delan seeds per $(K,\mathrm{seed})$.
+For Stage~1, where five DeLaN initialisations are trained per $(K,\mathrm{seed})$,
+we first compute the median $\pm$ IQR across DeLaN seeds for each dataset seed,
+and then aggregate these seed-wise median curves across dataset seeds.
+For time-dependent error visualisations, trajectories are aligned by normalised
+progress (mapping each trajectory time index to $[0,1]$) and resampled to a
+fixed number of bins; median $\pm$ IQR is then computed per progress bin.
+
+\subsection{Best Model Approch}
+
+\begin{algorithm}[H]
+\caption{Best-model selection for the DeLaN+LSTM pipeline}\label{alg:best_model_approach}
+\begin{algorithmic}
+\Require Trajectory pool size $K=84$ with fixed split $(N_{\mathrm{train}},N_{\mathrm{val}},N_{\mathrm{test}})=(59,8,17)$
+\Require Dataset seeds $\mathcal{D}=\{0,1,2,3,4\}$, DeLaN seeds $\mathcal{S}_{\mathrm{DeLaN}}=\{0,1,2,3,4\}$, LSTM seeds $\mathcal{S}_{\mathrm{LSTM}}=\{0,1,2,3,4\}$
+\Require Hyperparameter presets $\mathcal{H}_{\mathrm{DeLaN}}$ and $\mathcal{H}_{\mathrm{LSTM}}$ with $|\mathcal{H}_{\cdot}|=5$
+\Ensure Best DeLaN checkpoint and best LSTM checkpoint for the fixed $K$
+
+\State \textbf{Stage 1: DeLaN model selection}
+\ForAll{$d \in \mathcal{D}$}
+    \ForAll{$h \in \mathcal{H}_{\mathrm{DeLaN}}$}
+        \ForAll{$s \in \mathcal{S}_{\mathrm{DeLaN}}$}
+            \State Train DeLaN on split $(59,8,17)$ \Comment{log train/val curves; early stopping}
+            \State Record validation metric and append to aggregation buffers
+        \EndFor
+        \State Update aggregate plots for this $(K,d,h)$ \Comment{median $\pm$ IQR; see \texttt{delan\_plots.py}}
+        \State Save best DeLaN for this $(K,d)$ by validation error
+    \EndFor
+\EndFor
+\State Save best-model plots for DeLaN \Comment{exemplar overlays; see \texttt{delan\_plots.py}}
+
+\State \textbf{Freeze DeLaN and export residuals}
+\State Freeze best DeLaN parameters and export residual torques per trajectory
+
+\State \textbf{Stage 2: LSTM model selection (same split and $K$)}
+\ForAll{$d \in \mathcal{D}$}
+    \ForAll{$h \in \mathcal{H}_{\mathrm{LSTM}}$}
+        \ForAll{$s \in \mathcal{S}_{\mathrm{LSTM}}$}
+            \State Build LSTM windows from exported residuals (same split)
+            \State Train residual LSTM \Comment{log train/val curves; early stopping}
+            \State Record validation metric and append to aggregation buffers
+        \EndFor
+        \State Update aggregate plots for this $(K,d,h)$ \Comment{median $\pm$ IQR; see \texttt{lstm\_plots.py}}
+        \State Save best LSTM for this $(K,d)$ by validation loss
+    \EndFor
+\EndFor
+\State Save best-model plots for LSTM \Comment{residual overlays; see \texttt{lstm\_plots.py}}
+
+\State \textbf{Combined evaluation}
+\State Evaluate DeLaN+LSTM on the test split and store final metrics/plots
+\end{algorithmic}
+\end{algorithm}
