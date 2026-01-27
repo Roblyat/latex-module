@@ -7,7 +7,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
     The motivation for this work is given in two subsections, where the \emph{Context} subsection outlines the growing role of industrial and collaborative manipulators,
     while the \emph{Use Case} subsection specifies a concrete manipulation scenario that requires accurate online identification of robot and payload parameters.
 
-        \subsection{Context}
+        \textbf{Context}
         As the robotics industry grows year over year, so does the number of robots operating around the world. It is estimated that there were approximately 3.4 million industrial robots in use worldwide in
         2023~\cite{Q0_1_industrial_robots_in_operation}. At the same time, the number of newly installed industrial robots has been increasing steadily since 2014; between 2021 and 2024, around 541\,000 new industrial
         robots were installed per year~\cite{Q0_2_industrial_robots_new_installations}. Within this landscape, collaborative robots (cobots) represent about 10.5\% of the industrial robot market, with 57\,040 new units 
@@ -56,7 +56,7 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         \cite{Q1_1_fast_inertial_id_cobots, Q1_2_online_payload_mo, Q1_3_external_torque_smo, Q1_5_payload_estimation_compensation_2025, Q1_7_10947736, Q1_8_10944553, Q1_9_xu2022_double_weighting_payload_id, % chktex 2
         Q1_10_duan_payload_ftsensor, Q1_11_wei_composite_filter, Q1_13_dynamic_model_id_swevers2007, Q1_14_long2022sliding_momentum_observer, Q3_2_encoder_attention_payload}.
 
-        \subsection{Use Case}
+        \textbf{Use Case}
 
         The considerations above motivate a concrete use case in which a collaborative robotic arm must manipulate previously unseen objects in a shared workspace. 
         A vision system can provide geometric information such as shape and dimensions of the payload, but it does not directly reveal its mass, center of mass (CoM), or inertia tensor. 
@@ -71,12 +71,12 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         In all these cases, RDPI and PDPI must be performed online so that the controller maintains an up-to-date model of the combined robot-payload dynamics and the resulting contact forces. 
         Robust online identification methods are therefore a key enabling technology for safe human-robot collaboration and high-performance manipulation with arbitrary payloads and tools.
 
-    \section{Problem Statement}
+    \section{Problem Description}
     The subsection \emph{Kinematic and Dynamic Background of Robot Manipulation} analyses why endowing a robotic manipulator with awareness of its own dynamics, payload, and tools is mathematically demanding and cannot be
     achieved by simple calculation or direct measurement alone. The subsection \emph{Limitations of the Current State of the Art} then identifies the main shortcomings of existing identification and estimation methods
     in the literature, thereby motivating the contribution of this work.
 
-        \subsection{Kinematic and Dynamic Background of Robot Manipulation}
+        \textbf{Kinematic and Dynamic Background of Robot Manipulation}
         ~\label{sec:robot_dynamics_background}
         The inertial properties of a rigid body are collected in the standard 10-dimensional parameter vector
         \begin{equation}
@@ -194,88 +194,3 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         First, all available measurements (joint currents, positions, velocities and flange wrench) depend on the \emph{combined} dynamics of robot, tool and load via the nonlinear relationships~\eqref{eq:robot_dynamics}-\eqref{eq:F_measured_regressor}, so the contribution of the load parameters $\boldsymbol{\phi}_{\mathrm{load}}$ cannot be isolated by simple computation or direct measurement. 
         Second, accurate payload or load dynamic parameter identification (PDPI) presupposes an equally accurate compensation of the underlying robot-tool dynamics, including unmodelled effects such as friction and joint transmission nonlinearities. 
         Together, these aspects make dynamic awareness of payload, tool and robot a mathematically demanding inverse problem rather than a straightforward calculation from geometric or sensor data.
-
-        \subsection{Limitations of the Current State of the Art}
-
-        The SoA analysis in reveals several recurring gaps that are directly relevant for this work:
-
-        \begin{itemize}
-        \item \textbf{Weak and fragmentary treatment of payload inertia and effective rigid body.}
-        In Q1, payload mass (and often CoM) can be estimated accurately, but inertia tensors are frequently weakly excited, ill-conditioned or only partially validated, especially in cobot-safe regimes~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024} %\cite{Q1_1, Q1_5, Q1_7, Q1_10, Q1_16}
-        Q2-Q4 largely \emph{assume} fixed tools/payloads and do not identify the full effective rigid body at all~\cite{Q2_1_contact_force_gp_observer,Q2_4_GIACOMUZZO20231584,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277} %\cite{Q2_1, Q2_4, Q3_3, Q3_4, Q4_1, Q4_3, Q4_4}
-        As a result, there is no robust, general mechanism to obtain and maintain an accurate $\boldsymbol{\phi}_{\mathrm{eff}}$ that could be used systematically for tool/gripper compensation and subsequent PDPI.
-
-        \item \textbf{Entangled or black-box treatment of friction, transmission and contact effects.}
-        Many observer-based and LS/NE methods in Q1 are highly sensitive to imperfect friction and transmission models; errors grow around velocity reversals and at higher speeds, even with advanced observers or NN friction terms~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_6_hu2025_fdrdi,Q1_12_han_finite_time_observer,Q1_15_tang2023wls_rwspo,Q1_17_liu2021sensorless_dob_nn} %\cite{Q1_3, Q1_4, Q1_6, Q1_12, Q1_15, Q1_17}
-        Q2 explicitly models all unmodelled dynamics, friction and contacts as a single GP disturbance~\cite{Q2_1_contact_force_gp_observer,Q2_2_contact_force_gpadkf,Q2_3_contact_detection_gp}, %\cite{Q2_1, Q2_2, Q2_3}
-        which improves prediction but makes it hard to separate payload, friction and contact contributions in a physics-consistent way.
-        Q3 and Q4 introduce powerful black-box or PINN components, but again focus on reducing torque/current residuals rather than producing explicit interaction
-        wrenches~\cite{Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_4_10729277}. %\cite{Q3_3, Q3_4, Q4_1, Q4_4}
-
-        \item \textbf{Dependence on carefully designed excitation and repeated with/without-payload experiments.}
-        Strong RDPI/PDPI results in Q1 and Q3 typically rely on long, highly exciting trajectories (S-curves, Fourier/RRT paths) and repeated runs with and without payloads, often for each new object~\cite{Q1_1_fast_inertial_id_cobots,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_16_xu_payload_difference_2024,Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting} %\cite{Q1_1, Q1_6, Q1_7, Q1_8, Q1_9, Q1_13, Q1_16, Q3_2, Q3_6, Q3_7, Q3_8}
-        This calibration-style use of offline data is practical for commissioning, but gives limited evidence that a single offline-trained model, once obtained, can provide robust dynamic awareness across diverse everyday
-        motions and payload changes without further re-identification.
-
-       \item \textbf{Limited use of temporal models for physics-consistent PDPI and force estimation.}
-        Deep sequence models (LSTM/GRU/TCN) are used either as black-box torque/force predictors~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q3_5_contact_localization_cnn}
-        or for payload classification/estimation in largely static mappings~\cite{Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting}.
-        Physics-informed DeLaN/PINN models, with or without temporal residuals~\cite{Q4_1_extended_delan_motor,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277,Q4_6_HU2026103093},
-        focuse on joint-torque prediction in joint space. No existing work couples a temporal model with an explicit effective rigid-body representation to jointly obtain accurate joint-torque prediction,
-        tool/gripper compensation and interaction-force estimation in the measurement frame.
-
-        \end{itemize}
-
-    \section{Aim of Work}
-
-        The SoA review indicates that the strongest results for robot inverse dynamics and friction modelling are achieved when \emph{physics-structured} networks are combined with data-driven residual learners.
-        Extended DeLaN models can capture motor couplings and current-torque relations from encoder and motor data alone~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning}, while recent
-        PINN-based approaches augment a structured dynamics model with temporal convolutions to obtain joint-torque prediction and friction compensation on industrial
-        robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}. At the same time, several works show that recurrent residual learners-in particular LSTMs-are highly effective for compensating modelling errors
-        and estimating joint torques and end-effector forces in closely related settings~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation}.
-
-        The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that
-        can be trained using only encoder and motor-current data, yields an accurate nominal model of the robot-gripper joint torques and can be
-        consistently interpreted as a flange-wrench model in the force/torque sensor frame. Thereby providing a basis for tool/gripper compensation and subsequent
-        payload dynamic parameter identification (PDPI) as formulated in Section~\ref{sec:robot_dynamics_background}. Concretely, the work pursues the following objectives:
-        \begin{itemize}
-        \item \textbf{Stage~1 (structured inverse dynamics)} Stage~1 follows the improved DeLaN parameterisation of~\cite{Q4_6_HU2026103093}, using a Cholesky-factor inertia network and a learned potential,
-            complemented by an explicit Coulomb-viscous joint-friction model~\cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}. In contrast to the extended DeLaN-Motor architecture of~\cite{Q4_1_extended_delan_motor},
-            which embeds detailed motor couplings and is trained directly in current space, we adopt a simplified joint-side formulation and supervise the model using motor torques~\ref{eq:tau_motor},
-            obtained from encoder and motor-current data, where $k_t$ is give~\cite{QM_1_ur3_ur5_torque_constant}. The resulting DeLaN network is trained \emph{offline} on carefully designed excitation trajectories to
-            learn the nominal robot-gripper inverse dynamics.
-
-        \item \textbf{Stage~2 (residual sequence model)} Stage~2 adopts the DeLaN + TCN paradigm of~\cite{Q4_4_10729277}: the structured inverse-dynamics model from Stage~1 provides
-            a nominal torque prediction, and a separate sequence model (LSTM) learns residual joint torques from motion history.
-
-        \item \textbf{Evaluation in joint space and measurement frame.} Evaluate the resulting DeLaN+LSTM architecture both in joint space and in the force/torque sensor frame, quantifying its ability to reproduce the nominal
-            robot-gripper wrench across diverse trajectories.
-        \end{itemize}
-
-        In this work, a 6D force/torque sensor is used primarily as a \emph{research instrument} to validate the joint-space modelling in the end-effector frame:
-        flange-wrench measurements $\vec{F}_{\mathrm{meas}}$ are compared against the wrenches obtained by mapping the joint-space DeLaN+LSTM predictions through the Jacobian.
-        Once consistency between predicted and measured flange wrenches has been demonstrated, the joint-space trained DeLaN+LSTM architecture provides a robust basis for PDPI by delivering a reliable tool/gripper
-        wrench compensation in the measurement frame.
-
-        By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this thesis aims to move from the calibration-heavy, fragmented SoA towards a unified and
-        practically deployable notion of dynamic awareness: a cobot that can reliably predict its own joint torques, reproduce its nominal flange wrench in the measurement frame, and separate intrinsic
-        robot-gripper dynamics from payload/collision-induced effects.
-        
-        \begin{itemize}
-            \item[\textbf{RQ1}] 
-                How accurately can a DeLaN-based inverse-dynamics model, trained purely in joint space, predict the flange wrench in the measurement frame once mapped through the Jacobian? 
-                What extent does augmenting DeLaN with a residual sequence model improve this wrench prediction?
-                % (Evaluation of DeLaN-only vs.\ DeLaN+sequence model, and whether Q4\_1/Q4\_4-style joint-space modelling remains robust when viewed in the measurement frame.)
-            \item[\textbf{RQ2}]
-                How does augmenting a DeLaN with a residual sequence model (LSTM) improve this wrench prediction?
-            \item[\textbf{RQ3}]
-                Does augmenting DeLaN with an LSTM-based residual model achieve joint-torque prediction and friction compensation performance comparable to a TCN-based residual model?                
-                % (Evaluation of whether the simpler recurrent LSTM is as robust as a TCN residual in joint space.)
-        \end{itemize}
-
-            
-
-
-
-
-

@@ -1,10 +1,56 @@
 \chapter{Methods}~\label{sec:methods}
-
 Quick overview of what is found in methods (DeLaN + LSTM)-> May start with general DeLaN / LSTM explanation -> moves on with my pipeline mathematics -> then implementation of my pipeline, especially Dataset
 and input-/output vector dimentions here, also dataset recording offline training online execution.
 
-Do i have to explain how DeLaN and LSTM work? ->~\cite{Q4_4_10729277,Q4_6_HU2026103093} show DeLaN (also with figures) 
-and~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation} show LSTM (also with figures). I could also do one figure each, very short explain these two and cite with the given above and DeLaN / LSTM base paper. 
+\section{Aim of Work}
+
+The SoA review indicates that the strongest results for robot inverse dynamics and friction modelling are achieved when \emph{physics-structured} networks are combined with data-driven residual learners.
+Extended DeLaN models can capture motor couplings and current-torque relations from encoder and motor data alone~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning}, while recent
+PINN-based approaches augment a structured dynamics model with temporal convolutions to obtain joint-torque prediction and friction compensation on industrial
+robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}. At the same time, several works show that recurrent residual learners-in particular LSTMs-are highly effective for compensating modelling errors
+and estimating joint torques and end-effector forces in closely related settings~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation}.
+
+The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that
+can be trained using only encoder and motor-current data, yields an accurate nominal model of the robot-gripper joint torques and can be
+consistently interpreted as a flange-wrench model in the force/torque sensor frame. Thereby providing a basis for tool/gripper compensation and subsequent
+payload dynamic parameter identification (PDPI) as formulated in Section~\ref{sec:robot_dynamics_background}. Concretely, the work pursues the following objectives:
+\begin{itemize}
+\item \textbf{Stage~1 (structured inverse dynamics)} Stage~1 follows the improved DeLaN parameterisation of~\cite{Q4_6_HU2026103093}, using a Cholesky-factor inertia network and a learned potential,
+    complemented by an explicit Coulomb-viscous joint-friction model~\cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}. In contrast to the extended DeLaN-Motor architecture of~\cite{Q4_1_extended_delan_motor},
+    which embeds detailed motor couplings and is trained directly in current space, we adopt a simplified joint-side formulation and supervise the model using motor torques~\ref{eq:tau_motor},
+    obtained from encoder and motor-current data, where $k_t$ is give~\cite{QM_1_ur3_ur5_torque_constant}. The resulting DeLaN network is trained \emph{offline} on carefully designed excitation trajectories to
+    learn the nominal robot-gripper inverse dynamics.
+
+\item \textbf{Stage~2 (residual sequence model)} Stage~2 adopts the DeLaN + TCN paradigm of~\cite{Q4_4_10729277}: the structured inverse-dynamics model from Stage~1 provides
+    a nominal torque prediction, and a separate sequence model (LSTM) learns residual joint torques from motion history.
+
+\item \textbf{Evaluation in joint space and measurement frame.} Evaluate the resulting DeLaN+LSTM architecture both in joint space and in the force/torque sensor frame, quantifying its ability to reproduce the nominal
+    robot-gripper wrench across diverse trajectories.
+\end{itemize}
+
+In this work, a 6D force/torque sensor is used primarily as a \emph{research instrument} to validate the joint-space modelling in the end-effector frame:
+flange-wrench measurements $\vec{F}_{\mathrm{meas}}$ are compared against the wrenches obtained by mapping the joint-space DeLaN+LSTM predictions through the Jacobian.
+Once consistency between predicted and measured flange wrenches has been demonstrated, the joint-space trained DeLaN+LSTM architecture provides a robust basis for PDPI by delivering a reliable tool/gripper
+wrench compensation in the measurement frame.
+
+By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this thesis aims to move from the calibration-heavy, fragmented SoA towards a unified and
+practically deployable notion of dynamic awareness: a cobot that can reliably predict its own joint torques, reproduce its nominal flange wrench in the measurement frame, and separate intrinsic
+robot-gripper dynamics from payload/collision-induced effects.
+
+\begin{itemize}
+    \item[\textbf{RQ1}] 
+        How accurately can a DeLaN-based inverse-dynamics model, trained purely in joint space, predict the flange wrench in the measurement frame once mapped through the Jacobian? 
+        What extent does augmenting DeLaN with a residual sequence model improve this wrench prediction?
+        % (Evaluation of DeLaN-only vs.\ DeLaN+sequence model, and whether Q4\_1/Q4\_4-style joint-space modelling remains robust when viewed in the measurement frame.)
+    \item[\textbf{RQ2}]
+        How does augmenting a DeLaN with a residual sequence model (LSTM) improve this wrench prediction?
+    \item[\textbf{RQ3}]
+        Does augmenting DeLaN with an LSTM-based residual model achieve joint-torque prediction and friction compensation performance comparable to a TCN-based residual model?                
+        % (Evaluation of whether the simpler recurrent LSTM is as robust as a TCN residual in joint space.)
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Stage~1: Structured inverse dynamics for robot + fixed gripper}~\label{subsec:stage1}
 
@@ -126,6 +172,9 @@ force/torque sensor is not required for fitting the DeLaN model.
 After training, the DeLaN parameters are frozen and the model serves as a
 data-driven nominal inverse-dynamics model of the robot-gripper system.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Stage~2: Sequence model for residual joint torques}~\label{subsec:stage2}
 
 In the second stage, we model history-dependent effects that are not captured
@@ -223,7 +272,8 @@ which is compared against the measured wrench for evaluation.}
 ~\label{fig:methods_pipeline}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Data preprocessing and dataset construction}
 \label{sec:data_preprocessing}
@@ -415,6 +465,9 @@ avoid \texttt{dtype=object} issues in the JAX-based DeLaN implementation.
 
 \vspace{0.75\baselineskip}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{DeLaN training setup}
 \label{sec:delan_training_setup}
 
@@ -547,7 +600,14 @@ directly, but enforcing a constant sampling time and applying dedicated
 filtering to $\dot{\mathbf{q}}_k$ and $\ddot{\mathbf{q}}_k$ constitutes a
 straightforward extension of the preprocessing pipeline.
 
-\section{Stage~2 dataset for the LSTM}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Long-Short-Term-Memory Training Setup}
+
+\vspace{0.75\baselineskip}
+
+\textbf{Export DeLaN Residuals}
 
 After training Stage~1, the DeLaN parameters $(\boldsymbol{\theta},\boldsymbol{\psi})$
 are frozen and the model is evaluated on all training samples
@@ -596,6 +656,10 @@ and collect them in
   \in \mathbb{R}^{N_{\mathrm{train,tot}} \times 6}.
 \end{equation}
 
+\vspace{0.75\baselineskip}
+
+\textbf{Build LSTM Windows}
+
 Let $H$ denote the history length (sequence length) used in Stage~2.
 From the flattened arrays
 $\tilde{\mathbf{Q}}_{\mathrm{train}},
@@ -640,3 +704,114 @@ $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\boldsymbol{\tau}}_{\mathrm
 per time step, and
 $\mathbf{Y}^{\mathrm{LSTM}}_{\mathrm{train}} \in \mathbb{R}^{N_H \times 6}$.
 A completely analogous construction is used for the test split.
+
+\vspace{0.75\baselineskip}
+
+\textbf{LSTM Training}
+
+\vspace{0.75\baselineskip}
+
+We train an LSTM-based residual model $g_{\boldsymbol{\phi}}$ on the windowed
+dataset $(\mathbf{x}_k,\mathbf{y}_k)$.
+As in Stage~1, the goal is to prevent single joints from dominating the
+objective. To this end, we apply a train-only standardisation of both inputs
+and targets, and train the network to predict \emph{scaled} residuals.
+
+\paragraph{Train-only standardisation.}
+Let
+$\mathbf{X}^{\mathrm{LSTM}}_{\mathrm{train}} \in \mathbb{R}^{N_H \times H \times d_{\mathrm{in}}}$
+and
+$\mathbf{Y}^{\mathrm{LSTM}}_{\mathrm{train}} \in \mathbb{R}^{N_H \times 6}$
+denote the windowed training set.
+We compute feature-wise input statistics across all windows and time steps,
+\begin{equation}
+  \mu_{x,j}
+  =
+  \frac{1}{N_H H}
+  \sum_{k=1}^{N_H}\sum_{t=1}^{H} X^{\mathrm{LSTM}}_{\mathrm{train}}[k,t,j],
+  \qquad
+  \sigma^2_{x,j}
+  =
+  \frac{1}{N_H H}
+  \sum_{k=1}^{N_H}\sum_{t=1}^{H}
+  \bigl(X^{\mathrm{LSTM}}_{\mathrm{train}}[k,t,j] - \mu_{x,j}\bigr)^2,
+\end{equation}
+for $j=1,\dots,d_{\mathrm{in}}$, and collect them into vectors
+$\boldsymbol{\mu}_x,\boldsymbol{\sigma}_x \in \mathbb{R}^{d_{\mathrm{in}}}$.
+Analogously, we compute per-joint target statistics over windows,
+\begin{equation}
+  \mu_{y,i}
+  =
+  \frac{1}{N_H}
+  \sum_{k=1}^{N_H} Y^{\mathrm{LSTM}}_{\mathrm{train}}[k,i],
+  \qquad
+  \sigma^2_{y,i}
+  =
+  \frac{1}{N_H}
+  \sum_{k=1}^{N_H}
+  \bigl(Y^{\mathrm{LSTM}}_{\mathrm{train}}[k,i] - \mu_{y,i}\bigr)^2,
+\end{equation}
+for $i=1,\dots,6$, yielding
+$\boldsymbol{\mu}_y,\boldsymbol{\sigma}_y \in \mathbb{R}^{6}$.
+To avoid numerical issues, standard deviations below a small threshold
+$\varepsilon$ are clamped to $1$ component-wise.
+Defining diagonal scaling matrices
+\[
+  \mathbf{W}_x = \mathrm{diag}(\boldsymbol{\sigma}_x^{-1}),
+  \qquad
+  \mathbf{W}_y = \mathrm{diag}(\boldsymbol{\sigma}_y^{-1}),
+\]
+the standardised inputs and targets are then given by
+\begin{align}
+  \mathbf{x}^{\mathrm{n}}_{k,t}
+    &= \mathbf{W}_x \bigl(\mathbf{x}_{k,t} - \boldsymbol{\mu}_x\bigr), \\
+  \boldsymbol{r}^{\mathrm{s}}_{\tau,k}
+    &= \mathbf{W}_y \bigl(\boldsymbol{r}_{\tau,k} - \boldsymbol{\mu}_y\bigr),
+\end{align}
+with $\boldsymbol{r}_{\tau,k}=\mathbf{y}_k$.
+The same $(\boldsymbol{\mu}_x,\boldsymbol{\sigma}_x,\boldsymbol{\mu}_y,\boldsymbol{\sigma}_y)$
+computed on the training split are used to scale the test split.
+
+\paragraph{Architecture and objective.}
+The residual model is implemented as a two-layer LSTM with dropout regularisation
+and a linear output layer,
+\begin{equation}
+  \hat{\boldsymbol{r}}_{\tau,k}^{\mathrm{s}}
+  =
+  g_{\boldsymbol{\phi}}
+  \bigl(
+    \mathbf{x}^{\mathrm{n}}_k
+  \bigr)
+  \in \mathbb{R}^{6},
+\end{equation}
+where $\mathbf{x}^{\mathrm{n}}_k$ denotes the standardised input window and
+$\hat{\boldsymbol{r}}_{\tau,k}^{\mathrm{s}}$ the predicted \emph{scaled} residual.
+Training minimises a mean-squared error on scaled residuals,
+\begin{equation}
+  \mathcal{L}_{\mathrm{LSTM}}(\boldsymbol{\phi})
+  =
+  \frac{1}{N_H}
+  \sum_{k=1}^{N_H}
+  \left\|
+    \hat{\boldsymbol{r}}_{\tau,k}^{\mathrm{s}}
+    -
+    \boldsymbol{r}_{\tau,k}^{\mathrm{s}}
+  \right\|_2^2,
+\end{equation}
+which corresponds to a balanced, per-joint normalisation via
+$\boldsymbol{\sigma}_y$.
+Optimisation is performed with Adam using shuffled mini-batches and an internal
+validation split; the best-performing model is selected by early stopping on
+the validation loss.
+
+\paragraph{Inference (unscaled units).}
+For reporting and for composing the final DeLaN+LSTM torque prediction, the
+scaled residual is mapped back to physical units via
+\begin{equation}
+  \hat{\boldsymbol{r}}_{\tau,k}
+  =
+  \mathbf{W}_y^{-1}\hat{\boldsymbol{r}}_{\tau,k}^{\mathrm{s}}
+  +
+  \boldsymbol{\mu}_y,
+\end{equation}
+where $\mathbf{W}_y^{-1}=\mathrm{diag}(\boldsymbol{\sigma}_y)$.
