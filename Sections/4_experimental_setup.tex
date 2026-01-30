@@ -1,5 +1,9 @@
 \chapter{Experimental Setup}
 
+\textbf{Measurement convention (motor current domain).}
+From this chapter onwards, we formulate training objectives and evaluation metrics in the measured actuation domain provided by the dataset, i.e., per-joint motor currents $\mathbf{i}_{\mathrm{motor}}$ in $\mathrm{A}$.
+Where expressions are written in terms of motor torque, they are understood via the linear DC motor relation $\boldsymbol{\tau}_{\mathrm{motor}} = k_t\,\mathbf{i}_{\mathrm{motor}}$ introduced earlier; consequently, all reported errors in this chapter are expressed in $\mathrm{A}$ (and can be mapped to torque units by multiplication with $k_t$ when needed).
+
 \section{Dataset of Collaborative Robots}
 
 \textbf{Dataset source and scope.}
@@ -156,9 +160,9 @@ network initialisation (DeLaN seed).
 This effect is visible in the collapse of the median learning curves for $K\geq 32$
 (Figures~\ref{fig:kdom_delan_train_loss_by_k} and~\ref{fig:kdom_delan_val_mse_by_k}), while the
 dispersion and occasional outliers remain seed-dependent, especially for the progress-aligned
-torque RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}).
+torque RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}). \textbf{main objective best DelaN -> best LSTM here}
 
-\textbf{Objective.}
+\textbf{Objective DeLaN}
 To obtain a reliable basis for the second experiment, we therefore fix $K=84$ and select a DeLaN
 hyperparameter preset within the stable $K$ regime.
 Since Algorithm~\ref{alg:best_model_approach} performs validation-based checkpoint selection, the
@@ -216,117 +220,6 @@ initialisations?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 
-\textbf{Stage 2: Should we already set up the LSTM best-model loop?}
-Yes—\emph{you can set up Stage 2 now} without first having identified the single best DeLaN configuration, as long as Stage~2 is formulated as a \emph{conditional} optimization: \emph{given} a reasonably stable DeLaN baseline (selected by validation error), we then optimize the residual learner and quantify the added value.
-
-This is consistent with the standard two-stage residual-compensation logic used in the literature: (i) learn a physics-based inverse dynamics model, (ii) learn a data-driven residual term capturing unmodeled effects such as friction and other nonlinearities. :contentReference[oaicite:0]{index=0}
-
-\paragraph{Why Stage 2 is already meaningful (even if DeLaN is not fully “final”).}
-\begin{itemize}
-    \item Your K-domination experiments indicate that DeLaN variance is dominated by the data regime $K$ (and by fold/seed effects at low $K$). This means you already know the correct strategy for Stage~2: \textbf{freeze a strong DeLaN regime} (high $K$) and then study what the residual learner can add \emph{in a stable baseline setting}.
-    \item In related robotic torque/force estimation work, LSTM-style models are trained with \textbf{early stopping based on validation loss} (e.g., stop when validation loss does not improve for 5 consecutive epochs) and sequence length was found to matter (longer histories improved performance). 
-    \item Also, including torque-related signals as inputs can materially improve sequential models (reported improvement on the order of $\sim$15\% in one study), which directly motivates testing feature modes that \textbf{include $\hat{\tau}$} vs.\ those that do not. :contentReference[oaicite:2]{index=2}
-\end{itemize}
-
-\subsection{Recommended Stage 2 “best LSTM” experiment design}
-The goal is to identify an LSTM configuration that (i) reliably converges (no premature stopping), (ii) yields consistent gains over the DeLaN baseline, and (iii) generalizes across dataset splits.
-
-\paragraph{Core principle: nested selection.}
-Do \textbf{not} sweep LSTM hyperparameters on weak DeLaN runs. Instead:
-\begin{enumerate}
-    \item For each dataset split (dataset seed), train multiple DeLaN initializations.
-    \item Select the best DeLaN using validation torque RMSE (or MSE equivalently).
-    \item Only then train the residual LSTM(s) on the residuals of the selected DeLaN.
-\end{enumerate}
-This reduces wasted LSTM training and makes LSTM comparisons interpretable.
-
-\paragraph{Stage 2 sweep axes (what to vary).}
-Given your observations (H=25 fails; patience too small stops at 5--15 epochs), the highest-value sweep is:
-
-\begin{itemize}
-    \item \textbf{History length $H$ (primary axis).} 
-    Use a small set biased toward longer contexts, e.g.
-    \[
-    H \in \{50, 100, 150, 200\}.
-    \]
-    Rationale: longer sequences improved sequential model performance in related work. :contentReference[oaicite:3]{index=3}
-
-    \item \textbf{Early stopping policy (primary axis).}
-    Your current policy (warm-up $=0$, patience $=10$) can stop too early.
-    Use a \emph{minimum-training constraint} plus patience:
-    \[
-    \text{warm-up} \in \{10, 20\}, \quad \text{patience} \in \{20, 30\}.
-    \]
-    This matches the general practice of validation-based stopping (commonly used in torque/force estimation networks) but avoids premature termination. :contentReference[oaicite:4]{index=4}
-
-    \item \textbf{Feature modes (secondary axis, but important for interpretation).}
-    For a thesis-ready story, I would run:
-    \[
-    \texttt{full},\ \texttt{state},\ \texttt{tau\_hat},\ \texttt{state\_tauhat}.
-    \]
-    Motivation: papers report that adding torque(-like) signals can help sequential estimators. :contentReference[oaicite:5]{index=5}
-    In your case, $\hat{\tau}_{\mathrm{DeLaN}}$ is the torque-like proxy; this makes the comparison scientifically meaningful:
-    \begin{itemize}
-        \item \texttt{state} tests whether residuals are explainable purely from kinematics.
-        \item \texttt{tau\_hat} tests whether the residual mainly depends on the baseline prediction.
-        \item \texttt{full} tests whether kinematics + baseline together is best.
-    \end{itemize}
-
-    \item \textbf{Model capacity (secondary axis).}
-    Keep most LSTM capacity fixed initially to isolate $H$ and early stopping:
-    \[
-    \text{units}=128,\ \text{dropout}=0.2,\ \text{layers}=2
-    \]
-    and only if results saturate, test one larger and one smaller setting, e.g.\ units $\in\{64,128,256\}$.
-
-    \item \textbf{Seeds.}
-    For Stage 2, add \textbf{LSTM seeds} only after narrowing to 1--2 best configs:
-    \[
-    s_{\mathrm{LSTM}} \in \{0,1,2\}
-    \]
-    is usually enough to quantify residual-model variance.
-\end{itemize}
-
-\subsection{How to define the Stage 2 selection metric (what “best” means)}
-To match your pipeline and avoid leakage:
-
-\begin{itemize}
-    \item Select the \textbf{best LSTM config} by minimizing \textbf{validation residual RMSE} (or validation loss if your loss is residual MSE).
-    \item Report final performance on the test set via your combined evaluation metrics:
-    \[
-    \mathrm{RMSE}(\tau_{\mathrm{gt}}, \tau_{\mathrm{DeLaN}}),\quad
-    \mathrm{RMSE}(\tau_{\mathrm{gt}}, \tau_{\mathrm{DeLaN}}+\hat{r}),
-    \]
-    and derived gain metrics.
-\end{itemize}
-
-\subsection{Implementation notes that matter for correctness}
-% \begin{itemize}
-%     \item \textbf{Avoid Unicode combining characters in \LaTeX:} use $\ddot{q}$ instead of $q̈$.
-%     \item \textbf{Filtering/derivatives:} Lutter explicitly computes velocities/accelerations via finite differences and low-pass filtering (offline, zero-phase) to avoid phase shift. 
-%     This supports your approach of filtered signals before residual learning.
-% \end{itemize}
-
-\subsection{A concrete Stage 2 “best LSTM” loop (thesis-ready)}
-With DeLaN fixed to a stable regime (e.g., your lutter-like preset and high $K$):
-
-\begin{enumerate}
-    \item Fix a stable DeLaN regime (high $K$) and select best DeLaN per dataset seed using validation RMSE.
-    \item For each selected DeLaN:
-    \begin{enumerate}
-        \item Sweep $H \in \{50,100,150,200\}$.
-        \item Sweep early stopping settings: warm-up $\in\{10,20\}$, patience $\in\{20,30\}$.
-        \item Sweep feature modes: \texttt{full}, \texttt{state}, \texttt{tau\_hat}, \texttt{state\_tauhat}.
-        \item Train LSTM, select best checkpoint on validation.
-        \item Run combined evaluation and store $(\mathrm{delan\_rmse}, \mathrm{rg\_rmse}, \mathrm{gain}, \mathrm{gain\_ratio})$.
-    \end{enumerate}
-    \item Pick the final Stage~2 config as the one with the best (median) test gain ratio and low dispersion (IQR) across dataset seeds.
-\end{enumerate}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{algorithm}[H]
 \caption{Best-model selection for the DeLaN+LSTM pipeline}\label{alg:best_model_approach}
 \begin{algorithmic}
@@ -335,46 +228,139 @@ With DeLaN fixed to a stable regime (e.g., your lutter-like preset and high $K$)
 \Require Hyperparameter presets $\mathcal{H}_{\mathrm{DeLaN}}$ and $\mathcal{H}_{\mathrm{LSTM}}$ with $|\mathcal{H}_{\cdot}|=5$
 \Ensure Best DeLaN checkpoint and best LSTM checkpoint for the fixed $K$
 
-	\State \textbf{Stage 1: DeLaN model selection}
-	\ForAll{$d \in \mathcal{D}$}
-	    \ForAll{$h \in \mathcal{H}_{\mathrm{DeLaN}}$}
-	        \ForAll{$s \in \mathcal{S}_{\mathrm{DeLaN}}$}
-	            \State Train DeLaN on split $(59,8,17)$ \Comment{log train/val curves; early stopping}
-	            \State Record $\mathrm{RMSE}_{\mathrm{val}}$ and $\mathrm{RMSE}_{\mathrm{test}}$ \Comment{flag diverged runs}
-	        \EndFor
-	        \State Compute seed-wise statistics for $(d,h)$ and append to aggregation buffers:
-	        \Statex \hspace{1.25em}$\tilde{r}_{\mathrm{val}}(d,h)=\mathrm{median}_{s}\!\left(\mathrm{RMSE}_{\mathrm{val}}\right)$,\;
-	        $q_{\mathrm{val}}(d,h)=\mathrm{IQR}_{s}\!\left(\mathrm{RMSE}_{\mathrm{val}}\right)$,\;
-	        $\tilde{r}_{\mathrm{test}}(d,h)=\mathrm{median}_{s}\!\left(\mathrm{RMSE}_{\mathrm{test}}\right)$
-	        \State Save best DeLaN for this $(K,d)$ by validation error
-	    \EndFor
-	\EndFor
-	\State Aggregate across dataset seeds for each $h$:
-	\Statex \hspace{1.25em}$x_h=\mathrm{median}_{d}\!\left(\tilde{r}_{\mathrm{val}}(d,h)\right)$,\;
-	$y^{\mathrm{IQR}}_h=\mathrm{median}_{d}\!\left(q_{\mathrm{val}}(d,h)\right)$,\;
-	$y^{\mathrm{test}}_h=\mathrm{median}_{d}\!\left(\tilde{r}_{\mathrm{test}}(d,h)\right)$
-	\State Plot \texttt{scatter\_valrmse\_median\_vs\_iqr\_\_delan} \Comment{$x$: $x_h$ (median val RMSE), $y$: $y^{\mathrm{IQR}}_h$ (IQR of val RMSE)}
-	\State Plot \texttt{scatter\_valrmse\_median\_vs\_testrmse\_median\_\_delan} \Comment{$x$: $x_h$ (median val RMSE), $y$: $y^{\mathrm{test}}_h$ (median test RMSE)}
-	\State Save best-model plots for DeLaN \Comment{exemplar overlays; see \texttt{delan\_plots.py}}
+\State \textbf{Stage 1: DeLaN model selection}
+\State Set $\lambda=0.5$, $P=10.0$ \Comment{stability weight, divergence penalty}
+\ForAll{$h \in \mathcal{H}_{\mathrm{DeLaN}}$}
+    \State Initialize fold summaries $\mathcal{F}_h \leftarrow \emptyset$
+    \ForAll{$d \in \mathcal{D}$}
+        \State Initialize run buffers $\mathcal{R} \leftarrow \emptyset$, curves $\mathcal{C}_{\mathrm{train}},\mathcal{C}_{\mathrm{val}} \leftarrow \emptyset$
+        \ForAll{$s \in \mathcal{S}_{\mathrm{DeLaN}}$}
+            \State Train DeLaN on fold $d$ with hyper-set $h$ and seed $s$ \Comment{early stopping on val MSE}
+            \If{training crashed or NaN/Inf or missing metrics}
+                \State Mark diverged and store placeholder metrics
+            \Else
+                \State Record curves $\mathrm{train\_loss}(e), \mathrm{val\_mse}(e)$, torque RMSE over progress, torque RMSE per joint, and $\mathrm{RMSE}_{\mathrm{val}}, \mathrm{RMSE}_{\mathrm{test}}, e^\star$       
+            \EndIf
+            \State Append curves and run metrics to $\mathcal{C}_{\mathrm{train}}, \mathcal{C}_{\mathrm{val}}, \mathcal{R}$ \Comment{includes torque RMSE progress and per-joint traces}
+        \EndFor
+        \State Align curves to common length $E_{\max}$ and aggregate median$\,\pm\,$IQR
+        \State Compute $\tilde{r}_{\mathrm{val}}(d,h)$, $q_{\mathrm{val}}(d,h)$, $\tilde{r}_{\mathrm{test}}(d,h)$ over non-diverged runs
+        \State Compute divergence rate $\rho(d,h)=\#\mathrm{diverged}/|\mathcal{S}_{\mathrm{DeLaN}}|$
+        \State Score $s(h,d)=\tilde{r}_{\mathrm{val}}(d,h)+\lambda\,q_{\mathrm{val}}(d,h)+P\,\rho(d,h)$
+        \State Choose best seed $s^\star$ with minimal $\mathrm{RMSE}_{\mathrm{val}}$ among non-diverged runs
+        \State Save fold artifacts for $(h,d)$ \Comment{median$\pm$IQR curves; best-run plots; checkpoint $(h,d,s^\star)$}
+        \State Append fold summary $(\tilde{r}_{\mathrm{val}},q_{\mathrm{val}},\tilde{r}_{\mathrm{test}},\rho,s)$ to $\mathcal{F}_h$
+    \EndFor
+    \State Aggregate across dataset seeds for $h$:
+    \Statex \hspace{1.25em}$S_h=\mathrm{median}_{d}\!\left(s(h,d)\right)$,\;
+    $Q_h=\mathrm{IQR}_{d}\!\left(s(h,d)\right)$,\;
+    $x_h=\mathrm{median}_{d}\!\left(\tilde{r}_{\mathrm{val}}(d,h)\right)$,\;
+    $y^{\mathrm{test}}_h=\mathrm{median}_{d}\!\left(\tilde{r}_{\mathrm{test}}(d,h)\right)$
+    \State Save hyper-set summary for $h$ and add one point to scatter datasets
+\EndFor
+\State Choose best hyper-set $h^\star=\arg\min_h S_h$
+\State Plot scatter A: $x$ vs stability (median or IQR of $q_{\mathrm{val}}$ across $d$)
+\State Plot scatter B: $x$ vs $y^{\mathrm{test}}_h$ \Comment{validation vs test alignment}
+\State Choose final DeLaN checkpoint: $d^\star=\arg\min_d s(h^\star,d)$, use saved $(h^\star,d^\star,s^\star)$
 
 \State \textbf{Freeze DeLaN and export residuals}
 \State Freeze best DeLaN parameters and export residual torques per trajectory
+\end{algorithmic}
+\end{algorithm}
 
-\State \textbf{Stage 2: LSTM model selection (same split and $K$)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\textbf{Objective LSTM}}
+
+\textbf{Motivation.}
+After selecting and freezing the best DeLaN checkpoint (Algorithm~\ref{alg:best_model_approach}), Stage~2 addresses the remaining modelling error by learning the residual torques
+$\boldsymbol{r}_{\tau,k}=\boldsymbol{\tau}_{\mathrm{motor},k}-\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}$ (Eq.~\ref{eq:tau_residual}).
+In contrast to Stage~1, where architecture and training are kept fixed, the LSTM performance can depend strongly on the available history length $H$ and on which signals are provided as inputs.
+We therefore treat the residual learner as a dedicated best-model selection problem under a fixed DeLaN baseline.
+
+\textbf{Objective and selection criterion.}
+The goal is to choose a configuration $(f,H)$ and corresponding checkpoints such that the \emph{end-to-end} prediction error of the combined model
+$\hat{\boldsymbol{\tau}}_{\mathrm{RG},k}=\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}+\hat{\boldsymbol{r}}_{\tau,k}$ (Eq.~\ref{eq:combined_torque_rg})
+is minimised on held-out trajectories, while remaining robust to (i) the dataset split induced by the dataset seed $d$ and (ii) the LSTM initialisation seed.
+Since the LSTM operates on history windows, evaluation is performed only on indices with valid context ($k\geq H-1$).
+
+\textbf{Ablation axes.}
+Algorithm~\ref{alg:lstm_best_model_approach} sweeps three window lengths $H\in\{50,100,150\}$ and four feature modes $f$ that probe whether residual dynamics are primarily explained by kinematics, by the DeLaN torque baseline, or by their combination:
+\texttt{state} uses $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}})$,
+\texttt{tau\_hat} uses $\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}$,
+\texttt{full} uses $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}})$, and
+\texttt{state\_tauhat} uses $(\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}})$ (dropping $\mathbf{q}$).
+For each $(d,f,H)$, multiple LSTM seeds are trained with early stopping, and both residual-level metrics and combined-model torque RMSE are recorded.
+
+\textbf{Stability-aware ranking across seeds.}
+To select a configuration that is both accurate and reliable, we rank $(f,H)$ by a robustness-aware score based on the combined-model torque RMSE:
+for each dataset seed $d$, we aggregate across LSTM seeds using median and IQR, and add a divergence penalty for failed runs (NaN/Inf or missing metrics).
+The resulting per-seed score $s(d,f,H)$ is then aggregated across dataset seeds, and the final choice is $(f^\star,H^\star)=\arg\min_{(f,H)} S_{f,H}$ as defined in Algorithm~\ref{alg:lstm_best_model_approach}.
+
+\begin{algorithm}[H]
+\caption{Best-model selection for the LSTM residual model}\label{alg:lstm_best_model_approach}
+\begin{algorithmic}
+\Require Dataset seeds $\mathcal{D}$, feature modes $\mathcal{F}=\{\texttt{full},\texttt{state},\texttt{tau\_hat},\texttt{state\_tauhat}\}$, window lengths $\mathcal{H}=\{50,100,150\}$
+\Require LSTM seeds $\mathcal{S}_{\mathrm{LSTM}}$, stability weight $\lambda=0.5$, divergence penalty $P=10.0$
+\Require Residual datasets exported from the best DeLaN for each $d \in \mathcal{D}$
+\Ensure Best LSTM checkpoint and best $(f,H)$ configuration
+
+\State \textbf{Build LSTM datasets (once per $(d,f,H)$)}
 \ForAll{$d \in \mathcal{D}$}
-    \ForAll{$h \in \mathcal{H}_{\mathrm{LSTM}}$}
-        \ForAll{$s \in \mathcal{S}_{\mathrm{LSTM}}$}
-            \State Build LSTM windows from exported residuals (same split)
-            \State Train residual LSTM \Comment{log train/val curves; early stopping}
-            \State Record validation metric and append to aggregation buffers
+    \State Load residual dataset for $d$
+    \ForAll{$f \in \mathcal{F}$}
+        \ForAll{$H \in \mathcal{H}$}
+            \State Build LSTM window NPZ for $(d,f,H)$ \Comment{features by $f$, window length $H$}
         \EndFor
-        \State Update aggregate plots for this $(K,d,h)$ \Comment{median $\pm$ IQR; see \texttt{lstm\_plots.py}}
-        \State Save best LSTM for this $(K,d)$ by validation loss
     \EndFor
 \EndFor
-\State Save best-model plots for LSTM \Comment{residual overlays; see \texttt{lstm\_plots.py}}
 
-\State \textbf{Combined evaluation}
-\State Evaluate DeLaN+LSTM on the test split and store final metrics/plots
+\State \textbf{LSTM training and per-seed combined evaluation}
+\ForAll{$d \in \mathcal{D}$}
+    \ForAll{$f \in \mathcal{F}$}
+        \ForAll{$H \in \mathcal{H}$}
+            \State Initialize run buffers $\mathcal{R} \leftarrow \emptyset$, curves $\mathcal{C}_{\mathrm{train}},\mathcal{C}_{\mathrm{val}} \leftarrow \emptyset$
+            \ForAll{$\ell \in \mathcal{S}_{\mathrm{LSTM}}$}
+                \State Train LSTM on NPZ$(d,f,H)$ with seed $\ell$ \Comment{early stopping; save best checkpoint}
+                \If{training crashed or NaN/Inf or missing metrics}
+                    \State Mark diverged
+                \Else
+                    \State Record curves $\mathrm{train\_loss}(e), \mathrm{val\_loss}(e)$ and $e^\star$
+                    \State Record residual metrics $\mathrm{RMSE}_{\mathrm{res}}, \mathrm{MSE}_{\mathrm{res}}$
+                    \State Run combined evaluation with DeLaN baseline for $d$ and this LSTM
+                    \State Record $\mathrm{RMSE}_{\mathrm{rg}}$, gain, gain\_ratio
+                \EndIf
+                \State Append curves and run metrics to $\mathcal{C}_{\mathrm{train}}, \mathcal{C}_{\mathrm{val}}, \mathcal{R}$
+            \EndFor
+            \State Align curves to common length $E_{\max}$ and aggregate median$\,\pm\,$IQR
+            \State Compute medians and IQRs over non-diverged runs:
+            \Statex \hspace{1.25em}$\tilde{r}_{\mathrm{res}}(d,f,H)$, $q_{\mathrm{res}}(d,f,H)$,
+            $\tilde{r}_{\mathrm{rg}}(d,f,H)$, $q_{\mathrm{rg}}(d,f,H)$,
+            $\tilde{g}(d,f,H)$, $q_g(d,f,H)$
+            \State Compute divergence rate $\rho(d,f,H)=\#\mathrm{diverged}/|\mathcal{S}_{\mathrm{LSTM}}|$
+            \State Score $s(d,f,H)=\tilde{r}_{\mathrm{rg}}(d,f,H)+\lambda\,q_{\mathrm{rg}}(d,f,H)+P\,\rho(d,f,H)$
+            \State Save config artifacts for $(d,f,H)$ \Comment{median$\pm$IQR curves and metrics; score}
+        \EndFor
+    \EndFor
+\EndFor
+
+\State \textbf{Aggregate across dataset seeds (per $(f,H)$)}
+\ForAll{$f \in \mathcal{F}$}
+    \ForAll{$H \in \mathcal{H}$}
+        \State Compute summary across $d$:
+        \Statex \hspace{1.25em}$S_{f,H}=\mathrm{median}_{d}\!\left(s(d,f,H)\right)$,\;
+        $Q_{f,H}=\mathrm{IQR}_{d}\!\left(s(d,f,H)\right)$,\;
+        $\tilde{r}_{\mathrm{rg}}(f,H)=\mathrm{median}_{d}\!\left(\tilde{r}_{\mathrm{rg}}(d,f,H)\right)$,\;
+        $\tilde{g}(f,H)=\mathrm{median}_{d}\!\left(\tilde{g}(d,f,H)\right)$
+        \State Save per-$(f,H)$ summary and add to boxplots / progress-curve aggregation
+    \EndFor
+\EndFor
+
+\State \textbf{Final selection}
+\State Choose best $(f^\star,H^\star)=\arg\min_{(f,H)} S_{f,H}$
+\State Report boxplots and progress-normalized RMSE curves for best configs
 \end{algorithmic}
 \end{algorithm}

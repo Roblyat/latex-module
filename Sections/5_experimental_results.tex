@@ -7,7 +7,7 @@ This chapter reports experimental evidence for the proposed two-stage pipeline, 
 
 \subsection{K-Domination Results}
 
-\textbf{Stage~1 (DeLaN): learning dynamics.}
+Stage~1 (DeLaN): learning dynamics
 Figures~\ref{fig:kdom_delan_train_loss_by_k} and~\ref{fig:kdom_delan_val_mse_by_k}
 summarise the Stage~1 optimisation as a function of the number of trajectories
 $K$.
@@ -18,14 +18,14 @@ convergence and improved generalisation.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{Images/05_results/k_story/evaluation/A1_train_loss_by_K.png}
+    \includegraphics[width=\linewidth]{Images/05_results/k_story/delan/A1_train_loss_by_K.png}
     \caption{DeLaN training loss by $K$ shown as median $\pm$ IQR across dataset seeds (with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:kdom_delan_train_loss_by_k}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{Images/05_results/k_story/evaluation/A2_val_mse_by_K.png}
+    \includegraphics[width=\linewidth]{Images/05_results/k_story/delan/A2_val_mse_by_K.png}
     \caption{DeLaN validation MSE by $K$ shown as median $\pm$ IQR across dataset seeds (with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:kdom_delan_val_mse_by_k}
 \end{figure}
@@ -40,9 +40,9 @@ variability, and the curves stabilise for large $K$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/evaluation/A3_torque_rmse_progress_by_K.png}
+    \includegraphics[width=0.95\linewidth]{Images/05_results/k_story/delan/A3_torque_rmse_progress_by_K.png}
     \caption{DeLaN torque RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR.}
-    \label{fig:kdom_delan_rmse_progress_by_k}
+    \label{fig:kdom_delan_rmse_per_joint}
 \end{figure}
 
 \textbf{Stage~1 (DeLaN): per-joint error.}
@@ -54,9 +54,9 @@ joints and reduced dispersion.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Images/05_results/k_story/evaluation/A4_torque_rmse_per_joint_grouped.png}
+    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/delan/A4_torque_rmse_per_joint_grouped.png}
     \caption{DeLaN torque RMSE per joint (median $\pm$ IQR) for selected values of $K$ (bars) with IQR error bars.}
-    \label{fig:kdom_delan_rmse_per_joint}
+    \label{fig:kdom_delan_rmse_progress_by_k}
 \end{figure}
 
 \textbf{Stage~2 (LSTM): learning dynamics.}
@@ -69,14 +69,14 @@ residual model.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/evaluation/B1_train_loss_by_K.png}
+    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/lstm/B1_train_loss_by_K.png}
     \caption{LSTM training loss by $K$ shown as median $\pm$ IQR across dataset seeds ($H=100$, feature mode \texttt{full}).}
     \label{fig:kdom_lstm_train_loss_by_k}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/evaluation/B2_val_loss_by_K.png}
+    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/lstm/B2_val_loss_by_K.png}
     \caption{LSTM validation loss by $K$ shown as median $\pm$ IQR across dataset seeds ($H=100$, feature mode \texttt{full}).}
     \label{fig:kdom_lstm_val_loss_by_k}
 \end{figure}
@@ -91,16 +91,16 @@ errors across joints.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/evaluation/B3_residual_rmse_progress_by_K.png}
-    \caption{LSTM residual RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR ($H=100$, feature mode \texttt{full}).}
-    \label{fig:kdom_lstm_res_rmse_progress_by_k}
+    \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/lstm/B4_residual_rmse_per_joint_grouped.png}
+    \caption{LSTM residual RMSE per joint (median $\pm$ IQR) for selected values of $K$ ($H=100$, feature mode \texttt{full}).}
+    \label{fig:kdom_lstm_res_rmse_per_joint}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Images/05_results/k_story/evaluation/B4_residual_rmse_per_joint_grouped.png}
-    \caption{LSTM residual RMSE per joint (median $\pm$ IQR) for selected values of $K$ ($H=100$, feature mode \texttt{full}).}
-    \label{fig:kdom_lstm_res_rmse_per_joint}
+    \includegraphics[width=0.95\linewidth]{Images/05_results/k_story/lstm/B3_residual_rmse_progress_by_K.png}
+    \caption{LSTM residual RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR ($H=100$, feature mode \texttt{full}).}
+    \label{fig:kdom_lstm_res_rmse_progress_by_k}
 \end{figure}
 
 \textbf{End-to-end DeLaN+LSTM behaviour (representative trajectory).}
@@ -128,18 +128,91 @@ signal closely matches the ground-truth residual across joints, including sharp
 transitions, which directly explains the improvements observed in the combined
 torque prediction.
 
-\subsection{Best Model Approch Results}
+\subsection{Best Model Approach Results}
+
+\textbf{DeLaN Best Model}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{Images/05_results/k_story/lstm/residual_gt_vs_pred_test_H100.png}
-    \caption{Representative residual overlay: ground-truth residual versus LSTM-predicted residual (test split, valid indices $k\geq H-1$, $H=100$).}
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/delan_best_train_val_curves_by_hp.png}
+    \caption{Train Loss / Validation MSE DeLaN median+IQR across seeds by hyper set}
+    \label{fig:delan_train_val_loss_across_seed_by_hyper}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/scatter_accuracy_vs_stability.png}
+    \caption{Scatter validation RMSE vs validation RMSE IQR}
+    \label{fig:delan_scatter_val_vs_valIQR}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/scatter_val_vs_test.png}
+    \caption{Scatter validation RMSE vs test RMSE}
+    \label{fig:delan_scatter_val_vs_test}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/A4_torque_rmse_per_joint_grouped.png}
+    % \caption{i_motor RMSE per joint by hyper set}
+    \label{fig:delan_rmse_per_joint}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{LSTM Best Model}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_best_val_loss_vs_rmse_total.png}
+    % \caption{lstm validation loss vs i_motor RMSE total}
+    \label{fig:lstm_val_loss_vs_rmse_total}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_overfit_ratio_by_feature_mode.png}
+    \caption{Overfit ration by feature mode}
+    \label{fig:lstm_overfit_ratio}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_residual_rmse_by_feature_mode.png}
+    % \caption{i_motor residual RMSE by feature mode}
+    \label{fig:lstm_residual_rmse_by_feature_mode}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_residual_rmse_by_H.png}
+    % \caption{i_motor residual RMSE by window length}
+    \label{fig:lstm_residual_rmse_by_window_length}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/residual_gt_vs_pred_test_H150.png}
+    % \caption{i_motor residual GT vs residual prediction}
+    \label{fig:lstm_residual_gt_vs_predicted}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Best Pipeline}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/evaluation/torque_rmse_per_joint_grouped_test_H150.png}
+    \caption{Best pipeline total RMSE per joint}
     \label{fig:kdom_residual_overlay_example}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{Images/05_results/k_story/evaluation/torque_gt_vs_delan_vs_combined_test_H100.png}
+    \includegraphics[width=\linewidth]{Images/05_results/best_model_story/evaluation/torque_gt_vs_delan_vs_combined_test_H150.png}
     \caption{Representative torque overlay: ground truth, DeLaN prediction, and combined DeLaN+LSTM prediction (test split, valid indices $k\geq H-1$, $H=100$).}
     \label{fig:kdom_torque_overlay_example}
 \end{figure}

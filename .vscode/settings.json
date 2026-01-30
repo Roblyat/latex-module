@@ -15,7 +15,10 @@
         "-pdf",
         "-outdir=%OUTDIR%",
         "%DOC%"
-      ]
+      ],
+      "env": {
+        "PATH": "/usr/local/texlive/2025/bin/x86_64-linux:/usr/bin:${env:PATH}"
+      }
     }
   ],
 

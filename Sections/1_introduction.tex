@@ -1,13 +1,15 @@
 \chapter{Introduction}
 This chapter provides the common thread of the work and positions it within the broader field of robotic manipulation and human-robot collaboration. 
-We first develop the \emph{motivation} for the study, followed by a precise \emph{problem description}, a formal \emph{problem statement}, and the resulting \emph{aim of the work}. 
-Subsequent chapters present the State of the Art, the proposed methods, the experimental evaluation, a discussion of the results and their implications, and an outlook on future research directions.
+First the \emph{Motivation} of the study is developed, followed by the \emph{Problem Description} and the resulting \emph{Aim of the Work}. 
+Subsequent chapters present the \emph{State of the Art}, a formal \emph{Problem Statement}, the \emph{Related Work} and proposed methods, the experimental setup and evaluation, a discussion of the results
+and their implications, and an outlook on future research directions.
 
     \section{Motivation}
-    The motivation for this work is given in two subsections, where the \emph{Context} subsection outlines the growing role of industrial and collaborative manipulators,
-    while the \emph{Use Case} subsection specifies a concrete manipulation scenario that requires accurate online identification of robot and payload parameters.
+    The motivation for this work is classified in a context and a use case, where the context outlines the growing role of industrial and collaborative manipulators,
+    while the use case specifies a concrete manipulation scenario that requires accurate online identification of robot and payload parameters.
 
-        \textbf{Context}
+        \vspace{0.75\baselineskip}
+
         As the robotics industry grows year over year, so does the number of robots operating around the world. It is estimated that there were approximately 3.4 million industrial robots in use worldwide in
         2023~\cite{Q0_1_industrial_robots_in_operation}. At the same time, the number of newly installed industrial robots has been increasing steadily since 2014; between 2021 and 2024, around 541\,000 new industrial
         robots were installed per year~\cite{Q0_2_industrial_robots_new_installations}. Within this landscape, collaborative robots (cobots) represent about 10.5\% of the industrial robot market, with 57\,040 new units 
@@ -44,19 +46,20 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
                         };
                 \end{axis}
             \end{tikzpicture}
-            \caption{Global annual installations of collaborative robots from 2017 to 2023 (in thousand units). Data from~\cite{Q0_3_industrial_robots_new_cobot_installations_BarChart}.}\label{fig:cobot_installations}
+            \caption{Global annual installations of collaborative robots from 2017 to 2023 (in thousand units). Figure modified from~\cite{Q0_3_industrial_robots_new_cobot_installations_BarChart}.}\label{fig:cobot_installations}
         \end{figure}
 
         The growing deployment of, and increasing collaboration with, robots imposes stringent requirements on safety and performance. 
         As tasks become more complex and humans and robots share workspaces more closely, two closely related problems become central: 
-        safe manipulation of payloads and safe physical human-robot interaction. 
-        Addressing both problems requires accurate knowledge of the inertial parameters of the manipulated object together with consistent estimation of the robot's dynamic state and interaction forces. 
+        safe manipulation of payloads and safe physical human-robot interaction \cite{Q1_1_fast_inertial_id_cobots, Q1_2_online_payload_mo, Q1_5_payload_estimation_compensation_2025}. 
+        Addressing both problems requires accurate knowledge of the inertial parameters of the manipulated object together with consistent estimation of
+        the robot's dynamic state and interaction forces \cite{Q1_3_external_torque_smo, Q1_14_long2022sliding_momentum_observer, Q1_11_wei_composite_filter, Q3_2_encoder_attention_payload}. 
         A collaborative robot must therefore maintain an internal representation of the mass-inertia properties of the payload or tool it manipulates and of the forces exchanged with its environment. 
-        This dynamic awareness is a prerequisite for compliant, contact-rich behaviour and for precise, high-performance manipulation in close proximity to humans.
-        \cite{Q1_1_fast_inertial_id_cobots, Q1_2_online_payload_mo, Q1_3_external_torque_smo, Q1_5_payload_estimation_compensation_2025, Q1_7_10947736, Q1_8_10944553, Q1_9_xu2022_double_weighting_payload_id, % chktex 2
-        Q1_10_duan_payload_ftsensor, Q1_11_wei_composite_filter, Q1_13_dynamic_model_id_swevers2007, Q1_14_long2022sliding_momentum_observer, Q3_2_encoder_attention_payload}.
+        This dynamic awareness is a prerequisite for compliant, contact-rich behaviour and for precise, high-performance manipulation in close proximity to humans
+        \cite{Q1_7_10947736, Q1_8_10944553, Q1_9_xu2022_double_weighting_payload_id, % chktex 2
+        Q1_10_duan_payload_ftsensor, Q1_13_dynamic_model_id_swevers2007}.
 
-        \textbf{Use Case}
+        \vspace{0.75\baselineskip}
 
         The considerations above motivate a concrete use case in which a collaborative robotic arm must manipulate previously unseen objects in a shared workspace. 
         A vision system can provide geometric information such as shape and dimensions of the payload, but it does not directly reveal its mass, center of mass (CoM), or inertia tensor. 
@@ -71,13 +74,13 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         In all these cases, RDPI and PDPI must be performed online so that the controller maintains an up-to-date model of the combined robot-payload dynamics and the resulting contact forces. 
         Robust online identification methods are therefore a key enabling technology for safe human-robot collaboration and high-performance manipulation with arbitrary payloads and tools.
 
-    \section{Problem Description}
-    The subsection \emph{Kinematic and Dynamic Background of Robot Manipulation} analyses why endowing a robotic manipulator with awareness of its own dynamics, payload, and tools is mathematically demanding and cannot be
-    achieved by simple calculation or direct measurement alone. The subsection \emph{Limitations of the Current State of the Art} then identifies the main shortcomings of existing identification and estimation methods
-    in the literature, thereby motivating the contribution of this work.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        \textbf{Kinematic and Dynamic Background of Robot Manipulation}
-        ~\label{sec:robot_dynamics_background}
+    \section{Problem Description}
+    The following kinematic and dynamic background of robot manipulation analyses why endowing a robotic manipulator with awareness of its own dynamics, payload, and tools is mathematically demanding and cannot be
+    achieved by simple calculation or direct measurement alone.
+        % ~\label{sec:robot_dynamics_background}
         The inertial properties of a rigid body are collected in the standard 10-dimensional parameter vector
         \begin{equation}
         \boldsymbol{\phi}^T
@@ -194,3 +197,53 @@ Subsequent chapters present the State of the Art, the proposed methods, the expe
         First, all available measurements (joint currents, positions, velocities and flange wrench) depend on the \emph{combined} dynamics of robot, tool and load via the nonlinear relationships~\eqref{eq:robot_dynamics}-\eqref{eq:F_measured_regressor}, so the contribution of the load parameters $\boldsymbol{\phi}_{\mathrm{load}}$ cannot be isolated by simple computation or direct measurement. 
         Second, accurate payload or load dynamic parameter identification (PDPI) presupposes an equally accurate compensation of the underlying robot-tool dynamics, including unmodelled effects such as friction and joint transmission nonlinearities. 
         Together, these aspects make dynamic awareness of payload, tool and robot a mathematically demanding inverse problem rather than a straightforward calculation from geometric or sensor data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        \section{Aim of Work}
+
+        The SoA review indicates that the strongest results for robot inverse dynamics and friction modelling are achieved when \emph{physics-structured} networks are combined with data-driven residual learners.
+        Extended DeLaN models can capture motor couplings and current-torque relations from encoder and motor data alone~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning}, while recent
+        PINN-based approaches augment a structured dynamics model with temporal convolutions to obtain joint-torque prediction and friction compensation on industrial
+        robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}. At the same time, several works show that recurrent residual learners-in particular LSTMs-are highly effective for compensating modelling errors
+        and estimating joint torques and end-effector forces in closely related settings~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation}.
+
+        The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that
+        can be trained using only encoder and motor-current data, yields an accurate nominal model of the robot-gripper joint torques and can be
+        consistently interpreted as a flange-wrench model in the force/torque sensor frame. Thereby providing a basis for tool/gripper compensation and subsequent
+        payload dynamic parameter identification (PDPI) as formulated in Section~\ref{sec:robot_dynamics_background}. Concretely, the work pursues the following objectives:
+        \begin{itemize}
+        \item \textbf{Stage~1 (structured inverse dynamics)} Stage~1 follows the improved DeLaN parameterisation of~\cite{Q4_6_HU2026103093}, using a Cholesky-factor inertia network and a learned potential,
+            complemented by an explicit Coulomb-viscous joint-friction model~\cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}. In contrast to the extended DeLaN-Motor architecture of~\cite{Q4_1_extended_delan_motor},
+            which embeds detailed motor couplings and is trained directly in current space, we adopt a simplified joint-side formulation and supervise the model using motor torques~\ref{eq:tau_motor},
+            obtained from encoder and motor-current data, where $k_t$ is give~\cite{QM_1_ur3_ur5_torque_constant}. The resulting DeLaN network is trained \emph{offline} on carefully designed excitation trajectories to
+            learn the nominal robot-gripper inverse dynamics.
+
+        \item \textbf{Stage~2 (residual sequence model)} Stage~2 adopts the DeLaN + TCN paradigm of~\cite{Q4_4_10729277}: the structured inverse-dynamics model from Stage~1 provides
+            a nominal torque prediction, and a separate sequence model (LSTM) learns residual joint torques from motion history.
+
+        \item \textbf{Evaluation in joint space and measurement frame.} Evaluate the resulting DeLaN+LSTM architecture both in joint space and in the force/torque sensor frame, quantifying its ability to reproduce the nominal
+            robot-gripper wrench across diverse trajectories.
+        \end{itemize}
+
+        In this work, a 6D force/torque sensor is used primarily as a \emph{research instrument} to validate the joint-space modelling in the end-effector frame:
+        flange-wrench measurements $\vec{F}_{\mathrm{meas}}$ are compared against the wrenches obtained by mapping the joint-space DeLaN+LSTM predictions through the Jacobian.
+        Once consistency between predicted and measured flange wrenches has been demonstrated, the joint-space trained DeLaN+LSTM architecture provides a robust basis for PDPI by delivering a reliable tool/gripper
+        wrench compensation in the measurement frame.
+
+        By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this thesis aims to move from the calibration-heavy, fragmented SoA towards a unified and
+        practically deployable notion of dynamic awareness: a cobot that can reliably predict its own joint torques, reproduce its nominal flange wrench in the measurement frame, and separate intrinsic
+        robot-gripper dynamics from payload/collision-induced effects.
+
+        \begin{itemize}
+            \item[\textbf{RQ1}] 
+                How accurately can a DeLaN-based inverse-dynamics model, trained purely in joint space, predict the flange wrench in the measurement frame once mapped through the Jacobian? 
+                What extent does augmenting DeLaN with a residual sequence model improve this wrench prediction?
+                % (Evaluation of DeLaN-only vs.\ DeLaN+sequence model, and whether Q4\_1/Q4\_4-style joint-space modelling remains robust when viewed in the measurement frame.)
+            \item[\textbf{RQ2}]
+                How does augmenting a DeLaN with a residual sequence model (LSTM) improve this wrench prediction?
+            \item[\textbf{RQ3}]
+                Does augmenting DeLaN with an LSTM-based residual model achieve joint-torque prediction and friction compensation performance comparable to a TCN-based residual model?                
+                % (Evaluation of whether the simpler recurrent LSTM is as robust as a TCN residual in joint space.)
+        \end{itemize}

@@ -1,0 +1,106 @@
+\textbf{Stage 2: Should we already set up the LSTM best-model loop?}
+Yes—\emph{you can set up Stage 2 now} without first having identified the single best DeLaN configuration, as long as Stage~2 is formulated as a \emph{conditional} optimization: \emph{given} a reasonably stable DeLaN baseline (selected by validation error), we then optimize the residual learner and quantify the added value.
+
+This is consistent with the standard two-stage residual-compensation logic used in the literature: (i) learn a physics-based inverse dynamics model, (ii) learn a data-driven residual term capturing unmodeled effects such as friction and other nonlinearities. :contentReference[oaicite:0]{index=0}
+
+\paragraph{Why Stage 2 is already meaningful (even if DeLaN is not fully “final”).}
+\begin{itemize}
+    \item Your K-domination experiments indicate that DeLaN variance is dominated by the data regime $K$ (and by fold/seed effects at low $K$). This means you already know the correct strategy for Stage~2: \textbf{freeze a strong DeLaN regime} (high $K$) and then study what the residual learner can add \emph{in a stable baseline setting}.
+    \item In related robotic torque/force estimation work, LSTM-style models are trained with \textbf{early stopping based on validation loss} (e.g., stop when validation loss does not improve for 5 consecutive epochs) and sequence length was found to matter (longer histories improved performance). 
+    \item Also, including torque-related signals as inputs can materially improve sequential models (reported improvement on the order of $\sim$15\% in one study), which directly motivates testing feature modes that \textbf{include $\hat{\tau}$} vs.\ those that do not. :contentReference[oaicite:2]{index=2}
+\end{itemize}
+
+\subsection{Recommended Stage 2 “best LSTM” experiment design}
+The goal is to identify an LSTM configuration that (i) reliably converges (no premature stopping), (ii) yields consistent gains over the DeLaN baseline, and (iii) generalizes across dataset splits.
+
+\paragraph{Core principle: nested selection.}
+Do \textbf{not} sweep LSTM hyperparameters on weak DeLaN runs. Instead:
+\begin{enumerate}
+    \item For each dataset split (dataset seed), train multiple DeLaN initializations.
+    \item Select the best DeLaN using validation torque RMSE (or MSE equivalently).
+    \item Only then train the residual LSTM(s) on the residuals of the selected DeLaN.
+\end{enumerate}
+This reduces wasted LSTM training and makes LSTM comparisons interpretable.
+
+\paragraph{Stage 2 sweep axes (what to vary).}
+Given your observations (H=25 fails; patience too small stops at 5--15 epochs), the highest-value sweep is:
+
+\begin{itemize}
+    \item \textbf{History length $H$ (primary axis).} 
+    Use a small set biased toward longer contexts, e.g.
+    \[
+    H \in \{50, 100, 150, 200\}.
+    \]
+    Rationale: longer sequences improved sequential model performance in related work. :contentReference[oaicite:3]{index=3}
+
+    \item \textbf{Early stopping policy (primary axis).}
+    Your current policy (warm-up $=0$, patience $=10$) can stop too early.
+    Use a \emph{minimum-training constraint} plus patience:
+    \[
+    \text{warm-up} \in \{10, 20\}, \quad \text{patience} \in \{20, 30\}.
+    \]
+    This matches the general practice of validation-based stopping (commonly used in torque/force estimation networks) but avoids premature termination. :contentReference[oaicite:4]{index=4}
+
+    \item \textbf{Feature modes (secondary axis, but important for interpretation).}
+    For a thesis-ready story, I would run:
+    \[
+    \texttt{full},\ \texttt{state},\ \texttt{tau\_hat},\ \texttt{state\_tauhat}.
+    \]
+    Motivation: papers report that adding torque(-like) signals can help sequential estimators. :contentReference[oaicite:5]{index=5}
+    In your case, $\hat{\tau}_{\mathrm{DeLaN}}$ is the torque-like proxy; this makes the comparison scientifically meaningful:
+    \begin{itemize}
+        \item \texttt{state} tests whether residuals are explainable purely from kinematics.
+        \item \texttt{tau\_hat} tests whether the residual mainly depends on the baseline prediction.
+        \item \texttt{full} tests whether kinematics + baseline together is best.
+    \end{itemize}
+
+    \item \textbf{Model capacity (secondary axis).}
+    Keep most LSTM capacity fixed initially to isolate $H$ and early stopping:
+    \[
+    \text{units}=128,\ \text{dropout}=0.2,\ \text{layers}=2
+    \]
+    and only if results saturate, test one larger and one smaller setting, e.g.\ units $\in\{64,128,256\}$.
+
+    \item \textbf{Seeds.}
+    For Stage 2, add \textbf{LSTM seeds} only after narrowing to 1--2 best configs:
+    \[
+    s_{\mathrm{LSTM}} \in \{0,1,2\}
+    \]
+    is usually enough to quantify residual-model variance.
+\end{itemize}
+
+\subsection{How to define the Stage 2 selection metric (what “best” means)}
+To match your pipeline and avoid leakage:
+
+\begin{itemize}
+    \item Select the \textbf{best LSTM config} by minimizing \textbf{validation residual RMSE} (or validation loss if your loss is residual MSE).
+    \item Report final performance on the test set via your combined evaluation metrics:
+    \[
+    \mathrm{RMSE}(\tau_{\mathrm{gt}}, \tau_{\mathrm{DeLaN}}),\quad
+    \mathrm{RMSE}(\tau_{\mathrm{gt}}, \tau_{\mathrm{DeLaN}}+\hat{r}),
+    \]
+    and derived gain metrics.
+\end{itemize}
+
+\subsection{Implementation notes that matter for correctness}
+% \begin{itemize}
+%     \item \textbf{Avoid Unicode combining characters in \LaTeX:} use $\ddot{q}$ instead of $q̈$.
+%     \item \textbf{Filtering/derivatives:} Lutter explicitly computes velocities/accelerations via finite differences and low-pass filtering (offline, zero-phase) to avoid phase shift. 
+%     This supports your approach of filtered signals before residual learning.
+% \end{itemize}
+
+\subsection{A concrete Stage 2 “best LSTM” loop (thesis-ready)}
+With DeLaN fixed to a stable regime (e.g., your lutter-like preset and high $K$):
+
+\begin{enumerate}
+    \item Fix a stable DeLaN regime (high $K$) and select best DeLaN per dataset seed using validation RMSE.
+    \item For each selected DeLaN:
+    \begin{enumerate}
+        \item Sweep $H \in \{50,100,150,200\}$.
+        \item Sweep early stopping settings: warm-up $\in\{10,20\}$, patience $\in\{20,30\}$.
+        \item Sweep feature modes: \texttt{full}, \texttt{state}, \texttt{tau\_hat}, \texttt{state\_tauhat}.
+        \item Train LSTM, select best checkpoint on validation.
+        \item Run combined evaluation and store $(\mathrm{delan\_rmse}, \mathrm{rg\_rmse}, \mathrm{gain}, \mathrm{gain\_ratio})$.
+    \end{enumerate}
+    \item Pick the final Stage~2 config as the one with the best (median) test gain ratio and low dispersion (IQR) across dataset seeds.
+\end{enumerate}
