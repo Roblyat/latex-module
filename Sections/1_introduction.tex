@@ -11,9 +11,9 @@ and their implications, and an outlook on future research directions.
         \vspace{0.75\baselineskip}
 
         As the robotics industry grows year over year, so does the number of robots operating around the world. It is estimated that there were approximately 3.4 million industrial robots in use worldwide in
-        2023~\cite{Q0_1_industrial_robots_in_operation}. At the same time, the number of newly installed industrial robots has been increasing steadily since 2014; between 2021 and 2024, around 541\,000 new industrial
+        2023~\cite{Q0_1_industrial_robots_in_operation}. At the same time, the number of newly installed industrial robots has been increasing steadily since 2014. Between 2021 and 2024, around 541\,000 new industrial
         robots were installed per year~\cite{Q0_2_industrial_robots_new_installations}. Within this landscape, collaborative robots (cobots) represent about 10.5\% of the industrial robot market, with 57\,040 new units 
-        deployed in 2023, and annual cobot installations since 2020, 2022, and 2023 reaching roughly 50\,000 units per year; importantly, these cobots are expected to complement rather than replace traditional industrial 
+        deployed in 2023, and annual cobot installations since 2020, 2022, and 2023 reaching roughly 50\,000 units per year. Importantly, these cobots are expected to complement rather than replace traditional industrial 
         robots~\cite{Q0_3_industrial_robots_new_cobot_installations_BarChart}.
 
         \begin{figure}[ht]
@@ -177,7 +177,8 @@ and their implications, and an outlook on future research directions.
         \label{eq:I_payload}
         \end{equation}
 
-        If a force/torque sensor is mounted at the flange, the measured wrench can be written, using the relations derived in the Appendix, as
+        If a force/torque sensor is mounted at the flange, the measured wrench can be written,
+        using the relations derived in the Appendix~\ref{app:kinematic_background}, as
         \begin{equation}
         \vec{F}_{\mathrm{measured}}
         =
@@ -190,7 +191,7 @@ and their implications, and an outlook on future research directions.
         \label{eq:F_measured_regressor}
         \end{equation}
 
-        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix~\ref{app:query_categories}. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.\footnote{All experiments in this work are simulation-based; in the subsequent method formulation, sensor bias and noise are therefore neglected and \eqref{eq:F_measured_regressor} is used without $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$.}
+        where $Y(\cdot)$ is the $6\times 10$ Newton-Euler regressor matrix defined in the Appendix~\ref{app:query_categories}. It is linear in the inertial parameter vector $\boldsymbol{\phi}_{\mathrm{eff}}$, but depends nonlinearly on the motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$. The terms $\vec{F}_{\mathrm{bias}}$ and $\vec{n}$ denote sensor bias and noise, respectively.
         The motion variables $(\mathbf{a},\boldsymbol{\alpha},\boldsymbol{\omega})$ are in turn determined by the joint state and motor torques through the nonlinear dynamics\eqref{eq:robot_dynamics}-\eqref{eq:I_payload}.
 
         From an identification viewpoint, this creates two tightly coupled challenges. 
@@ -203,47 +204,29 @@ and their implications, and an outlook on future research directions.
 
         \section{Aim of Work}
 
-        The SoA review indicates that the strongest results for robot inverse dynamics and friction modelling are achieved when \emph{physics-structured} networks are combined with data-driven residual learners.
-        Extended DeLaN models can capture motor couplings and current-torque relations from encoder and motor data alone~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning}, while recent
-        PINN-based approaches augment a structured dynamics model with temporal convolutions to obtain joint-torque prediction and friction compensation on industrial
-        robots~\cite{Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}. At the same time, several works show that recurrent residual learners-in particular LSTMs-are highly effective for compensating modelling errors
-        and estimating joint torques and end-effector forces in closely related settings~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation}.
+        The SoA review highlights two persistent challenges for dynamic awareness in collaborative manipulation.
+        First, accurate inverse-dynamics and friction compensation are often obtained in calibration-centric workflows that depend on carefully designed excitation and repeated identification runs.
+        Second, hard-to-model effects (e.g., frictional memory and transmission nonlinearities) are frequently absorbed into lumped residual terms or task-specific models.
+        Recent physics-informed architectures such as Deep Lagrangian Networks (DeLaN) provide a mechanics-consistent model class for inverse dynamics~\cite{Q4_2_lutter2023combiningphysicsdeeplearning,Q4_6_HU2026103093} and have been extended towards motor-side supervision when joint-torque measurements are unavailable~\cite{Q4_1_extended_delan_motor}.
+        Complementarily, deep sequence models, in particular LSTMs, have been shown to be effective residual learners for dynamics and force/torque estimation from proprioceptive histories~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation}.
 
-        The aim of this thesis is to build on these insights and develop a \emph{physics-informed, sequence-model-based inverse-dynamics architecture} that
-        can be trained using only encoder and motor-current data, yields an accurate nominal model of the robot-gripper joint torques and can be
-        consistently interpreted as a flange-wrench model in the force/torque sensor frame. Thereby providing a basis for tool/gripper compensation and subsequent
-        payload dynamic parameter identification (PDPI) as formulated in Section~\ref{sec:robot_dynamics_background}. Concretely, the work pursues the following objectives:
+        Aligned with the limitations identified in Chapter~2, the aim of this thesis is to develop and evaluate a \emph{physics-informed, sequence-model-based inverse-dynamics pipeline} that learns a single nominal actuation model from encoder and motor-current data, while separating structured rigid-body dynamics from history-dependent residual effects.
+        This nominal model is intended to provide a foundation for tool/gripper compensation and subsequent payload dynamic parameter identification (PDPI) as formulated in Section~\ref{sec:robot_dynamics_background}.
+        Although the structured inverse-dynamics formulation can, in principle, be interpreted in the end-effector wrench measurement frame via Jacobian mapping, the evaluation in this thesis is conducted purely in joint space in the measured actuation domain of motor currents.
+        Concretely, the work pursues the following objectives:
         \begin{itemize}
-        \item \textbf{Stage~1 (structured inverse dynamics)} Stage~1 follows the improved DeLaN parameterisation of~\cite{Q4_6_HU2026103093}, using a Cholesky-factor inertia network and a learned potential,
-            complemented by an explicit Coulomb-viscous joint-friction model~\cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}. In contrast to the extended DeLaN-Motor architecture of~\cite{Q4_1_extended_delan_motor},
-            which embeds detailed motor couplings and is trained directly in current space, we adopt a simplified joint-side formulation and supervise the model using motor torques~\ref{eq:tau_motor},
-            obtained from encoder and motor-current data, where $k_t$ is give~\cite{QM_1_ur3_ur5_torque_constant}. The resulting DeLaN network is trained \emph{offline} on carefully designed excitation trajectories to
-            learn the nominal robot-gripper inverse dynamics.
-
-        \item \textbf{Stage~2 (residual sequence model)} Stage~2 adopts the DeLaN + TCN paradigm of~\cite{Q4_4_10729277}: the structured inverse-dynamics model from Stage~1 provides
-            a nominal torque prediction, and a separate sequence model (LSTM) learns residual joint torques from motion history.
-
-        \item \textbf{Evaluation in joint space and measurement frame.} Evaluate the resulting DeLaN+LSTM architecture both in joint space and in the force/torque sensor frame, quantifying its ability to reproduce the nominal
-            robot-gripper wrench across diverse trajectories.
+        \item Learn a DeLaN-based baseline predictor of per-joint motor currents from joint kinematics, using a parameterisation that respects key mechanical structure (e.g., positive-definite inertia) and serves as a consistent nominal model~\cite{Q4_2_lutter2023combiningphysicsdeeplearning,Q4_6_HU2026103093}.
+        \item Freeze the baseline and learn the remaining motor-current residual dynamics with an LSTM sequence model over a finite history window, capturing effects not explained by the instantaneous state alone~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation}.
+        \item Establish a trajectory-level split and model-selection protocol, and benchmark DeLaN and DeLaN+LSTM against the dataset baseline on the IEEE DataPort trajectories, reporting per-joint RMSE in current units [A]~\cite{Q_Dataset_Paper}.
         \end{itemize}
 
-        In this work, a 6D force/torque sensor is used primarily as a \emph{research instrument} to validate the joint-space modelling in the end-effector frame:
-        flange-wrench measurements $\vec{F}_{\mathrm{meas}}$ are compared against the wrenches obtained by mapping the joint-space DeLaN+LSTM predictions through the Jacobian.
-        Once consistency between predicted and measured flange wrenches has been demonstrated, the joint-space trained DeLaN+LSTM architecture provides a robust basis for PDPI by delivering a reliable tool/gripper
-        wrench compensation in the measurement frame.
+        Accordingly, the contributions of this work are a motor-current-domain formulation of a physics-structured DeLaN baseline. Combined with an LSTM residual model into a single inverse-dynamics predictor and an evaluation and best-model selection procedure, that quantifies accuracy and stability under trajectory-level splits. An implementation that reproduces preprocessing, training, and evaluation end-to-end within a containerised pipeline.
 
-        By combining a physics-informed inverse-dynamics backbone with a sequence model trained offline but executed online, this thesis aims to move from the calibration-heavy, fragmented SoA towards a unified and
-        practically deployable notion of dynamic awareness: a cobot that can reliably predict its own joint torques, reproduce its nominal flange wrench in the measurement frame, and separate intrinsic
-        robot-gripper dynamics from payload/collision-induced effects.
-
-        \begin{itemize}
-            \item[\textbf{RQ1}] 
-                How accurately can a DeLaN-based inverse-dynamics model, trained purely in joint space, predict the flange wrench in the measurement frame once mapped through the Jacobian? 
-                What extent does augmenting DeLaN with a residual sequence model improve this wrench prediction?
-                % (Evaluation of DeLaN-only vs.\ DeLaN+sequence model, and whether Q4\_1/Q4\_4-style joint-space modelling remains robust when viewed in the measurement frame.)
-            \item[\textbf{RQ2}]
-                How does augmenting a DeLaN with a residual sequence model (LSTM) improve this wrench prediction?
-            \item[\textbf{RQ3}]
-                Does augmenting DeLaN with an LSTM-based residual model achieve joint-torque prediction and friction compensation performance comparable to a TCN-based residual model?                
-                % (Evaluation of whether the simpler recurrent LSTM is as robust as a TCN residual in joint space.)
-        \end{itemize}
+	        \begin{itemize}
+	            \item[\textbf{RQ1}]
+	                How accurately does a physics-structured DeLaN baseline predict per-joint motor currents on held-out trajectories, and how does trajectory coverage affect stability and generalisation (evaluated by per-joint motor-current RMSE in $\mathrm{A}$ on validation/test splits, reported as median $\pm$ IQR across seeds)?
+	            \item[\textbf{RQ2}]
+	                To what extent does an LSTM residual model reduce the remaining motor-current prediction error, and how do feature choice and history length influence accuracy and overfitting behaviour (evaluated by residual and combined motor-current RMSE in $\mathrm{A}$ on the test split, and by the overfit indicator $\mathcal{L}_{\mathrm{val}}/\mathcal{L}_{\mathrm{train}}$)?
+	            \item[\textbf{RQ3}]
+	                How does the proposed DeLaN+LSTM pipeline compare to the classical model-based identification baseline on the IEEE DataPort benchmark datasets and operating conditions~\cite{Q_Dataset_Paper} (evaluated by per-joint motor-current RMSE in $\mathrm{A}$ on the $5{,}000$-sample held-out test split and relative RMSE change versus the baseline)?
+	        \end{itemize}

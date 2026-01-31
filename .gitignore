@@ -3,3 +3,5 @@ build/*
 
 # But NOT APE.pdf
 !build/APE.pdf
+
+content

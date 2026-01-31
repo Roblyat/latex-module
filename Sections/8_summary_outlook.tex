@@ -1,86 +1,21 @@
 \chapter{Summary and Outlook}
 
-    The results in this thesis can be interpreted as a first step towards a more
-    general notion of \emph{dynamic awareness} for collaborative manipulators.
-    Several conceptual implications and natural extensions are worth highlighting.
+This thesis addressed the problem of learning accurate inverse-dynamics models for collaborative manipulators in a way that remains compatible with the requirements of online payload and interaction-force estimation.
+Rather than treating inverse dynamics as a purely black-box regression task, the work adopted a physics-inspired learning strategy that embeds mechanical structure into the model class and learns the remaining discrepancy from data.
+Since the IEEE DataPort dataset used for evaluation provides motor-current measurements (but no joint-torque ground truth), Chapters~4--7 consistently formulated objectives and metrics in the motor-current domain, noting that torque-domain quantities can be recovered up to a constant motor torque constant in the operating regime considered.
 
-    \paragraph{Online motor-current awareness for safety–critical control.}
-    Once the DeLaN+LSTM architecture has been trained and deployed, the robot
-    possesses an accurate estimate of its joint motor currents
-    $\hat{\mathbf{i}}_{\mathrm{RG},k}$ at every time step and---via the known conversion factor $k_t$ and the
-    Jacobian---of the corresponding end–effector wrench
-    $\hat{\vec{F}}_{\mathrm{RG},k}$ in the measurement frame. In principle, this
-    enables model–predictive controllers and safety monitors to operate directly on
-    end–effector wrench limits, for example those prescribed for
-    collaborative operation, rather than relying on conservative joint–space
-    bounds. By exploiting the available actuation margin more tightly, such a
-    controller could realise higher velocity and acceleration profiles while
-    remaining within certified interaction–force constraints.
+The proposed approach is a two-stage pipeline.
+Stage~1 uses Deep Lagrangian Networks (DeLaN) to learn a structured dynamics predictor from joint kinematics, yielding a baseline motor-current model that respects fundamental properties of rigid-body dynamics.
+Stage~2 augments this baseline with a residual Long Short-Term Memory (LSTM) sequence model trained on the remaining modelling error, enabling history-dependent corrections that capture effects not explained by the instantaneous state alone.
+To make both stages reproducible and comparable across dataset splits, the thesis introduced a trajectory-level evaluation protocol, an explicit best-model selection procedure that accounts for accuracy and seed stability, and an implementation that runs end-to-end within a containerised stack.
 
-    \paragraph{Beyond joint space: evaluation of end–effector wrench prediction.}
-    The present thesis restricts training and quantitative evaluation to joint
-    space: the DeLaN+LSTM model is trained on joint states and motor currents, and
-    its quality is assessed primarily via motor-current prediction errors. A
-    natural next step is a systematic evaluation of end–effector wrench prediction
-    against ground–truth FT data at the flange. One promising route is to combine
-    IsaacSim–based data generation (with and without domain randomisation and
-    sensor noise) with real–robot experiments using the same excitation families
-    as in this work. This would allow a comprehensive comparison between
-    \emph{(i)} models trained purely in simulation and tested on the real robot,
-    \emph{(ii)} models trained on real data and tested on held–out real
-    trajectories, and \emph{(iii)} hybrid training schemes that mix simulated and
-    measured data. Such an evaluation pipeline would provide strong evidence for
-    the robustness of the joint–space training strategy when viewed in the
-    measurement frame. Once this consistency between Jacobian–mapped model predictions 
-    and ground–truth flange wrenches has been demonstrated, the same DeLaN+LSTM architecture 
-    can, in principle, be trained and deployed using proprioceptive data alone, without
-    requiring an FT sensor in the loop.
+Experimentally, the K-domination study quantified how the available number of trajectories affects optimisation stability and generalisation for both stages.
+The results showed that increasing trajectory coverage reduces both the typical error level and the variability across dataset seeds, and that the residual learning problem in Stage~2 is tightly coupled to the quality of the Stage~1 baseline.
+The best-model approach further demonstrated how targeted hyperparameter and feature-mode ablations translate into measurable accuracy--robustness trade-offs.
+Finally, the benchmark comparison to the dataset baseline highlighted that the relative performance depends on the operating condition: the proposed physics-informed pipeline is most competitive in regimes where the linear identification baseline exhibits larger errors (e.g., under load and on the larger robot), while the baseline remains difficult to beat in the unloaded UR3 condition.
 
-    \paragraph{Tool/gripper calibration as a third learning stage.}
-    In the current experiments, the LSTM residual model in Stage~2 reduces the
-    motor-current error on the nominal robot–only configuration to near zero. When
-    a fixed gripper is mounted, one could either re–record the entire dataset with
-    the gripper attached or, more interestingly, treat the gripper as an additional
-    structured disturbance to be learned. Conceptually, this suggests a
-    third learning stage in which a small network (e.g.\ another LSTM) takes the
-    residual error of Stage~2 as input and learns a tool–specific compensation
-    term. From a closed–loop viewpoint, the robot would then iteratively refine
-    its internal model when a new tool is attached, realising a form of transfer
-    learning for tool calibration without rebuilding the entire inverse–dynamics
-    model from scratch.
-
-    \paragraph{Towards payload identification from residual wrenches.}
-    Once tool/gripper effects are compensated, remaining discrepancies between the
-    nominal robot–gripper wrench model and the measured flange wrench can be
-    attributed primarily to external interaction and payload dynamics. Mapping the
-    Stage~2/Stage~3 residuals into the end–effector frame via the Jacobian (after applying $k_t$) yields
-    an estimate of the interaction wrench along and around the $x/y/z$ axes. In
-    combination with the corresponding end–effector linear and angular velocities
-    and accelerations, this opens the door to a further stage in which a dedicated
-    estimator recovers the payload dynamic parameters
-    $\boldsymbol{\phi}_{\mathrm{payload}} = (m,\mathbf{c},\mathbf{I}) \in \mathbb{R}^{10}$
-    from these residual wrenches in a Newton–Euler framework. In other words, the
-    same DeLaN+LSTM backbone that currently provides accurate joint–space
-    prediction could serve, after appropriate extensions, as the core of an
-    online PDPI pipeline that incrementally refines the effective rigid–body model
-    (robot + tool + payload) during everyday manipulation tasks.
-
-    \paragraph{Interpretable sparse models via SINDy.}
-    The DeLaN+LSTM architecture used in this thesis is deliberately expressive but remains a
-    largely black–box regression model: the Lagrangian network and the recurrent residual model
-    jointly fit the data, yet they do not expose which physical effects are actually dominant in the
-    identified dynamics. A complementary avenue for future work is to apply sparse identification
-    of nonlinear dynamics (SINDy)%~\cite{SOA_SINDy} 
-    to the same joint–space data. In such a
-    setting, the candidate function library could explicitly include standard rigid–body inverse-dynamics
-    terms (e.g.\ Newton–Euler and Lagrangian terms) expressed in current units, nonlinear Coriolis and gravity terms, and
-    parametric friction models, together with a small number of additional generic nonlinear
-    features. SINDy would then select a parsimonious subset of these terms that best explains the
-    observed motor currents, potentially yielding an interpretable model in which a few physically
-    meaningful contributions account for most of the variance in the data. This would provide
-    insight into which dynamic effects the robot actually relies on in practice, and would offer a
-    transparent counterpart to the high–capacity DeLaN+LSTM model used in the present work.%
-
-    % \textbf{Slow movment ISO Norms in Dataset paper signal to noise ration, good pipeline performance on collaboration trajectories
-    % check that statement in the dataset paper}
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The results in this thesis motivate several directions for future work.
+First, extending the current-domain evaluation to a torque-domain pipeline would allow direct integration with established payload identification methods. This requires converting motor currents to motor torques and, where needed, mapping joint torques to task-space quantities via the Jacobian.
+Second, the residual model is currently purely data-driven. Adding explicit, interpretable non-conservative terms (e.g., friction) to the structured dynamics model and using the sequence model only for the remaining error could improve transfer across payloads, trajectories, and robots.
+Third, the benchmark results are condition-dependent. Training across multiple datasets and robots, together with domain adaptation and uncertainty-aware model selection, could improve robustness when moving between load conditions and platforms.
+Finally, for online use, future work should study incremental adaptation and real-time computational budgets, and evaluate how better inverse-dynamics prediction improves payload parameter identification during manipulation tasks.

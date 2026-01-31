@@ -1,13 +1,10 @@
 \chapter{Methods}~\label{sec:methods}
-Quick overview of what is found in methods (DeLaN + LSTM)-> May start with general DeLaN / LSTM explanation -> moves on with my pipeline mathematics -> then implementation of my pipeline, especially Dataset
-and input-/output vector dimentions here, also dataset recording offline training online execution.
+This chapter formalises the proposed two-stage inverse-dynamics pipeline and its learning objectives.
+It first introduces the physics-inspired DeLaN backbone and the residual LSTM correction model, and then derives the combined predictor used throughout the thesis.
+Finally, the chapter specifies the dataset interface in terms of input/output signal vectors and dimensions, and clarifies the offline training versus online execution setting adopted in the experimental pipeline.
+To motivate the perspective of this work towards gripper/tool manipulation and compensation, as well as payload dynamic parameter identification, the structured inverse-dynamics formulation is also related to the end-effector wrench measurement frame.
+However, this thesis evaluates the developed method purely in joint space via motor-current modelling.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Related Work}~\label{subsec:relatedWork}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Stage~1: Structured inverse dynamics for robot + fixed gripper}~\label{subsec:stage1}
@@ -25,7 +22,8 @@ where $\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k \in \mathbb{R}^n$ are
 joint position, velocity and acceleration, $\boldsymbol{I}_k \in \mathbb{R}^n$
 are motor currents, and $\vec{F}_{\mathrm{meas},k} \in \mathbb{R}^6$ is the
 measured flange wrench in the sensor frame $S$.
-For brushless DC motors with torque constant $k_t$~\cite{QM_1_ur3_ur5_torque_constant}, the measured motor torques are
+For brushless DC motors with torque constant $k_t$~\cite{QM_1_ur3_ur5_torque_constant}, the measured motor torques, for the main area of operation
+range are
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{motor},k} = k_t\,\boldsymbol{I}_k.
 \end{equation}
@@ -44,8 +42,8 @@ The network implements a Lagrangian
   \label{eq:lagrangian}
 \end{equation}
 with positive-definite inertia matrix $\mathbf{M}_{\boldsymbol{\theta}}(\mathbf{q})$
-(e.g.\ represented via a Cholesky-factor network~(\ref{sec:app_inertia})) and potential
-$V_{\boldsymbol{\theta}}(\mathbf{q})$~(\ref{sec:app_potential}) represented by a neural network.\cite{Q4_1_extended_delan_motor,Q4_4_10729277,Q4_6_HU2026103093}
+(e.g.\ represented via a Cholesky-factor network) and potential
+$V_{\boldsymbol{\theta}}(\mathbf{q})$ represented by a neural network.\cite{Q4_2_lutter2023combiningphysicsdeeplearning, Q4_1_extended_delan_motor,Q4_4_10729277,Q4_6_HU2026103093}
 Using the Euler-Lagrange equations yields the conservative joint torques
 \begin{equation}
   \boldsymbol{\tau}_{\mathrm{cons}}
@@ -60,57 +58,22 @@ Using the Euler-Lagrange equations yields the conservative joint torques
 where $\mathbf{C}_{\boldsymbol{\theta}}$ and $\mathbf{G}_{\boldsymbol{\theta}}$ are
 implicitly defined by $\mathcal{L}_{\boldsymbol{\theta}}$ \cite{Q4_4_10729277,Q4_6_HU2026103093}.
 
-Joint friction and other non-conservative effects are captured by a
-Coulomb-viscous friction model, following the improved DeLaN design
-of~\cite{Q4_6_HU2026103093,QM_2_Coulomb_viscous_friction_ur5_10610737}.
-For each joint $i$ we adopt
-\begin{equation}
-  \tau_{\mathrm{fric},i}(\dot q_i;\boldsymbol{\psi})
-  =
-  f_{c,i}\,\operatorname{sgn}(\dot q_i)
-  +
-  f_{v,i}\,\dot q_i,
-\end{equation}
-with learned Coulomb and viscous coefficients $f_{c,i}$ and $f_{v,i}$,
-collected in $\boldsymbol{\psi}$.
-In vector form this can be written compactly as
-\begin{equation}
-  \boldsymbol{\tau}_{\mathrm{fric}}(\dot{\mathbf{q}};\boldsymbol{\psi})
-  =
-  f_{\mathrm{fric}}\bigl([\dot{\mathbf{q}},\operatorname{sgn}(\dot{\mathbf{q}})];\boldsymbol{\psi}\bigr),
-\end{equation}
-where $f_{\mathrm{fric}}$ denotes the joint-wise affine map implementing
-the Coulomb-viscous law~(\ref{sec:app_friction}).
+Joint friction and other non-conservative effects, for example joint backlash or friction and heat losses, are captured by Long-Short-Term-Memory Network further described in Subsection~\ref{subsec:stage2},
+Section~\ref{seq:LSTM_Training}
 
-The DeLaN torque prediction is the sum of conservative and frictional parts,
+The DeLaN torque prediction is the are the conservative parts of the inverse dynamic system,
+so that for sample $k$
+
 \begin{equation}
   \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}
-  (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi})
+  (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta})
   =
   \boldsymbol{\tau}_{\mathrm{cons}}
-    (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta})
-  +
-  \boldsymbol{\tau}_{\mathrm{fric}}(\dot{\mathbf{q}};\boldsymbol{\psi}).
-\end{equation}
-For compactness we write this as a parametric model
-\begin{equation}
-  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}
-  (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi})
-  =
-  f_{\mathrm{DeLaN}}\bigl(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta},\boldsymbol{\psi}\bigr),
-\end{equation}
-so that for sample $k$
-\begin{equation}
-  \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN},k}
-  =
-  f_{\mathrm{DeLaN}}\bigl(
-    \mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k;
-    \boldsymbol{\theta},\boldsymbol{\psi}
-  \bigr).
+    (\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}};\boldsymbol{\theta}).
 \end{equation}
 
-The parameters $(\boldsymbol{\theta},\boldsymbol{\psi})$ are trained offline by
-minimising a joint-space regression loss~\cite{Q4_4_10729277,Q4_6_HU2026103093}
+The parameter $\boldsymbol{\theta}$ is trained offline by
+minimising a joint-space regression loss~\cite{Q4_2_lutter2023combiningphysicsdeeplearning}
 \begin{equation}
   \mathcal{L}_{\mathrm{DeLaN}}(\boldsymbol{\theta},\boldsymbol{\psi})
   =
@@ -118,13 +81,13 @@ minimising a joint-space regression loss~\cite{Q4_4_10729277,Q4_6_HU2026103093}
   \left\|
     \hat{\boldsymbol{\tau}}_{\mathrm{DeLaN}}
       (\mathbf{q}_k,\dot{\mathbf{q}}_k,\ddot{\mathbf{q}}_k;
-       \boldsymbol{\theta},\boldsymbol{\psi})
+       \boldsymbol{\theta})
     -
     \boldsymbol{\tau}_{\mathrm{motor},k}
   \right\|_2^2.
   \label{eq:delan_joint_loss}
 \end{equation}
-Note that this training objective uses only joint states and motor torques; the
+Note that this training objective uses only joint states and motor torques. The
 force/torque sensor is not required for fitting the DeLaN model.
 
 After training, the DeLaN parameters are frozen and the model serves as a
@@ -136,7 +99,7 @@ data-driven nominal inverse-dynamics model of the robot-gripper system.
 \section{Stage~2: Sequence model for residual joint torques}~\label{subsec:stage2}
 
 In the second stage, we model history-dependent effects that are not captured
-by the structured DeLaN model, such as backlash and fine-grained nonlinear
+by the structured DeLaN model, such as backlash and nonlinear
 friction. Using the same robot-gripper dataset (still without payload and
 without contact), we first compute the joint-space residual torques
 \begin{equation}
@@ -233,69 +196,96 @@ which is compared against the measured wrench for evaluation.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Dataset of Collaborative Robots}
+
+All experiments are based on the publicly available ``Dataset of Collaborative Robots for
+Energy Consumption Modeling'' released via IEEE DataPort~\cite{Dataset_Dataport} and
+documented in~\cite{Q_Dataset_Paper}.
+The dataset contains measurements from two Universal Robots platforms (UR3e and UR10e)
+recorded both without load and with an external payload.
+
+Each log sample provides a time stamp $t$ and a trajectory identifier, and includes joint-space
+signals (joint positions $\mathbf{q}$, joint velocities $\dot{\mathbf{q}}$) together with electrical
+measurements (per-joint motor currents $\mathbf{i}$, motor voltages, as well as
+robot-level current and voltage).
+In addition, the dataset provides end-effector quantities such as Cartesian position and the
+measured wrench (force and moment) at the end effector.
+In the remainder of this thesis, motor current is treated as the central measured actuation signal.
+
+To excite the robot dynamics across a wide range of operating conditions, the robots execute
+sinusoidal joint motions with varying amplitudes, frequencies, and initial conditions~\cite{Q_Dataset_Paper}:
+\begin{equation}
+  q_i(t) = q_{i0} + A_i \cos\!\bigl(2\pi f_i t + \varphi_i\bigr),
+\end{equation}
+where $q_i$, $q_{i0}$, $A_i$, $f_i$ and $\varphi_i$ denote the desired joint position, initial
+position, amplitude, oscillation frequency, and phase of joint $i$, respectively.
+The experiments were conducted for UR3e and UR10e under two load conditions: without load
+and with an attached payload (hammer $1.5\,\mathrm{kg}$ and RobotiQ 2F-85 gripper $1\,\mathrm{kg}$)~\cite{Q_Dataset_Paper}.
+
+The signals are recorded at $100\,\mathrm{Hz}$.
+For each robot (and load condition), the dataset provides $50{,}000$ samples for training and
+$5{,}000$ samples for testing~\cite{Q_Dataset_Paper}.
+Since the underlying dynamics are time-invariant, the published dataset is formed by combining
+multiple shorter recordings into one consistent dataset, without treating discontinuities as
+separate experiments~\cite{Q_Dataset_Paper}.
+
+Since the dataset provides motor current measurements, we formulate training objectives and
+evaluation metrics in the measured actuation domain as per-joint motor currents
+$\mathbf{i}_{\mathrm{motor}}$ in $\mathrm{A}$.
+When needed for interpretation, current-domain errors can be mapped to equivalent motor-domain
+errors via the (previously introduced) constant conversion factor $k_t$, by multiplying with
+$k_t$.
+Consistent with the pipeline overview in Fig.~\ref{fig:methods_pipeline}, we omit the conversion
+$\boldsymbol{\tau}_{\mathrm{motor}} = k_t\,\mathbf{i}_{\mathrm{motor}}$ and the rightmost Jacobian-based
+flange-wrench mapping block, and evaluate the approach directly as a combined motor-current model
+$\hat{\mathbf{i}}_{\mathrm{comb}}$.
+
 \section{Data preprocessing and dataset construction}
 \label{sec:data_preprocessing}
 
-The starting point is a long-format log of robot measurements, exported as a CSV
-with columns
-\[
-  \texttt{Time},\;
-  \texttt{Joint Name},\;
-  \texttt{Position},\;
-  \texttt{Velocity},\;
-  \texttt{Acceleration},\;
-  \texttt{Effort}.
-\]
-Each row corresponds to a single joint at a given timestamp. In this first
-iteration, the joint velocities and accelerations are taken directly from the
-controller without additional filtering, and the joint effort is interpreted as
-a torque-like quantity. The precise mapping from motor currents to joint
-torques is introduced later via the torque constant $k_t$
-(cf.~Section~\ref{sec:methods}).
+The preprocessing step converts the raw IEEE DataPort logs into a DeLaN-ready,
+trajectory-wise dataset.
+In our implementation, we use a \emph{wide} CSV representation in which each row
+corresponds to one time step and contains all six joint channels, together with
+an explicit trajectory identifier.
+Concretely, the wide format provides a time stamp \texttt{t1}, per-joint
+kinematics \texttt{q1}--\texttt{q6} and \texttt{dq1}--\texttt{dq6}, per-joint
+motor currents \texttt{Iq1}--\texttt{Iq6}, and an integer \texttt{ID} column.
+The DeLaN preprocessing service maps this wide table into the long-format
+interface expected by the upstream codebase\cite{Q4_2_lutter2023combiningphysicsdeeplearning} (columns \texttt{Time}, \texttt{Joint Name}, \texttt{Position}, \texttt{Velocity}, \texttt{Acceleration}, \texttt{Effort}),
+propagating \texttt{ID} as \texttt{trajectory\_id}.
+Thus, trajectory boundaries are taken directly from the dataset rather than
+being inferred by heuristic re-segmentation.
 
-\paragraph{Joint selection (UR5 arm).}
-From the full log we select only the six UR5 joints
+We consider the six revolute joints of the manipulator and use a fixed ordering
+$j\in\{1,\dots,6\}$ consistent with the wide columns.
+For each row (frame) index $f$ we read
 \[
-  \mathcal{J}
-  =
-  \bigl\{
-    \texttt{ur5\_shoulder\_pan\_joint},\,
-    \texttt{ur5\_shoulder\_lift\_joint},\,
-    \texttt{ur5\_elbow\_joint},\,
-    \texttt{ur5\_wrist\_1\_joint},\,
-    \texttt{ur5\_wrist\_2\_joint},\,
-    \texttt{ur5\_wrist\_3\_joint}
-  \bigr\},
-\]
-which defines $n_{\mathrm{dof}} = 6$ for all subsequent processing. For each
-timestamp $t$ we thus obtain a 6-dimensional joint configuration, velocity,
-acceleration and effort vector.
-
-\paragraph{Frame-wise representation and trajectory segmentation.}
-Let $\{t_f\}_{f=1}^{F}$ denote the sorted set of unique timestamps in the log.
-For each frame index $f$ and each joint $j \in \mathcal{J}$ we collect
-\[
+  t_f,\quad
   q_{f,j},\quad
   \dot q_{f,j},\quad
-  \ddot q_{f,j},\quad
-  \tau^{\mathrm{eff}}_{f,j},
+  I_{f,j},
 \]
-where $\tau^{\mathrm{eff}}_{f,j}$ denotes the measured joint effort.
-Stacking over joints yields frame-wise vectors
+where $I_{f,j}$ denotes the measured motor current.
+Stacking over joints yields the frame-wise vectors
 \[
-  \mathbf{q}_f,\ \dot{\mathbf{q}}_f,\ \ddot{\mathbf{q}}_f,\ 
-  \boldsymbol{\tau}^{\mathrm{eff}}_f \in \mathbb{R}^{6}.
+  \mathbf{q}_f,\ \dot{\mathbf{q}}_f,\ \mathbf{I}_f \in \mathbb{R}^{6}.
 \]
+For compatibility with the DeLaN data interface, the current vector is stored
+as a generic actuation channel $\boldsymbol{\tau}^{\mathrm{eff}}_f := \mathbf{I}_f$.
 
-To obtain multiple trajectories from a single continuous log, we segment the
-frames into fixed-length windows. For a chosen number of frames per trajectory,
-$T_{\mathrm{seg}}$, we define a trajectory index
-\[
-  \mathrm{traj}(f)
-  =
-  \left\lfloor \frac{f-1}{T_{\mathrm{seg}}} \right\rfloor,
-\]
-and group all frames with the same $\mathrm{traj}(f)$ into one trajectory.
+Let $\mathcal{I}=\{1,\dots,N_{\mathrm{traj}}\}$ denote the set of unique
+trajectory identifiers.
+For each $i\in\mathcal{I}$, we collect all frames with \texttt{trajectory\_id}
+equal to $i$, sort them by time, and stack them into a variable-length
+trajectory of length $T_i$.
+To attenuate sensor noise while avoiding temporal misalignment, we apply a
+4th-order Butterworth low-pass filter with cutoff frequency $f_c = 10\,\mathrm{Hz}$.
+The filter is applied in zero-phase form (forward--backward filtering), thereby
+preventing phase shifts in $\mathbf{q}$, $\dot{\mathbf{q}}$ and $\mathbf{I}$.
+Joint accelerations $\ddot{\mathbf{q}}$ are then derived from the filtered
+velocities via numerical differentiation and are filtered analogously, which
+aligns with the baseline preprocessing used for the dataset~\cite{Q_Dataset_Paper}.
 
 For trajectory $i$ this yields a time series of length $T_i$ with
 \begin{align}
@@ -341,11 +331,8 @@ with shapes
   \in \mathbb{R}^{T_i \times 6}.
 \]
 
-\paragraph{Train/test split by trajectory.}
-Let $\mathcal{I} = \{1,\dots,N_{\mathrm{traj}}\}$ denote the set of all
-trajectory indices.
-We randomly permute $\mathcal{I}$ and partition it into disjoint training and
-test index sets,
+We randomly permute $\mathcal{I}$ (with a dataset seed) and partition it into
+disjoint training and test index sets,
 \[
   \mathcal{I}_{\mathrm{train}} \cup \mathcal{I}_{\mathrm{test}} = \mathcal{I},
   \qquad
@@ -353,8 +340,10 @@ test index sets,
 \]
 such that a given trajectory is entirely in either the training or the test
 set. This avoids leakage of near-identical neighbouring samples across splits.
+For the learning-curve experiments, we optionally subsample a fixed number of
+trajectories $K$ (seeded) before splitting, such that each $(K,\mathrm{seed})$
+corresponds to a fixed trajectory subset.
 
-\paragraph{NPZ dataset structure.}
 For efficient loading during model training, the trajectory-wise data are stored
 in a NumPy \texttt{.npz} archive with the following keys:
 \begin{align}
@@ -392,7 +381,6 @@ $\mathbf{T}^{(i)}$; the conversion to motor torques via
 $\boldsymbol{\tau}_{\mathrm{motor},k} = k_t\,\boldsymbol{I}_k$ is applied
 later in the training pipeline (cf.~\eqref{eq:tau_motor}).
 
-\paragraph{Flattening trajectories for DeLaN training.}
 On the DeLaN side, the trajectory-wise arrays are flattened into a single pool
 of samples for stochastic optimisation.
 Denoting concatenation along the time dimension by $\mathrm{vstack}(\cdot)$,
@@ -442,7 +430,6 @@ the DeLaN model $f_{\mathrm{DeLaN}}$ is trained as described in
 Section~\ref{sec:methods}. Here we summarise the main implementation details
 used in this work.
 
-\paragraph{Feature transform on joint positions.}
 Instead of feeding the raw joint angles $\mathbf{q}_k$ directly into the
 DeLaN subnetworks, we use a bounded, trigonometric feature map
 \begin{equation}
@@ -459,11 +446,7 @@ where the sine and cosine are applied element-wise.
 This follows the common practice in DeLaN/PINN-based models of encoding
 revolute joints through periodic features, which mitigates angle wrap-around
 and keeps the network inputs well scaled.
-The feature vector $\boldsymbol{\phi}(\mathbf{q}_k)$ is used as input to the
-inertia MLPs and the potential network described in
-Appendix~\ref{ch:appendix_delan}.
 
-\paragraph{Per-joint loss normalisation.}
 To prevent joints with large torque magnitudes from dominating the optimisation,
 we employ a per-joint normalisation in the inverse-dynamics loss.
 Let
@@ -515,7 +498,6 @@ In practice, additional factors derived from $\ddot{\mathbf{q}}$ may be
 included analogously, but the essential idea is that the loss is balanced
 across joints.
 
-\paragraph{Replay buffer and random mini-batch sampling.}
 All training samples are stored in a replay buffer $\mathcal{M}$, which
 supports random-access mini-batch sampling.
 At each optimisation step, a mini-batch index set
@@ -532,10 +514,9 @@ batch
 \]
 is used to evaluate $\mathcal{L}_{\mathrm{DeLaN}}$ and its gradients.
 This renders the optimisation effectively i.i.d.\ over the flattened pool of
-samples; the original trajectory grouping is retained only for the train/test
+samples. The original trajectory grouping is retained only for the train/test
 split and for later sequence-based models and visualisations.
 
-\paragraph{Importance of constant sampling time.}
 Throughout the preprocessing and training pipeline, we assume a (approximately)
 constant sampling interval
 \[
@@ -561,11 +542,9 @@ straightforward extension of the preprocessing pipeline.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Long-Short-Term-Memory Training Setup}
+\section{Long-Short-Term-Memory Training Setup}~\label{seq:LSTM_Training}
 
 \vspace{0.75\baselineskip}
-
-\textbf{Export DeLaN Residuals}
 
 After training Stage~1, the DeLaN parameters $(\boldsymbol{\theta},\boldsymbol{\psi})$
 are frozen and the model is evaluated on all training samples
@@ -616,8 +595,6 @@ and collect them in
 
 \vspace{0.75\baselineskip}
 
-\textbf{Build LSTM Windows}
-
 Let $H$ denote the history length (sequence length) used in Stage~2.
 From the flattened arrays
 $\tilde{\mathbf{Q}}_{\mathrm{train}},
@@ -665,17 +642,12 @@ A completely analogous construction is used for the test split.
 
 \vspace{0.75\baselineskip}
 
-\textbf{LSTM Training}
-
-\vspace{0.75\baselineskip}
-
-We train an LSTM-based residual model $g_{\boldsymbol{\phi}}$ on the windowed
+We train an LSTM-based~\cite{GeeksforGeeks_LSTM_TensorFlow} residual model $g_{\boldsymbol{\phi}}$ on the windowed
 dataset $(\mathbf{x}_k,\mathbf{y}_k)$.
 As in Stage~1, the goal is to prevent single joints from dominating the
 objective. To this end, we apply a train-only standardisation of both inputs
 and targets, and train the network to predict \emph{scaled} residuals.
 
-\paragraph{Train-only standardisation.}
 Let
 $\mathbf{X}^{\mathrm{LSTM}}_{\mathrm{train}} \in \mathbb{R}^{N_H \times H \times d_{\mathrm{in}}}$
 and
@@ -730,7 +702,6 @@ with $\boldsymbol{r}_{\tau,k}=\mathbf{y}_k$.
 The same $(\boldsymbol{\mu}_x,\boldsymbol{\sigma}_x,\boldsymbol{\mu}_y,\boldsymbol{\sigma}_y)$
 computed on the training split are used to scale the test split.
 
-\paragraph{Architecture and objective.}
 The residual model is implemented as a two-layer LSTM with dropout regularisation
 and a linear output layer,
 \begin{equation}
@@ -759,10 +730,9 @@ Training minimises a mean-squared error on scaled residuals,
 which corresponds to a balanced, per-joint normalisation via
 $\boldsymbol{\sigma}_y$.
 Optimisation is performed with Adam using shuffled mini-batches and an internal
-validation split; the best-performing model is selected by early stopping on
+validation split. The best-performing model is selected by early stopping on
 the validation loss.
 
-\paragraph{Inference (unscaled units).}
 For reporting and for composing the final DeLaN+LSTM torque prediction, the
 scaled residual is mapped back to physical units via
 \begin{equation}

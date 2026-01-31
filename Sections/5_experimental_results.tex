@@ -1,9 +1,19 @@
 \chapter{Experimental Results}
 
-\textbf{Chapter overview.}
-This chapter reports experimental results for the proposed two-stage pipeline, covering (i) the effect of the number of available trajectories ($K$) on DeLaN and residual LSTM training dynamics and accuracy, (ii) a quantitative comparison to the dataset baseline, and (iii) a best-model evaluation on ``with load'' trajectories.
+This chapter reports experimental results for the proposed two-stage pipeline, covering the effect of the number of available 
+trajectories ($K$) on DeLaN and residual LSTM training dynamics and accuracy. A quantitative comparison to the dataset baseline 
+and a best-model evaluation on ``with load'' and ``without load'' trajectories.
 
 \section{Learning Curve Results}
+
+This section reports learning-curve experiments in which the number of available trajectories
+$K$ is varied to quantify how trajectory coverage affects optimisation dynamics and
+motor-current prediction accuracy for both stages of the pipeline.
+Across the presented losses and RMSE metrics, smaller $K$ values exhibit higher dispersion
+across dataset seeds and more pronounced error variability, while larger $K$ values yield more
+consistent convergence behaviour and lower typical RMSE.
+The final comparison figures additionally report the per-joint test RMSE for DeLaN versus the
+combined DeLaN+LSTM predictor for representative runs.
 
 \subsection{K-Domination Results}
 
@@ -41,13 +51,12 @@ Validation MSE decreases for all $K$ and separates clearly by trajectory count:
 smaller $K$ values attain higher validation errors and wider interquartile ranges,
 whereas the largest settings concentrate at lower validation MSE.
 
-\textbf{Stage~1 (DeLaN): motor-current error as a function of motion progress.}
 Figure~\ref{fig:kdom_delan_rmse_progress_by_k} reports the motor-current RMSE along the
 normalised trajectory progress.
 The smallest setting ($K=8$) exhibits pronounced error spikes and large IQR,
 with peaks exceeding $3\,\mathrm{A}$ in the early part of the motion.
 Increasing $K$ substantially reduces both the typical error level and its
-variability; for larger $K$, the median curves remain close to each other and the
+variability. For larger $K$, the median curves remain close to each other and the
 IQR bands narrow over most of the progress range.
 
 \begin{figure}[H]
@@ -57,12 +66,11 @@ IQR bands narrow over most of the progress range.
     \label{fig:kdom_delan_rmse_progress_by_k}
 \end{figure}
 
-\textbf{Stage~1 (DeLaN): per-joint error.}
 Figure~\ref{fig:kdom_delan_rmse_per_joint} reports per-joint motor-current RMSE for all
 evaluated values of $K$.
 For $K=8$, the error is dominated by joints 3 and 5, where the median RMSE exceeds
 $3\,\mathrm{A}$.
-For intermediate $K$ (e.g., $K=16$), joint 4 exhibits a pronounced increase in
+For intermediate $K$ (like $K=16$), joint 4 exhibits a pronounced increase in
 RMSE relative to the other joints.
 For larger $K$, the per-joint medians concentrate within a narrower range and the
 IQR bars decrease across joints.
@@ -74,7 +82,6 @@ IQR bars decrease across joints.
     \label{fig:kdom_delan_rmse_per_joint}
 \end{figure}
 
-\textbf{Stage~2 (LSTM): learning dynamics.}
 Figures~\ref{fig:kdom_lstm_train_loss_by_k} and~\ref{fig:kdom_lstm_val_loss_by_k}
 show the Stage~2 training and validation loss of the residual LSTM.
 While the training loss decreases rapidly for all $K$, the validation loss shows
@@ -95,7 +102,6 @@ validation loss and narrower IQR bands across the training horizon.
     \label{fig:kdom_lstm_val_loss_by_k}
 \end{figure}
 
-\textbf{Stage~2 (LSTM): residual error.}
 Figure~\ref{fig:kdom_lstm_res_rmse_progress_by_k} shows the residual motor-current RMSE over
 normalised trajectory progress, and Figure~\ref{fig:kdom_lstm_res_rmse_per_joint}
 summarises per-joint residual errors.
@@ -117,7 +123,6 @@ levels across progress and across joints.
     \label{fig:kdom_lstm_res_rmse_progress_by_k}
 \end{figure}
 
-\textbf{End-to-end motor-current accuracy (per joint).}
 Figure~\ref{fig:kdom_combined_rmse_per_joint_example} reports per-joint motor-current
 RMSE on the test split for a representative evaluation (valid indices $k\geq H-1$).
 Across all joints, the combined DeLaN+LSTM predictor attains lower RMSE than the
@@ -132,11 +137,12 @@ DeLaN baseline, with the largest absolute differences observed on joints 0--2.
 
 \subsection{Best Model Approach Results}
 
-\textbf{DeLaN Best Model}
 Figures~\ref{fig:delan_train_val_loss_across_seed_by_hyper}--\ref{fig:delan_rmse_per_joint}
-summarise the DeLaN best-model sweep at fixed $K=84$.
-The results are aggregated across dataset seeds with seed-wise aggregation across
-DeLaN initialisations.
+summarise the DeLaN best-model sweep at fixed $K=84$ on the $50{,}000$-sample
+\texttt{UR3\_Load0Dataset} training pool.
+All metrics in this subsection are computed on this pool, which is split into $70\%$ training,
+$10\%$ validation, and $20\%$ test subsets for model selection.
+Results are aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations.
 
 \begin{figure}[H]
     \centering
@@ -154,7 +160,7 @@ final validation MSE plateau.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/scatter_accuracy_vs_stability.png}
-    \caption{Hyperparameter comparison: median validation motor-current RMSE versus seed-stability measured by the median within-split IQR of validation RMSE (each point denotes one DeLaN hyperparameter preset; statistics aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations).}
+    \caption{Hyperparameter comparison: median validation motor-current RMSE versus seed-stability measured by the median within-split IQR of validation RMSE (each point denotes one DeLaN hyperparameter preset. Statistics aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:delan_scatter_val_vs_valIQR}
 \end{figure}
 
@@ -166,7 +172,7 @@ and a stability range of approximately $0.009$--$0.023\,\mathrm{A}$.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/scatter_val_vs_test.png}
-    \caption{Hyperparameter comparison: median validation motor-current RMSE versus median test motor-current RMSE (each point denotes one DeLaN hyperparameter preset; statistics aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations).}
+    \caption{Hyperparameter comparison: median validation motor-current RMSE versus median test motor-current RMSE (each point denotes one DeLaN hyperparameter preset. Statistics aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:delan_scatter_val_vs_test}
 \end{figure}
 
@@ -189,7 +195,6 @@ The IQR bars are largest on joints 1 and 4.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\textbf{LSTM Best Model}
 Figures~\ref{fig:lstm_val_loss_vs_rmse_total}--\ref{fig:lstm_residual_gt_vs_predicted}
 summarise the LSTM best-model sweep at fixed $K=84$ based on the residual datasets exported
 from the selected DeLaN baseline.
@@ -197,7 +202,7 @@ from the selected DeLaN baseline.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_best_val_loss_vs_rmse_total.png}
-    \caption{Best validation loss versus total motor-current RMSE on the test split for the LSTM residual model (marker colour denotes feature mode; marker outline denotes history length $H$).}
+    \caption{Best validation loss versus total motor-current RMSE on the test split for the LSTM residual model (marker colour denotes feature mode, marker outline denotes history length $H$).}
     \label{fig:lstm_val_loss_vs_rmse_total}
 \end{figure}
 
@@ -209,7 +214,7 @@ test RMSE values around $0.31$--$0.34\,\mathrm{A}$.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_overfit_ratio_by_feature_mode.png}
-    \caption{Overfit indicator (final validation loss / final training loss) by feature mode shown as boxplots across runs (green triangles indicate means; panels use different $y$-axis ranges for readability).}
+    \caption{Overfit indicator (final validation loss / final training loss) by feature mode shown as boxplots across runs (green triangles indicate means, panels use different $y$-axis ranges for readability).}
     \label{fig:lstm_overfit_ratio}
 \end{figure}
 
@@ -221,7 +226,7 @@ the high-range panel includes ratios extending beyond $30$.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_residual_rmse_by_feature_mode.png}
-    \caption{LSTM residual motor-current RMSE on the test split by feature mode shown as boxplots across runs (green triangles indicate means; panels use different $y$-axis ranges for readability).}
+    \caption{LSTM residual motor-current RMSE on the test split by feature mode shown as boxplots across runs (green triangles indicate means, panels use different $y$-axis ranges for readability).}
     \label{fig:lstm_residual_rmse_by_feature_mode}
 \end{figure}
 
@@ -254,14 +259,15 @@ Figure~\ref{fig:lstm_residual_gt_vs_predicted} provides a representative residua
 all joints, showing the ground-truth residual and the corresponding LSTM prediction over time.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Best Pipeline}
+\clearpage
 
 Figure~\ref{fig:kdom_residual_overlay_example} reports the per-joint motor-current RMSE on the test
 split for the selected DeLaN baseline and for the combined DeLaN+LSTM predictor (valid indices
 $k\geq H-1$, $H=150$).
 Across joints, the DeLaN bars range from approximately $0.12$ to $0.46\,\mathrm{A}$, whereas the
 combined predictor ranges from approximately $0.07$ to $0.25\,\mathrm{A}$.
+The ground-truth baseline is zero by construction and is therefore not visible as a bar.
+The combined model attains lower RMSE than the DeLaN baseline on all joints, with the largest absolute reduction on joint~1 (the UR3 shoulder-lift joint), which is a major load-bearing joint of the arm.
 The largest RMSE is observed on joint 1 and the smallest on joint 5 for both models.
 
 \begin{figure}[H]
@@ -270,6 +276,8 @@ The largest RMSE is observed on joint 1 and the smallest on joint 5 for both mod
     \caption{Best pipeline motor-current RMSE per joint on the test split comparing DeLaN and the combined DeLaN+LSTM predictor (valid indices $k\geq H-1$, $H=150$).}
     \label{fig:kdom_residual_overlay_example}
 \end{figure}
+
+\clearpage
 
 Figure~\ref{fig:kdom_torque_overlay_example} shows the corresponding motor-current time-series
 overlay for the same evaluation, plotting the ground truth together with the DeLaN prediction and
@@ -284,7 +292,6 @@ the combined DeLaN+LSTM prediction for each joint.
 
 \section{Performance Evaluation to Baseline}
 
-\textbf{5.3 Performance Evaluation to Baseline.}
 To benchmark the proposed DeLaN+LSTM pipeline against prior work on the same dataset,
 we compare against the data-driven dynamic model presented in~\cite{Q_Dataset_Paper}
 and its accompanying IEEE DataPort release~\cite{Dataset_Dataport}.
@@ -307,149 +314,98 @@ Evaluation is reported as per-joint RMSE in current units,
   \sqrt{\frac{1}{n}\sum_{k=1}^{n}\left(i_{i,k}^{\mathrm{real}}-i_{i,k}^{\mathrm{pred}}\right)^2}.
 \end{equation}
 
-\textbf{Baseline results on IEEE DataPort dataset.}
-Tables~\ref{tab:baseline_current_rmse_train} and~\ref{tab:baseline_current_rmse_test}
-reproduce the current-prediction RMSE reported by~\cite{Q_Dataset_Paper} for UR3e and UR10e,
-each without load and with load, for the provided training and testing datasets.
+Table~\ref{tab:baseline_vs_delan_fullpipeline_test}
+reproduces the current-prediction RMSE reported by~\cite{Q_Dataset_Paper} for UR3e and UR10e,
+each without load and with load, for the provided testing datasets.
+In the baseline study, the model is fitted on $50{,}000$ training samples and evaluated on $5{,}000$ unseen test samples~\cite{Q_Dataset_Paper}.
 Across conditions, UR3e baseline RMSE values are on the order of $0.06$--$0.38\,\mathrm{A}$,
 while UR10e baseline RMSE values range up to $1.56\,\mathrm{A}$ on the test set.
+The UR3e without-load DeLaN+LSTM model corresponds to the resulting best-model configuration selected in the Best Model Approach (Subsection~5.1.2).
+The UR3e with-load and UR10e without-load DeLaN+LSTM models are trained using the same hyperparameter configuration identified in the Best Model Approach, and the corresponding benchmark test metrics are reported in the same table.
 
-\begin{table}[H]
-    \centering
-    \scriptsize
-    \setlength{\tabcolsep}{3pt}
-    \caption{Baseline motor-current RMSE on the training dataset (Table~I in~\cite{Q_Dataset_Paper}).}
-    \label{tab:baseline_current_rmse_train}
-    \resizebox{\linewidth}{!}{%
-    \begin{tabular}{l r r r r r r r r r r r r}
-        \toprule
-        RMSE & $i_1$ [A] & \% & $i_2$ [A] & \% & $i_3$ [A] & \% & $i_4$ [A] & \% & $i_5$ [A] & \% & $i_6$ [A] & \% \\
-        \midrule
-        UR3e without load & 0.103 & 1.79 & 0.118 & 1.72 & 0.114 & 2.77 & 0.071 & 3.26 & 0.077 & 3.79 & 0.063 & 3.11 \\
-        UR3e with load    & 0.101 & 1.76 & 0.182 & 2.49 & 0.154 & 3.43 & 0.136 & 5.32 & 0.092 & 4.50 & 0.071 & 3.47 \\
-        UR10e without load& 0.477 & 1.88 & 0.615 & 0.85 & 0.322 & 1.28 & 0.096 & 3.27 & 0.091 & 3.57 & 0.096 & 3.34 \\
-        UR10e with load   & 0.444 & 1.38 & 0.692 & 0.96 & 0.338 & 1.34 & 0.104 & 3.35 & 0.089 & 3.47 & 0.087 & 3.02 \\
-        \bottomrule
-    \end{tabular}%
-    }
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \scriptsize
-    \setlength{\tabcolsep}{3pt}
-    \caption{Baseline motor-current RMSE on the testing dataset (Table~II in~\cite{Q_Dataset_Paper}).}
-    \label{tab:baseline_current_rmse_test}
-    \resizebox{\linewidth}{!}{%
-    \begin{tabular}{l r r r r r r r r r r r r}
-        \toprule
-        RMSE & $i_1$ [A] & \% & $i_2$ [A] & \% & $i_3$ [A] & \% & $i_4$ [A] & \% & $i_5$ [A] & \% & $i_6$ [A] & \% \\
-        \midrule
-        UR3e without load & 0.089 & 3.14 & 0.130 & 2.87 & 0.122 & 4.55 & 0.066 & 4.39 & 0.106 & 8.29 & 0.083 & 5.89 \\
-        UR3e with load    & 0.096 & 3.31 & 0.376 & 5.63 & 0.308 & 5.09 & 0.249 & 8.53 & 0.150 & 8.10 & 0.070 & 4.10 \\
-        UR10e without load& 0.490 & 3.24 & 0.853 & 2.54 & 0.351 & 3.14 & 0.110 & 4.40 & 0.098 & 6.48 & 0.078 & 5.12 \\
-        UR10e with load   & 0.809 & 4.39 & 1.555 & 6.05 & 0.653 & 5.06 & 0.185 & 9.88 & 0.097 & 6.47 & 0.080 & 5.41 \\
-        \bottomrule
-    \end{tabular}%
-    }
-\end{table}
-
-\textbf{Our evaluation protocol and split.}
 In addition to the dataset baseline, we report motor-current RMSE for the DeLaN and DeLaN+LSTM
-models produced by the thesis-internal model-selection procedure at fixed $K=84$ trajectories and
-split sizes (train, val, test) = (59, 8, 17) trajectories.
+pipeline under the same benchmark scale as the IEEE DataPort split, means training on $50{,}000$ samples
+and testing on $5{,}000$ unseen samples.
+The split is constructed at the trajectory level to prevent leakage of samples from training trajectories into
+the test set.
+Benchmark-level evaluation is reported for \texttt{UR3\_Load0Dataset}, \texttt{UR3\_Load2Dataset}, and
+\texttt{UR10\_Load0Dataset}, which provide the full $50{,}000/5{,}000$ sample split.
+To align the benchmark conditions with the IEEE DataPort baseline nomenclature, we treat
+\texttt{UR3\_Load0Dataset} as the counterpart to ``UR3e without load'' and \texttt{UR10\_Load0Dataset} as the
+counterpart to ``UR10e without load'' in Tables~\ref{tab:baseline_vs_delan_fullpipeline_test}.
+Analogously, we benchmark \texttt{UR3\_Load2Dataset} against the baseline ``UR3e with load'' condition.
+The remaining datasets (\texttt{UR10Load1Dataset}, \texttt{UR10Load2Dataset}, and \texttt{UR3Load1Dataset})
+contain substantially fewer than $50{,}000$ total samples and are therefore not included in the benchmark-level
+comparison.
 Since the dataset provides motor current measurements, and motor current is treated as the primary
 actuation signal throughout this thesis, we report RMSE in current units [A] per joint.
-Load-condition baselines are included as placeholders and will be filled once the best-model pipeline
-is re-run on the ``with load'' trajectories.
-
-\begin{table}[H]
-    \centering
-    \caption{DeLaN motor-current RMSE per joint on the held-out test split (17 trajectories, $K=84$).}
-    \label{tab:baseline_ours_delan_test}
-    \begin{tabular}{l r r r r r r}
-        \toprule
-        & $i_1$ [A] & $i_2$ [A] & $i_3$ [A] & $i_4$ [A] & $i_5$ [A] & $i_6$ [A] \\
-        \midrule
-        UR3e without load & 0.368 & 0.405 & 0.286 & 0.226 & 0.219 & 0.202 \\
-        UR3e with load (\textit{TBD}) & -- & -- & -- & -- & -- & -- \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \caption{DeLaN motor-current RMSE per joint on the validation split (8 trajectories, $K=84$).}
-    \label{tab:baseline_ours_delan_val}
-    \begin{tabular}{l r r r r r r}
-        \toprule
-        & $i_1$ [A] & $i_2$ [A] & $i_3$ [A] & $i_4$ [A] & $i_5$ [A] & $i_6$ [A] \\
-        \midrule
-        UR3e without load & 0.408 & 0.484 & 0.331 & 0.284 & 0.273 & 0.257 \\
-        UR3e with load (\textit{TBD}) & -- & -- & -- & -- & -- & -- \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \caption{Best-model DeLaN+LSTM pipeline motor-current RMSE per joint on the validation split (8 trajectories, valid indices $k\geq H-1$).}
-    \label{tab:baseline_ours_fullpipeline_val}
-    \begin{tabular}{l r r r r r r}
-        \toprule
-        & $i_1$ [A] & $i_2$ [A] & $i_3$ [A] & $i_4$ [A] & $i_5$ [A] & $i_6$ [A] \\
-        \midrule
-        UR3e without load & 0.069 & 0.083 & 0.124 & 0.063 & 0.086 & 0.052 \\
-        UR3e with load (\textit{TBD}) & -- & -- & -- & -- & -- & -- \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\textbf{Reporting notes.}
-Direct numerical comparison to~\cite{Q_Dataset_Paper} is not one-to-one, since the
-baseline is identified on the dataset-provided training split (50k samples) and evaluated on the
-dataset-provided test split (5k samples), whereas our results are obtained from the thesis-specific
-trajectory-wise split (59/8/17 trajectories) and include the LSTM warm-up constraint $k\geq H-1$.
-Accordingly, Tables~\ref{tab:baseline_ours_delan_test}--\ref{tab:baseline_ours_fullpipeline_val}
-report results under the thesis-specific split and evaluation constraints.
-
-\section{DeLaN+LSTM Gripper Compensation}
-
-\textbf{Best-model evaluation on ``with load'' trajectories.}
-Following the best-model selection procedure, we evaluate the final DeLaN+LSTM pipeline on the
-``with load'' trajectories of the IEEE DataPort dataset~\cite{Dataset_Dataport} and report the
-corresponding motor-current RMSE metrics.
-The corresponding best-model metrics are reported in Table~\ref{tab:gripper_comp_table7_delan} and Table~\ref{tab:gripper_comp_table8_fullpipeline}
-(placeholders shown until the best-model run on the loaded dataset is completed).
+For the residual LSTM and the combined DeLaN+LSTM model, metrics are evaluated only on valid indices $k\geq H-1$ to account for the history window warm-up.
 
 \begin{table}[H]
     \centering
     \scriptsize
     \setlength{\tabcolsep}{3pt}
-    \caption{Best-model DeLaN motor-current RMSE per joint for gripper compensation on dataset~\cite{Dataset_Dataport} (placeholders).}
-    \label{tab:gripper_comp_table7_delan}
-    \begin{tabular}{l r r r r r r}
+    \caption{Baseline~\cite{Q_Dataset_Paper} vs. DeLaN vs. DeLaN+LSTM motor-current RMSE per joint on the benchmark test split (trained on $50{,}000$ samples, evaluated on $5{,}000$ unseen samples. DeLaN+LSTM evaluated on valid indices $k\geq H-1$).}
+    \label{tab:baseline_vs_delan_fullpipeline_test}
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{l l r r r r r r r r r r r r}
         \toprule
-        Condition & $i_1$ [A] & $i_2$ [A] & $i_3$ [A] & $i_4$ [A] & $i_5$ [A] & $i_6$ [A] \\
+        Dataset & Model & $i_1$ [A] & \% & $i_2$ [A] & \% & $i_3$ [A] & \% & $i_4$ [A] & \% & $i_5$ [A] & \% & $i_6$ [A] & \% \\
         \midrule
-        UR3e without load (\textit{TBD}) & -- & -- & -- & -- & -- & -- \\
-        UR3e with load (\textit{TBD})    & -- & -- & -- & -- & -- & -- \\
+        UR3e without load  & Baseline    & 0.089 & 3.14  & 0.130 & 2.87  & 0.122 & 4.55  & 0.066 & 4.39  & 0.106 & 8.29  & 0.083 & 5.89 \\
+        UR3e without load  & DeLaN       & 0.247 & 0.764 & 0.464 & 0.555 & 0.195 & 0.386 & 0.147 & 0.525 & 0.287 & 0.969 & 0.124 & 0.982 \\
+        UR3e without load  & DeLaN+LSTM  & 0.153 & 0.473 & 0.307 & 0.368 & 0.162 & 0.320 & 0.146 & 0.520 & 0.200 & 0.677 & 0.089 & 0.710 \\
+        UR3e with   load   & Baseline    & 0.096 & 3.31  & 0.376 & 5.63  & 0.308 & 5.09  & 0.249 & 8.53  & 0.150 & 8.10  & 0.070 & 4.10 \\
+        UR3e with   load   & DeLaN       & 0.295 & 0.696 & 0.833 & 0.523 & 0.442 & 0.466 & 0.244 & 0.356 & 0.231 & 0.601 & 0.180 & 0.600 \\
+        UR3e with   load   & DeLaN+LSTM  & 0.052 & 0.122 & 0.142 & 0.089 & 0.098 & 0.103 & 0.080 & 0.116 & 0.051 & 0.133 & 0.043 & 0.144 \\
+        UR10e without load & Baseline    & 0.490 & 3.24  & 0.853 & 2.54  & 0.351 & 3.14  & 0.110 & 4.40  & 0.098 & 6.48  & 0.078 & 5.12 \\
+        UR10e without load & DeLaN       & 1.473 & 0.753 & 2.158 & 0.346 & 0.954 & 0.318 & 0.275 & 0.543 & 0.216 & 1.011 & 0.261 & 0.947 \\
+        UR10e without load & DeLaN+LSTM  & 0.316 & 0.161 & 0.705 & 0.113 & 0.350 & 0.117 & 0.075 & 0.148 & 0.076 & 0.355 & 0.073 & 0.264 \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}%
+    }
 \end{table}
 
-\begin{table}[H]
+Table~\ref{tab:baseline_vs_delan_fullpipeline_test} reports per-joint motor-current RMSE on the
+benchmark test split for the dataset baseline~\cite{Q_Dataset_Paper}, the learned DeLaN predictor,
+and the combined DeLaN+LSTM model.
+For UR3e without load, the baseline yields RMSE values between $0.066$ and $0.130\,\mathrm{A}$ across
+joints, while DeLaN and DeLaN+LSTM range between $0.124$--$0.464\,\mathrm{A}$ and $0.089$--$0.307\,\mathrm{A}$, respectively.
+For UR3e with load, DeLaN+LSTM reports lower RMSE than both the baseline and DeLaN on all joints, with values in the range $0.043$--$0.142\,\mathrm{A}$.
+For UR10e without load, DeLaN exhibits substantially larger RMSE than the other models, whereas DeLaN+LSTM reports $0.073$--$0.705\,\mathrm{A}$ across joints.
+
+\begin{figure}[H]
     \centering
-    \scriptsize
-    \setlength{\tabcolsep}{3pt}
-    \caption{Best-model DeLaN+LSTM pipeline motor-current RMSE per joint for gripper compensation on dataset~\cite{Dataset_Dataport} (placeholders).}
-    \label{tab:gripper_comp_table8_fullpipeline}
-    \begin{tabular}{l r r r r r r}
-        \toprule
-        Condition & $i_1$ [A] & $i_2$ [A] & $i_3$ [A] & $i_4$ [A] & $i_5$ [A] & $i_6$ [A] \\
-        \midrule
-        UR3e without load (\textit{TBD}) & -- & -- & -- & -- & -- & -- \\
-        UR3e with load (\textit{TBD})    & -- & -- & -- & -- & -- & -- \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+    \includegraphics[width=\linewidth]{Images/05_results/benchmark/per_joint_relative_gain.png}
+    \caption{Relative change in per-joint motor-current RMSE of DeLaN+LSTM versus the baseline model~\cite{Q_Dataset_Paper}, reported as $(\mathrm{RMSE}_{\mathrm{ours}}-\mathrm{RMSE}_{\mathrm{baseline}})/\mathrm{RMSE}_{\mathrm{baseline}}$ for UR3 (no load), UR3 (with load), and UR10 (no load). Negative values indicate a reduction in RMSE, positive values an increase.}
+    \label{fig:benchmark_relative_gain_per_joint}
+\end{figure}
+
+Figure~\ref{fig:benchmark_relative_gain_per_joint} summarises the joint-wise relative change of
+DeLaN+LSTM with respect to the baseline.
+For UR3 (no load), the relative change is positive for all joints and spans approximately $+0.1$ to $+1.4$.
+For UR3 (with load), the relative change is negative for all joints and lies approximately between $-0.4$ and $-0.7$.
+For UR10 (no load), the relative change is negative across joints and ranges from near $0$ down to approximately $-0.35$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/benchmark/ur3_load_effect.png}
+    \caption{Load sensitivity on UR3: overall motor-current RMSE for the baseline model~\cite{Q_Dataset_Paper} and DeLaN+LSTM, comparing the no-load and with-load conditions.}
+    \label{fig:benchmark_ur3_load_sensitivity}
+\end{figure}
+
+Figure~\ref{fig:benchmark_ur3_load_sensitivity} reports overall motor-current RMSE on UR3 under
+the no-load and with-load conditions.
+The baseline increases from approximately $0.10\,\mathrm{A}$ (no load) to $0.21\,\mathrm{A}$ (with load),
+whereas DeLaN+LSTM decreases from approximately $0.18\,\mathrm{A}$ to $0.08\,\mathrm{A}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/05_results/benchmark/ur3_vs_ur10_no_load.png}
+    \caption{Kinematic difference (UR3 versus UR10, no load): overall motor-current RMSE for the baseline model~\cite{Q_Dataset_Paper} and DeLaN+LSTM on the no-load test split for both manipulators.}
+    \label{fig:benchmark_ur3_vs_ur10_no_load}
+\end{figure}
+
+Figure~\ref{fig:benchmark_ur3_vs_ur10_no_load} contrasts UR3 and UR10 on the no-load test split.
+For the baseline model, the overall RMSE increases from approximately $0.10\,\mathrm{A}$ (UR3) to $0.33\,\mathrm{A}$ (UR10).
+For the DeLaN+LSTM model, the overall RMSE increases from approximately $0.18\,\mathrm{A}$ (UR3) to $0.27\,\mathrm{A}$ (UR10).

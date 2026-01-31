@@ -1,56 +1,17 @@
 \chapter{Experimental Setup}
 
-\textbf{Measurement convention (motor current domain).}
-From this chapter onwards, we formulate training objectives and evaluation metrics in the measured actuation domain provided by the dataset, i.e., per-joint motor currents $\mathbf{i}_{\mathrm{motor}}$ in $\mathrm{A}$.
-When needed for interpretation, current-domain errors can be mapped to equivalent motor-domain errors via the (previously introduced) constant conversion factor $k_t$, i.e., by multiplying with $k_t$.
-Consistent with this convention and the pipeline overview in Fig.~\ref{fig:methods_pipeline}, we omit the conversion $\boldsymbol{\tau}_{\mathrm{motor}} = k_t\,\mathbf{i}_{\mathrm{motor}}$ and the rightmost Jacobian-based flange-wrench mapping block, and evaluate the approach directly as a combined motor-current model $\hat{\mathbf{i}}_{\mathrm{comb}}$.
-
-\section{Dataset of Collaborative Robots}
-
-\textbf{Dataset source and scope.}
-All experiments are based on the publicly available ``Dataset of Collaborative Robots for
-Energy Consumption Modeling'' released via IEEE DataPort~\cite{Dataset_Dataport} and
-documented in~\cite{Q_Dataset_Paper}.
-The dataset contains measurements from two Universal Robots platforms (UR3e and UR10e)
-recorded both without load and with an external payload.
-
-\textbf{Recorded signals.}
-Each log sample provides a time stamp $t$ and a trajectory identifier, and includes joint-space
-signals (joint positions $\mathbf{q}$, joint velocities $\dot{\mathbf{q}}$) together with electrical
-measurements (per-joint motor currents $\mathbf{i}$, motor voltages, as well as
-robot-level current and voltage).
-In addition, the dataset provides end-effector quantities such as Cartesian position and the
-measured wrench (force and moment) at the end effector.
-In the remainder of this thesis, motor current is treated as the central measured actuation signal.
-
-\textbf{Data collection protocol.}
-To excite the robot dynamics across a wide range of operating conditions, the robots execute
-sinusoidal joint motions with varying amplitudes, frequencies, and initial conditions~\cite{Q_Dataset_Paper}:
-\begin{equation}
-  q_i(t) = q_{i0} + A_i \cos\!\bigl(2\pi f_i t + \varphi_i\bigr),
-\end{equation}
-where $q_i$, $q_{i0}$, $A_i$, $f_i$ and $\varphi_i$ denote the desired joint position, initial
-position, amplitude, oscillation frequency, and phase of joint $i$, respectively.
-The experiments were conducted for UR3e and UR10e under two load conditions: without load
-and with an attached payload (hammer $1.5\,\mathrm{kg}$ and RobotiQ 2F-85 gripper $1\,\mathrm{kg}$)~\cite{Q_Dataset_Paper}.
-
-\textbf{Sampling and dataset size.}
-The signals are recorded at $100\,\mathrm{Hz}$.
-For each robot (and load condition), the dataset provides $50{,}000$ samples for training and
-$5{,}000$ samples for testing~\cite{Q_Dataset_Paper}.
-Since the underlying dynamics are time-invariant, the published dataset is formed by combining
-multiple shorter recordings into one consistent dataset, without treating discontinuities as
-separate experiments~\cite{Q_Dataset_Paper}.
+This chapter specifies the experimental protocol used to evaluate the proposed two-stage DeLaN+LSTM pipeline on the IEEE DataPort collaborative-robot trajectories in the motor-current domain.
+All experiments operate on trajectory logs of joint positions $\mathbf{q}$, joint velocities $\dot{\mathbf{q}}$, and per-joint motor currents $\mathbf{i}_{\mathrm{motor}}$ sampled at approximately $100\,\mathrm{Hz}$; joint accelerations $\ddot{\mathbf{q}}$ are derived from the recorded state after per-trajectory preprocessing.
+To prevent leakage between trajectories, all train/validation/test splits are constructed at the trajectory level, and performance is reported as per-joint motor-current RMSE in $\mathrm{A}$, aggregated across seeds where applicable.
+Two complementary studies are considered: a learning-curve sweep (K-domination) that varies the number of available trajectories $K$ to quantify optimisation stability and generalisation in both stages, and a best-model study at fixed $K$ that selects robust DeLaN and LSTM configurations based on validation performance before evaluating on the held-out test split.
 
 \section{DeLaN + LSTM - Learning Curve Stroy}
 
-\textbf{Key findings.}
-The learning-curve study shows that trajectory quantity $K$ is a primary driver of stability and generalisation for both stages: small subsets lead to higher dispersion and occasional failure modes, whereas sufficiently large $K$ yields consistent convergence and low per-joint errors.
-In this regime, freezing the best DeLaN and learning residual dynamics with an LSTM provides an additional systematic reduction of the remaining modelling error.
+This learning-curve study evaluates the two-stage pipeline as a function of the number of available trajectories $K$.
+As $K$ increases, both the DeLaN backbone and the residual LSTM train more consistently across dataset seeds, yielding lower and more uniform per-joint motor-current errors; the residual LSTM provides an additional reduction of the remaining modelling error once the DeLaN baseline has stabilised.
 
 \subsection{K-Domination}
 
-\textbf{Motivation and experimental protocol.}
 The purpose of the K-domination study is to quantify how the number of available
 demonstration trajectories influences the complete two-stage pipeline
 (Stage~1 DeLaN and Stage~2 residual LSTM).
@@ -58,7 +19,6 @@ To this end, we construct multiple training sets by drawing $K$ trajectories
 from a fixed pool, train the full pipeline for each set under identical
 hyperparameters, and evaluate performance as a function of $K$.
 
-\textbf{Trajectory pool and signals.}
 The base dataset consists of $122$ trajectories, each identified by a trajectory
 ID.
 For each trajectory, we use joint position $\mathbf{q}$, joint velocity
@@ -66,18 +26,8 @@ $\dot{\mathbf{q}}$, and motor current $\mathbf{i}$.
 All logs are recorded at approximately $100\,\mathrm{Hz}$.
 Since trajectory durations vary substantially (roughly $5$--$40\,\mathrm{s}$),
 all filtering and preprocessing steps are applied per trajectory.
+The resulting DeLaN-ready dataset is constructed as described in Section~\ref{sec:data_preprocessing}.
 
-\textbf{Per-trajectory low-pass filtering.}
-To attenuate sensor noise while avoiding temporal misalignment, we apply a
-4th-order Butterworth low-pass filter with cutoff frequency
-$f_c = 10\,\mathrm{Hz}$.
-The filter is applied in zero-phase form (forward--backward filtering), thereby
-preventing phase shifts in $\mathbf{q}$, $\dot{\mathbf{q}}$ and $\mathbf{i}$.
-Joint accelerations $\ddot{\mathbf{q}}$ are derived from the filtered velocities
-via numerical differentiation and, if filtering is enabled, are filtered
-analogously.
-
-\textbf{Subsampling by $K$.}
 From the trajectory pool, we draw subsets of size
 \[
   K \in \{8,\,16,\,32,\,48,\,64,\,86,\,122\},
@@ -85,9 +35,8 @@ From the trajectory pool, we draw subsets of size
 using three independent dataset seeds.
 For each $(K,\mathrm{seed})$, a fixed trajectory split is created with
 test fraction $0.2$ and validation fraction $0.1$ at the level of complete
-trajectories (i.e., trajectories are never split across subsets).
+trajectories (trajectories are never split across subsets).
 
-\textbf{Stage~1 (DeLaN) configuration and model selection.}
 For each $(K,\mathrm{seed})$ subset, we train five DeLaN initialisations
 (seeds $s\in\{0,\dots,4\}$) and select the best DeLaN by validation error
 (validation motor-current RMSE, equivalently MSE).
@@ -99,11 +48,10 @@ Training is run for at most $200$ epochs with early stopping (patience $10$,
 monitored on validation MSE) to avoid overfitting and to ensure that changes in
 performance are attributable to $K$ rather than excessive training time.
 
-\textbf{Stage~2 (LSTM) configuration.}
 After selecting the best DeLaN, we freeze it and export residuals for each
 trajectory.
-Stage~2 uses a history length $H=100$ and feature mode \texttt{full}, i.e.,
-each LSTM input time step concatenates
+Stage~2 uses a history length $H=100$ and feature mode \texttt{full}.
+Each LSTM input time step concatenates
 $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\mathbf{i}}_{\mathrm{DeLaN}})$.
 The residual LSTM is trained with two stacked LSTM layers (units $128$), dropout
 $0.2$, batch size $64$, and a validation split of $0.1$.
@@ -138,7 +86,6 @@ all $K$ to isolate the effect of trajectory quantity.
 \end{algorithmic}
 \end{algorithm}
 
-\textbf{Aggregation and reporting.}
 For each $K$, we aggregate results across the three dataset seeds.
 Reported learning curves (train loss, validation loss) are shown as median
 curves with interquartile ranges (IQR, $25$--$75$ percentile) across the 5 delan seeds per $(K,\mathrm{seed})$.
@@ -151,28 +98,25 @@ fixed number of bins; median $\pm$ IQR is then computed per progress bin.
 
 \subsection{Best Model Approch}
 
-\textbf{Motivation.}
 The K-domination sweep shows that once a sufficiently large number of trajectories is available,
 the DeLaN training dynamics become comparable across $K$ and the remaining variance is dominated
-by (i) which trajectories end up in the train/validation/test split (dataset seed) and (ii) the
+by which trajectories end up in the train/validation/test split (dataset seed) and the
 network initialisation (DeLaN seed).
 This effect is visible in the collapse of the median learning curves for $K\geq 32$
 (Figures~\ref{fig:kdom_delan_train_loss_by_k} and~\ref{fig:kdom_delan_val_mse_by_k}), while the
 dispersion and occasional outliers remain seed-dependent, especially for the progress-aligned
-motor-current RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}). \textbf{main objective best DelaN -> best LSTM here}
+motor-current RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}).
 
-\textbf{Objective DeLaN}
 To obtain a reliable basis for the second experiment, we therefore fix $K=84$ and select a DeLaN
 hyperparameter preset within the stable $K$ regime.
 Since Algorithm~\ref{alg:best_model_approach} performs validation-based checkpoint selection, the
-hyperparameters should (i) reduce seed sensitivity (tight IQR with few or no catastrophic runs),
-(ii) reach low validation error quickly and consistently (stable early-stopping behaviour), and
-(iii) generalise such that the validation-based ranking correlates with test performance.
+hyperparameters should reduce seed sensitivity (tight IQR with few or no catastrophic runs),
+reach low validation error quickly and consistently (stable early-stopping behaviour) and
+generalise such that the validation-based ranking correlates with test performance.
 Accordingly, we do not select the setting with the lowest median validation error alone, but the
 setting that achieves a favourable accuracy--robustness trade-off across dataset and initialisation
 seeds.
 
-\textbf{Robust DeLaN score for hyperparameter selection.}
 For each DeLaN preset $h$ and dataset seed $d$, we aggregate validation RMSE across DeLaN seeds and compute a robustness-aware selection score
 \begin{equation}
   \mathrm{score}(h,d)
@@ -187,9 +131,8 @@ dataset and initialisation seeds, and $\rho(d,h)$ denotes the divergence rate (f
 We then aggregate $\mathrm{score}(h,d)$ across dataset seeds and select the preset $h^\star$ with minimal median score.
 Lower values of $\mathrm{score}(h,d)$ (and thus of its median across $d$) therefore indicate both high accuracy and high reliability.
 
-\textbf{Aggregate scatter plots.}
 In addition to the scalar score, we report two aggregated scatter plots for comparing presets $h$:
-(i) median validation RMSE versus IQR of validation RMSE, and (ii) median validation RMSE versus
+median validation RMSE versus IQR of validation RMSE and median validation RMSE versus
 median test RMSE.
 In both cases, statistics are computed across DeLaN seeds for each dataset seed first, and then
 aggregated across dataset seeds, such that each point reflects the combined accuracy--robustness
@@ -198,16 +141,16 @@ The bottom-left region of the median--IQR plot corresponds to accurate and stabl
 the validation--test plot directly assesses whether validation error is a reliable selector for
 test performance in the sense required by Algorithm~\ref{alg:best_model_approach}.
 
-\textbf{DeLaN presets ($|\mathcal{H}_{\mathrm{DeLaN}}|=5$).}
 Guided by the stable ``Lutter-like'' regime observed in the K-domination results for $K\geq 32$
 (Figures~\ref{fig:kdom_delan_train_loss_by_k}--\ref{fig:kdom_delan_rmse_per_joint}), we evaluate the
 following five presets at fixed $K=84$:
+The baseline preset is chosen to match the current best-practice DeLaN configuration reported in~\cite{Q4_2_lutter2023combiningphysicsdeeplearning} (\texttt{lutter\_like\_256}), while the remaining presets vary a single axis (capacity, regularisation, or step size) to probe stability and generalisation.
 \begin{enumerate}
-    \item \textbf{Baseline (Lutter-like):} SoftPlus, batch size $1024$, learning rate $10^{-4}$, weight decay $10^{-5}$, width $256$, depth $2$.
-    \item \textbf{Smaller capacity:} baseline with width $128$, depth $2$.
-    \item \textbf{Deeper network:} baseline with width $256$, depth $3$.
-    \item \textbf{More regularisation:} baseline with weight decay $10^{-4}$.
-    \item \textbf{Lower step size:} baseline with learning rate $5\cdot 10^{-5}$.
+    \item \textbf{Baseline (Lutter-like):} SoftPlus, batch size $1024$, learning rate $10^{-4}$, weight decay $10^{-5}$, width $256$, depth $2$ (\texttt{lutter\_like\_256}).
+    \item \textbf{Smaller capacity:} baseline with width $128$, depth $2$ (\texttt{lutter\_like\_128}); tests whether the $256$-wide model is necessary or whether a smaller network improves stability.
+    \item \textbf{Deeper network:} baseline with width $256$, depth $3$ (\texttt{lutter\_like\_256\_d3}); tests whether additional depth improves representation at the expense of seed stability.
+    \item \textbf{More regularisation:} baseline with weight decay $10^{-4}$ (\texttt{lutter\_like\_256\_wd1e4}); tests whether stronger regularisation reduces seed variance and improves generalisation.
+    \item \textbf{Lower step size:} baseline with learning rate $5\cdot 10^{-5}$ (\texttt{lutter\_like\_256\_lr5e5}); tests whether more conservative optimisation improves numerical stability versus underfitting.
 \end{enumerate}
 This best-model study thus fixes $K=84$ and asks: \emph{within the stable regime}, which
 hyperparameters provide the best accuracy--robustness trade-off across dataset splits and DeLaN
@@ -222,7 +165,7 @@ initialisations?
 \caption{Best-model selection for the DeLaN}\label{alg:best_model_approach}
 \begin{algorithmic}
 \Require 4th-order Butterworth low-pass filter with cutoff frequency $f_c = 10\,\mathrm{Hz}$
-\Require Trajectory pool size $K=86$ with fixed split $(N_{\mathrm{train}},N_{\mathrm{val}},N_{\mathrm{test}})=(60,8,17)$
+\Require \texttt{UR3\_Load0Dataset} training pool with $50{,}000$ samples, split into $(70\%,10\%,20\%)$ train/validation/test subsets for model selection
 \Require Dataset seeds $\mathcal{D}=\{0,1,2,3,4\}$, DeLaN seeds $\mathcal{S}_{\mathrm{DeLaN}}=\{0,1,2,3,4\}$, LSTM seeds $\mathcal{S}_{\mathrm{LSTM}}=\{0,1,2,3,4\}$
 \Require Hyperparameter presets $\mathcal{H}_{\mathrm{DeLaN}}$ and $\mathcal{H}_{\mathrm{LSTM}}$ with $|\mathcal{H}_{\cdot}|=5$
 \Ensure Best DeLaN checkpoint and best LSTM checkpoint for the fixed $K$
@@ -272,9 +215,6 @@ initialisations?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{\textbf{Objective LSTM}}
-
-\textbf{Motivation.}
 After selecting and freezing the best DeLaN checkpoint (Algorithm~\ref{alg:best_model_approach}), Stage~2 addresses the remaining modelling error by learning residual motor currents.
 For each time index $k$, the residual current is defined as
 \begin{equation}
@@ -288,8 +228,7 @@ For each time index $k$, the residual current is defined as
 In contrast to Stage~1, where architecture and training are kept fixed, the LSTM performance can depend strongly on the available history length $H$ and on which signals are provided as inputs.
 We therefore treat the residual learner as a dedicated best-model selection problem under a fixed DeLaN baseline.
 
-\textbf{Objective and selection criterion.}
-The goal is to choose a configuration $(f,H)$ and corresponding checkpoints such that the \emph{end-to-end} prediction error of the combined motor-current model
+The goal is to choose a configuration $(f,H)$ and corresponding checkpoints such that the end-to-end prediction error of the combined motor-current model
 \begin{equation}
   \hat{\mathbf{i}}_{\mathrm{RG},k}
   =
@@ -298,18 +237,19 @@ The goal is to choose a configuration $(f,H)$ and corresponding checkpoints such
   \hat{\boldsymbol{r}}_{i,k}
   \label{eq:combined_current_rg}
 \end{equation}
-is minimised on held-out trajectories, while remaining robust to (i) the dataset split induced by the dataset seed $d$ and (ii) the LSTM initialisation seed.
+is minimised on held-out trajectories, while remaining robust to the dataset split induced by the dataset seed $d$ and the LSTM initialisation seed.
 Since the LSTM operates on history windows, evaluation is performed only on indices with valid context ($k\geq H-1$).
 
-\textbf{Ablation axes.}
-Algorithm~\ref{alg:lstm_best_model_approach} sweeps three window lengths $H\in\{50,100,150\}$ and four feature modes $f$ that probe whether residual dynamics are primarily explained by kinematics, by the DeLaN current baseline, or by their combination:
-\texttt{state} uses $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}})$,
-\texttt{i\_hat} uses $\hat{\mathbf{i}}_{\mathrm{DeLaN}}$,
-\texttt{full} uses $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\mathbf{i}}_{\mathrm{DeLaN}})$, and
-\texttt{state\_ihat} uses $(\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\mathbf{i}}_{\mathrm{DeLaN}})$ (dropping $\mathbf{q}$).
+Algorithm~\ref{alg:lstm_best_model_approach} sweeps three window lengths $H\in\{50,100,150\}$ and four feature modes $f$.
+The feature modes are designed to isolate whether the residual motor-current dynamics are primarily explained by kinematics, by the DeLaN current baseline, or by their combination:
+\begin{description}
+    \item[\texttt{full}] $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\mathbf{i}}_{\mathrm{DeLaN}})$; tests whether the residual benefits from both kinematics and the DeLaN baseline prediction.
+    \item[\texttt{i\_hat}] $(\hat{\mathbf{i}}_{\mathrm{DeLaN}})$; tests whether the residual is largely a systematic correction correlated with the DeLaN prediction alone.
+    \item[\texttt{state}] $(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}})$; tests whether kinematics alone is sufficient to explain the residual, without access to the DeLaN baseline.
+    \item[\texttt{state\_ihat}] $(\dot{\mathbf{q}},\ddot{\mathbf{q}},\hat{\mathbf{i}}_{\mathrm{DeLaN}})$; tests whether absolute position can be omitted while retaining velocity/acceleration information conditioned on the DeLaN baseline prediction.
+\end{description}
 For each $(d,f,H)$, multiple LSTM seeds are trained with early stopping, and both residual-level metrics and combined-model motor-current RMSE are recorded.
 
-\textbf{Stability-aware ranking across seeds.}
 To select a configuration that is both accurate and reliable, we rank $(f,H)$ by a robustness-aware score based on the combined-model motor-current RMSE:
 for each dataset seed $d$, we aggregate across LSTM seeds using median and IQR, and add a divergence penalty for failed runs (NaN/Inf or missing metrics).
 The resulting per-seed score $s(d,f,H)$ is then aggregated across dataset seeds, and the final choice is $(f^\star,H^\star)=\arg\min_{(f,H)} S_{f,H}$ as defined in Algorithm~\ref{alg:lstm_best_model_approach}.

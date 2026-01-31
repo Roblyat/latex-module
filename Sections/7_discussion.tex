@@ -1,13 +1,28 @@
 \chapter{Discussion}
 
-\textbf{K-Domination.}
-The K-domination study (Section~5.1.1) quantifies how the number of available
+The experimental results reported the experimental results in a descriptive manner. This chapter synthesises these findings and relates them back to the research questions 
+introduced in the Introduction. In particular, we discuss how trajectory coverage $K$ affects the accuracy and stability of the physics-structured DeLaN baseline 
+(RQ1), how the residual LSTM reduces the remaining motor-current error and how feature choice and history length influence accuracy and overfitting behaviour (RQ2)
+and how the resulting two-stage predictor compares to the IEEE DataPort baseline across benchmark conditions (RQ3).
+
+\textbf{RQ1 (DeLaN accuracy and trajectory coverage).}
+Section~5.1.1 shows that DeLaN motor-current prediction accuracy and seed stability improve systematically as trajectory coverage increases: small subsets yield higher losses, wider interquartile ranges, and pronounced RMSE spikes along progress, whereas for $K\geq 32$ the learning curves and RMSE profiles cluster more tightly.
+Section~5.1.2 complements this with the best-model sweep at fixed $K=84$, demonstrating that validation-driven checkpoint selection transfers to similar test RMSE levels across the evaluated presets.
+
+\textbf{RQ2 (Residual learning, feature choice, and history length).}
+The best-pipeline evaluation in Section~5.1.2 shows that adding an LSTM residual model reduces the remaining DeLaN motor-current error on the held-out test split across all joints (valid indices $k\geq H-1$).
+The feature-mode and history-length sweeps further indicate that residual accuracy depends strongly on the chosen feature mode and the tested history lengths $H\in\{50,100,150\}$ yield comparable residual RMSE distributions, favouring shorter windows when latency and warm-up constraints matter.
+
+\textbf{RQ3 (Benchmark comparison to the dataset baseline).}
+Section~5.3 benchmarks the proposed pipeline under the same $50{,}000/5{,}000$ train/test protocol as the IEEE DataPort baseline and reports per-joint motor-current RMSE on three benchmark-capable datasets.
+On UR3e without load, the linear identification baseline attains the lowest RMSE, whereas on UR3e with load and on UR10e without load the DeLaN+LSTM model achieves lower RMSE than the baseline on most or all joints, as summarised by the relative-gain and overall-RMSE comparisons.
+
+The K-domination study quantifies how the number of available
 demonstration trajectories influences the two-stage pipeline.
-Across all reported metrics, increasing $K$ reduces both (i) the typical error level and
-(ii) the variability across dataset seeds, indicating improved generalisation and robustness with
+Across all reported metrics, increasing $K$ reduces both the typical error level and
+the variability across dataset seeds, indicating improved generalisation and robustness with
 more diverse motion coverage.
 
-\textbf{Stage~1 (DeLaN): learning dynamics and split sensitivity.}
 The DeLaN learning curves (Figures~\ref{fig:kdom_delan_train_loss_by_k}
 and~\ref{fig:kdom_delan_val_mse_by_k}) summarise the Stage~1 optimisation as a function of
 $K$.
@@ -17,10 +32,9 @@ This behaviour is consistent with the fact that the dataset seed determines whic
 are selected and how they are split into train/val/test at the trajectory level, which is comparable
 to evaluating different ``folds'' of the trajectory pool.
 At low $K$, some subsets can miss relevant dynamic regimes, resulting in splits that are harder
-to learn and therefore higher validation error; for $K \geq 32$ the curves collapse quickly,
+to learn and therefore higher validation error. For $K \geq 32$ the curves collapse quickly,
 indicating reduced sensitivity to the particular split.
 
-\textbf{Stage~1 (DeLaN): error over motion progress and per-joint balance.}
 The progress-aligned motor-current RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}) highlights
 that the smallest setting ($K=8$) exhibits pronounced error spikes and large variability along the
 trajectory, while increasing $K$ stabilises the error over the full progress range.
@@ -31,7 +45,6 @@ This aligns with the per-joint normalisation used in the Stage~1 loss, but also 
 sufficient trajectory diversity is required for this normalisation to translate into uniform
 generalisation across all joints.
 
-\textbf{Stage~2 (LSTM): dependence on $K$ and coupling to Stage~1.}
 The residual LSTM results (Figures~\ref{fig:kdom_lstm_train_loss_by_k},
 \ref{fig:kdom_lstm_val_loss_by_k}, and~\ref{fig:kdom_lstm_res_rmse_progress_by_k})
 indicate that larger $K$ yields lower validation loss and reduced variability.
@@ -40,10 +53,68 @@ performance is inherently coupled to the quality and coverage of the DeLaN resid
 Consequently, low $K$ can manifest as larger residual peaks and higher seed sensitivity, whereas
 larger $K$ provides a more stable residual learning problem.
 
-\textbf{End-to-end implication.}
 The representative overlays (Figures~\ref{fig:kdom_torque_overlay_example}
 and~\ref{fig:kdom_residual_overlay_example}) illustrate that the residual learner compensates
 systematic deviations of the DeLaN prediction and thereby reduces the final motor-current error.
 Taken together, the K-domination results support the interpretation that a minimum trajectory
 count is required before the two-stage pipeline becomes robust to the particular trajectory
 selection and split, with diminishing returns as $K$ approaches the full dataset.
+
+The best-model DeLaN sweep (Figures~\ref{fig:delan_train_val_loss_across_seed_by_hyper}--\ref{fig:delan_rmse_per_joint})
+starts from a ``Lutter-like'' baseline configuration and varies one axis at a time (capacity, depth, weight decay, or learning rate)
+to probe whether the remaining performance variability is driven by under-capacity, overfitting, or optimisation stability.
+The learning curves (Figure~\ref{fig:delan_train_val_loss_across_seed_by_hyper}) show that all presets converge rapidly and then plateau,
+indicating that differences between presets are expressed primarily in the final validation regime rather than in early transient behaviour.
+The accuracy--stability scatter (Figure~\ref{fig:delan_scatter_val_vs_valIQR}) reveals a trade-off between typical validation error and seed stability:
+the smaller-capacity variant attains the tightest within-split dispersion but at a higher median validation RMSE, consistent with capacity-limited fitting,
+whereas the deeper variant shifts toward lower validation RMSE while maintaining a comparable IQR.
+In contrast, both stronger weight decay and a lower learning rate move the operating point toward larger validation RMSE and higher dispersion,
+suggesting that these changes do not act as stabilisers in this setting.
+The validation--test scatter (Figure~\ref{fig:delan_scatter_val_vs_test}) indicates that the relative ranking on validation RMSE is broadly preserved on the test subset,
+supporting the use of validation-driven checkpoint selection in Algorithm~\ref{alg:best_model_approach}.
+Finally, the per-joint breakdown (Figure~\ref{fig:delan_rmse_per_joint}) shows that the spread across presets is not uniform across joints:
+joint~1 consistently exhibits the largest errors and variability, and the differences between presets are most pronounced on the higher-error joints,
+which aligns with the design goal of selecting a preset that is both accurate and robust under the dominant seed variability.
+
+The residual-model sweep (Figures~\ref{fig:lstm_val_loss_vs_rmse_total}--\ref{fig:lstm_residual_gt_vs_predicted}) evaluates whether residual motor-current dynamics
+are best explained from kinematics alone, from the DeLaN baseline prediction alone, or from their combination (Section~\ref{sec:methods}).
+Across configurations, the best-validation-loss versus test-RMSE scatter (Figure~\ref{fig:lstm_val_loss_vs_rmse_total}) separates a dominant cluster of low-error settings
+from a smaller set of markedly worse runs, indicating that some feature choices lead to consistently inferior residual predictors.
+This separation is reflected in the feature-mode boxplots: residual RMSE (Figure~\ref{fig:lstm_residual_rmse_by_feature_mode}) and the overfit indicator
+(Figure~\ref{fig:lstm_overfit_ratio}) both show that the feature mode relying only on the DeLaN baseline prediction (``\texttt{tau\_hat}'' in the plot labels,
+i.e., the DeLaN-predicted motor current) exhibits substantially larger errors and greater train--validation discrepancy than the other modes.
+By contrast, the hybrid feature mode combining velocity/acceleration with the DeLaN baseline (``\texttt{state\_tauhat}'') remains in the low-error regime
+and shows comparatively tight dispersion, consistent with the intended role of the residual model as a correction conditioned on both state and baseline prediction.
+At the same time, Figure~\ref{fig:lstm_overfit_ratio} shows that even for \texttt{state\_tauhat} the final validation-to-training loss ratio remains clearly above one,
+indicating a non-negligible generalisation gap: the residual predictor fits the training windows more strongly than the held-out validation windows.
+Together with the low and tightly clustered residual RMSE of \texttt{state\_tauhat} in Figure~\ref{fig:lstm_residual_rmse_by_feature_mode}, this explains why \texttt{state\_tauhat}
+is consistently favoured by the robustness-aware selection in Algorithm~\ref{alg:lstm_best_model_approach}, but it also highlights that its apparent dominance is established under the in-distribution trajectory split used here.
+Assessing whether this feature mode retains its advantage when extrapolating to more strongly shifted test conditions (like unseen tasks, payloads, or robots) remains an important direction for future work.
+Within the same comparison, the \texttt{state} and \texttt{full} modes yield similar residual RMSE levels but higher loss ratios than \texttt{state\_tauhat}, suggesting that including absolute joint position (and, in \texttt{full}, the DeLaN baseline) does not provide a clear robustness benefit in this setting.
+Conversely, the \texttt{tau\_hat}-only mode performs worst and exhibits the largest train--validation discrepancy, indicating that the DeLaN baseline prediction alone is insufficient to recover the history-dependent residual dynamics.
+Comparing history lengths (Figure~\ref{fig:lstm_residual_rmse_by_window_length}), the residual RMSE distributions for $H\in\{50,100,150\}$ are close in median and spread,
+suggesting that most predictive information is contained in relatively short histories and that increasing $H$ does not systematically improve the residual fit.
+Interpreting $H$ in physical time, the dataset is sampled at $100\,\mathrm{Hz}$, such that the smallest window length $H=50$ corresponds to $0.5\,\mathrm{s}$ of history.
+Since the three boxplots largely overlap, using the shortest window is preferable in practice: it reduces the required warm-up horizon ($k\geq H-1$) and the amount of past context needed for the residual predictor without sacrificing accuracy.
+At the same time, a $0.5\,\mathrm{s}$ history can still be substantial for fast, safety-critical interaction and tool/payload compensation, motivating future work on shorter-horizon residual models (for example faster sampling, more compact history representations, or training on shorter windows) while maintaining sufficient coverage of relevant motion regimes.
+The residual overlay (Figure~\ref{fig:lstm_residual_gt_vs_predicted}) further illustrates that the LSTM captures the dominant temporal structure of the residual across joints,
+while remaining errors concentrate around sharper transitions where the residual changes rapidly.
+
+Section~5.3 compares the proposed pipeline to the model-based identification baseline reported with the IEEE DataPort dataset~\cite{Q_Dataset_Paper}.
+The baseline fits a joint-wise, linear-in-parameters current model from kinematics, whereas the DeLaN and DeLaN+LSTM models implement physics-inspired representation learning (Stage~1)
+and a learned residual correction (Stage~2).
+Table~\ref{tab:baseline_vs_delan_fullpipeline_test} highlights that the relative performance depends strongly on the benchmark condition:
+for UR3e without load, the baseline attains the lowest per-joint RMSE, while the DeLaN+LSTM pipeline yields higher errors across all joints, indicating that the linear current regressor is already highly effective in this regime.
+For UR3e with load, the ranking reverses and the DeLaN+LSTM pipeline achieves substantially lower RMSE than both the baseline and the DeLaN-only model on all joints, suggesting that the hybrid physics-informed plus residual formulation better captures the load-conditioned current dynamics in this dataset.
+For UR10e without load, DeLaN-only produces markedly larger errors, while the DeLaN+LSTM pipeline reduces RMSE relative to DeLaN and improves upon the baseline on most joints, indicating that the residual model compensates systematic errors that remain after the physics-constrained Stage~1 fit.
+
+Figure~\ref{fig:benchmark_relative_gain_per_joint} summarises these trends as a relative change with respect to the baseline.
+The UR3 no-load panel shows positive relative changes on all joints, meaning that the two-stage pipeline does not outperform the baseline in that condition.
+By contrast, the UR3 with-load panel shows negative relative changes on all joints, indicating consistent improvement of DeLaN+LSTM over the baseline under load.
+For UR10 no load, the relative change remains negative across joints but with smaller magnitude, which is consistent with the more modest gains observed in Table~\ref{tab:baseline_vs_delan_fullpipeline_test}.
+
+The overall-RMSE summaries in Figures~\ref{fig:benchmark_ur3_load_sensitivity} and~\ref{fig:benchmark_ur3_vs_ur10_no_load} provide a compact view across conditions.
+On UR3, the baseline exhibits a higher overall RMSE for the with-load condition than for the no-load condition, while the DeLaN+LSTM pipeline shows the opposite trend in this benchmark.
+Across manipulators, both models exhibit higher overall RMSE on UR10 than on UR3 in the no-load setting, reflecting the increased error level on the larger robot. However, the gap between UR3 and UR10 is smaller for the DeLaN+LSTM pipeline than for the baseline.
+Taken together, these results suggest that the physics-informed neural pipeline is most competitive in regimes where the linear current identification baseline exhibits larger errors (under load and on UR10),
+while the baseline remains difficult to beat on UR3 without load, where its parametric structure appears sufficient for the observed current dynamics.

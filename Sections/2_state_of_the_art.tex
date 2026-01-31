@@ -34,7 +34,7 @@
 
     This process yielded 36 papers that are directly relevant to robot and payload dynamics, interaction force estimation and related identification problems.
     Table~\ref{tab:query-results} summarises how these works are distributed across the five query categories and counts, for each category, how many papers address payload dynamics, robot rigid-body dynamics,
-    and contact-force estimation (papers that treat payload and rigid-body dynamics contribute to both columns); the corresponding relations are visualised in the concept graph in Fig.~\ref{fig:SoA_concept_graph}.
+    and contact-force estimation (papers that treat payload and rigid-body dynamics contribute to both columns). The corresponding relations are visualised in the concept graph in Fig.~\ref{fig:SoA_concept_graph}.
 
     \begin{table}[H]
     \centering
@@ -77,7 +77,7 @@ illustrated in Figure~\ref{fig:approach_landscape}.
 
 \clearpage
 
-\textbf{Category Q1} groups classical \emph{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on linearly parameterised rigid-body dynamics (RBD) and LS/WLS-type Newton-Euler regressors,
+The Category Q1 `Classical / Observers' groups classical \emph{model-based methods for robot and payload dynamics and interaction force estimation}, mostly based on linearly parameterised rigid-body dynamics (RBD) and LS/WLS-type Newton-Euler regressors,
 sometimes combined with observers and Kalman filters~\cite{Q1_1_fast_inertial_id_cobots,Q1_2_online_payload_mo,Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_10_duan_payload_ftsensor,Q1_12_han_finite_time_observer,Q1_13_dynamic_model_id_swevers2007,Q1_14_long2022sliding_momentum_observer,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024,Q1_17_liu2021sensorless_dob_nn}.
 Across these works, three main lines of research can be distinguished in payload dynamic parameter identification (PDPI) using force/torque (FT) sensing~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor},
 robot and payload dynamic parameter identification in joint or motor-current space without FT sensors~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024},
@@ -88,14 +88,14 @@ A first group of methods performs PDPI directly in the FT frame~\cite{Q1_1_fast_
 They typically exploit static poses to identify the payload mass and centre of mass, and then use dedicated dynamic excitation trajectories together with LS or TLS-type Newton-Euler regressors to estimate the inertia tensor.
 Representative works demonstrate that, given a sufficiently informative excitation and an FT sensor rigidly mounted at the flange, payload mass can be recovered very accurately and CoM can be estimated with reasonable
 precision, even for heavy payloads~\cite{Q1_1_fast_inertial_id_cobots,Q1_7_10947736}.  
-However, inertia estimates are systematically more fragile---especially under cobot-typical safety constraints with short trajectories and low accelerations---and in several cases quantitative ground truth for CoM and inertia
+However, inertia estimates are systematically more fragile, especially under cobot-typical safety constraints with short trajectories and low accelerations and in several cases quantitative ground truth for CoM and inertia
 is missing or only partially available (validation is often given in terms of residual gravitational/inertial wrench after compensation rather than direct parameter error)~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor}.  
 Moreover, these approaches require additional FT hardware and considerable experimental effort in the form of carefully designed calibration motions.
 
 A second group tackles robot dynamic parameter identification (RDPI) and PDPI in joint space or motor-current space without FT sensors~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024}.  
 Here, fully or partially decoupled identification schemes are designed to separate gravitational, frictional and inertial effects, often using families of S-curve or Fourier trajectories executed both with and without
 payload~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007}.  
-Double-weighted WLS and optimisation-enhanced LS methods achieve very accurate joint-torque prediction and good agreement with CAD-based payload models, confirming that classical LS/NE pipelines---as systematised, for example, by Swevers et al.~\cite{Q1_13_dynamic_model_id_swevers2007}---remain a strong baseline
+Double-weighted WLS and optimisation-enhanced LS methods achieve very accurate joint-torque prediction and good agreement with CAD-based payload models, confirming that classical LS/NE pipelines, for example by Swevers et al.~\cite{Q1_13_dynamic_model_id_swevers2007} remain a strong baseline
 for RDPI and PDPI~\cite{Q1_6_hu2025_fdrdi,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024}.
 At the same time, these methods are typically executed in dedicated calibration phases, rely on repeated execution of long and highly exciting trajectories and payload parameters are updated only between such identification
 runs. They therefore provide an excellent commissioning tool and basis model, but do not by themselves endow the robot with continuous online awareness of payload changes during manipulation tasks.
@@ -112,22 +112,22 @@ More recent contributions bridge RDPI/PDPI and observer-based estimation by usin
 Momentum-observer-based schemes and parameter-difference methods compute external joint torques as residuals between measured and model-based torques and apply LS/RLS Newton-Euler regressors to recover payload mass, CoM and,
 in some cases, inertia during regular robot operation.  
 These works demonstrate that accurate online PDPI is possible without FT sensors, provided that a reasonably accurate base robot model, friction compensation and sufficiently exciting motions are available~\cite{Q1_2_online_payload_mo,Q1_16_xu_payload_difference_2024}.
-At the same time, they underline several structural limitations: inertia remains the hardest quantity to identify robustly; nonlinear friction, backlash and transmission effects must be modelled or learned carefully (with several authors explicitly noting residual error peaks near motion reversal due to unmodelled friction~\cite{Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo});
+At the same time, they underline several structural limitations: inertia remains the hardest quantity to identify robustly. Nonlinear friction, backlash and transmission effects must be modelled or learned carefully (with several authors explicitly noting residual error peaks near motion reversal due to unmodelled friction~\cite{Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo}).
 and the resulting estimators not providing a unified, continuously updated representation of robot and load.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0.75\baselineskip}
 
-\textbf{Category Q2} groups \emph{Gaussian Process (GP) and GP-hybrid methods for inverse dynamics and sensorless contact estimation}. 
+The Category Q2 `Gaussian Process (GP)' groups \emph{Gaussian Process (GP) and GP-hybrid methods for inverse dynamics and sensorless contact estimation}. 
 In all cases, a GP is trained offline as a residual or surrogate model on top of a nominal rigid-body dynamics (RBD) description, and then deployed online for torque or disturbance prediction
 ~\cite{Q2_1_contact_force_gp_observer,Q2_3_contact_detection_gp}
 
 Two studies use GPs to improve joint-space contact-force estimation.
-In~\cite{Q2_1_contact_force_gp_observer}, an enhanced GP learns the residual dynamics between an Euler-Lagrange model and measured torques; this residual is injected into a decoupling disturbance observer and Kalman filter
+In~\cite{Q2_1_contact_force_gp_observer}, an enhanced GP learns the residual dynamics between an Euler-Lagrange model and measured torques. This residual is injected into a decoupling disturbance observer and Kalman filter
 to obtain external joint torques and end-effector forces.  
 The follow-up~\cite{Q2_2_contact_force_gpadkf} extends this to a GP-adaptive disturbance Kalman filter, where the disturbance covariance is adjusted based on the GP output.
-Both papers show reduced estimation error and faster convergence than purely model-based observers, but require a reasonably accurate nominal model, high-quality proprioception and extensive non-contact training data;
-payload and tool effects are absorbed into a single residual term.
+Both papers show reduced estimation error and faster convergence than purely model-based observers, but require a reasonably accurate nominal model, high-quality proprioception and extensive non-contact training data.
+Payload and tool effects are absorbed into a single residual term.
 
 A third work combines GP inverse dynamics with learning-based contact detection~\cite{Q2_3_contact_detection_gp}.
 A GP predicts non-contact motor torques from joint states, and the residual between measured and GP-predicted torques is passed to a convolutional neural network that classifies contact vs.\ no-contact during assembly tasks,
@@ -140,7 +140,9 @@ Embedding such structure improves data efficiency and prediction accuracy and GP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0.75\baselineskip}
 
-\textbf{Category Q3} comprises deep-learning approaches for inverse dynamics, force estimation and payload identification.  
+\clearpage
+
+Deep Sequence Models comprises deep-learning approaches for inverse dynamics, force estimation and payload identification.  
 Most methods either learn residual dynamics on top of a nominal rigid-body model or learn a direct mapping from joint histories to payload parameters or contact indicators, using LSTM/GRU-type sequence models, feed-forward
 networks, CNNs or ensemble methods~\cite{Q3_1_tao_bll,Q3_2_encoder_attention_payload,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q3_5_contact_localization_cnn,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting}.
 
@@ -153,15 +155,15 @@ The LSTMs outperform MLPs, 1D convolutions and a DeLaN baseline in both simulati
 
 A second group uses deep models to infer end-effector wrench or contact directly from proprioception.  
 The adaptive sparse GRNN force observer in~\cite{Q3_4_asgrnn_force_observer} maps joint positions, velocities, accelerations and motor currents to 6D wrench on a UR5 teleoperation system, using an FT sensor only for
-supervision; it achieves strong soft/stiff collision force estimation and outperforms GP and MLP baselines.  
+supervision. It achieves strong soft/stiff collision force estimation and outperforms GP and MLP baselines.  
 In~\cite{Q3_5_contact_localization_cnn}, a CNN is trained in IsaacGym with domain randomisation to detect and localise link-environment contacts for a 7-DoF Panda using only link velocities and pose errors
 (no torque or FT sensing). The network reaches around 98\,\% accuracy in sim-to-real contact localisation, but does not estimate wrench magnitude or payload dynamics.
 
 The third line of work addresses \emph{payload dynamic parameter identification (PDPI)} with deep networks and ensembles.  
 A learning-based method for the OpenMANIPULATOR-X in~\cite{Q3_2_encoder_attention_payload} combines a nominal RBD model and camera pose estimation with an MLP that processes joint states and velocity sign to estimate
-per-joint torque contributions; a subsequent LS step recovers payload mass and CoM of known objects, with average errors of about 9\,\% in mass and 18\,\% in CoM.  
+per-joint torque contributions. A subsequent LS step recovers payload mass and CoM of known objects, with average errors of about 9\,\% in mass and 18\,\% in CoM.  
 For collaborative cobots,\cite{Q3_7_payload_id_online_ensemble} proposes a batch ensemble of weak learners (NNs or decision trees) that directly map $(q,\dot q,\tau)$ to payload parameters for a library of 77 payloads along
-a fixed excitation trajectory on a Franka robot; the method achieves good sim-to-real transfer and clearly reduces mass/CoM error compared to RLS, but still requires a dedicated excitation path per payload.  
+a fixed excitation trajectory on a Franka robot. The method achieves good sim-to-real transfer and clearly reduces mass/CoM error compared to RLS, but still requires a dedicated excitation path per payload.  
 This is generalised in~\cite{Q3_6_payload_id_incremental_ensemble,Q3_8_payload_id_catastrophic_forgetting}, which introduce incremental ensemble learning for PDPI along arbitrary task paths.  
 The initial incremental ensemble~\cite{Q3_6_payload_id_incremental_ensemble} adapts weak learners online based on Euclidean distance in feature space but suffers from catastrophic forgetting on previously seen trajectories.  
 The follow-up work~\cite{Q3_8_payload_id_catastrophic_forgetting} adds a bag-based classifier that routes new path segments to the most relevant weak learner and spawns new learners as required, thereby preserving accuracy
@@ -171,8 +173,8 @@ The price is a growing ensemble size and the fact that the individual learners r
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0.75\baselineskip}
 
-\textbf{Category Q4} groups \emph{physics-informed and differentiable dynamics models}, where deep networks are structured by Lagrangian or state-space physics and trained on joint data to predict torques or currents.
-The central goal in all works is accurate \emph{robot dynamic parameter identification (RDPI)} and inverse dynamics prediction for fixed robots; payload dynamics and interaction forces are not estimated explicitly.
+Physics-informed and differentiable dynamics models group Category Q4, where deep networks are structured by Lagrangian or state-space physics and trained on joint data to predict torques or currents.
+The central goal in all works is accurate robot dynamic parameter identification (RDPI) and inverse dynamics prediction for fixed robots. Payload dynamics and interaction forces are not estimated explicitly.
 
 A first line of work builds on Deep Lagrangian Networks (DeLaN) and related continuous-time models. The survey and benchmark in~\cite{Q4_2_lutter2023combiningphysicsdeeplearning} compares structured DeLaN/HNN models against
 black-box neural networks on low-DoF systems and a 4-DoF WAM arm, showing that physics-informed architectures achieve lower normalised errors and much longer valid prediction horizons than unconstrained networks. However,
@@ -180,8 +182,8 @@ these models assume conservative dynamics without contacts, and friction is eith
 couplings and friction on a UR10e arm, using joint positions, velocities and accelerations together with motor currents. The network learns Lagrangian terms plus actuator/friction parameters and predicts motor currents with
 high accuracy in simulation and on hardware, outperforming the original DeLaN and a feed-forward baseline, yet still under fixed tool/payload and contact-free conditions.
 
-A second line of work uses physics-informed neural networks (PINNs) as refinements of classical LS/NE identification. In~\cite{Q4_3_residual_pinns_dynamics_id}, base parameters are first obtained by a Newton-Euler regressor;
-a decomposed PINN then minimises a hybrid loss combining data residuals and the rigid-body dynamics equations, reducing joint-torque RMSE compared to LS alone. Building on this,~\cite{Q4_4_10729277}
+A second line of work uses physics-informed neural networks (PINNs) as refinements of classical LS/NE identification. In~\cite{Q4_3_residual_pinns_dynamics_id}, base parameters are first obtained by a Newton-Euler regressor.
+A decomposed PINN then minimises a hybrid loss combining data residuals and the rigid-body dynamics equations, reducing joint-torque RMSE compared to LS alone. Building on this,~\cite{Q4_4_10729277}
 proposes a friction-inclusive PINN for multi-joint industrial robots without joint torque sensors, combining Lagrangian dynamics with an explicit Stribeck friction model and a history-based residual network that learns
 remaining errors over a time window. The resulting hybrid model achieves very strong joint-torque (or current) prediction across several joints and outperforms DeLaN-type and LS baselines. Finally,~\cite{Q4_5_10305255}
 introduces an H-PINN for a single collaborative robot joint, embedding the joint's state-space dynamics into an RNN cell and jointly estimating physical parameters and state transitions, with highly accurate joint-level
@@ -190,65 +192,56 @@ dynamics prediction in simulation and experiments.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0.75\baselineskip}
 
-Taken together, the \textbf{Q1} literature shows that classical model-based techniques can deliver high-quality RDPI and PDPI, as well as useful sensorless interaction-force estimates, but typically only under carefully
+Taken together, model-based methods can deliver high-quality RDPI and PDPI, as well as useful sensorless interaction-force estimates, but typically only under carefully
 controlled excitation of dedicated identification trajectories~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_12_han_finite_time_observer,Q1_13_dynamic_model_id_swevers2007,Q1_15_tang2023wls_rwspo,Q1_16_xu_payload_difference_2024,Q1_17_liu2021sensorless_dob_nn}.
 From the perspective of this work, the main gaps are the lack of a unified, online notion of dynamic awareness that covers robot and payload; the persistent difficulty of reliably identifying and exploiting
-payload inertia in cobot-safe regimes; and the sensitivity of existing approaches to friction and transmission nonlinearities. [REFERENCES HERE!]
-(These limitations directly motivate the methodological choices and objectives formulated in the problem statement and aim of work.)
+payload inertia in cobot-safe regimes; and the sensitivity of existing approaches to friction and transmission nonlinearities~\cite{Q1_2_online_payload_mo,Q1_3_external_torque_smo}.
 
-Overall, \textbf{Q2} shows that GPs are effective residual models for unmodelled robot dynamics and can enhance sensorless contact estimation
+Gaussian Processes show up as effective residual models for unmodelled robot dynamics and can enhance sensorless contact estimation
 ~\cite{Q2_1_contact_force_gp_observer,Q2_2_contact_force_gpadkf,Q2_3_contact_detection_gp,Q2_4_GIACOMUZZO20231584}.
 However, the GP is always a lumped compensator: there is no sequence-aware handling of backlash or history-dependent friction,
 and no unified dynamic representation in the measurement frame that could serve as a precise, task-agnostic basis for tool/gripper compensation.
 
-Overall, the \textbf{Q3} literature shows that deep models can substantially improve torque and force estimation and can achieve competitive PDPI, including sim-to-real transfer for collaborative robots.  
+\clearpage
+
+The literature shows that deep models can substantially improve torque and force estimation and can achieve competitive PDPI, including sim-to-real transfer for collaborative robots.  
 At the same time, existing works either depend on accurate nominal models and FT supervision, or operate as largely black-box payload regressors, and none provide a unified deep sequence model that simultaneously
 delivers joint-torque prediction, tool/payload compensation and interaction-force awareness during general manipulation tasks.
 
-Across \textbf{Q4}, physics-informed deep models consistently improve inverse-dynamics prediction and friction compensation compared to purely black-box networks, while using only encoder and motor data~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277,Q4_5_10305255}.
+Across Physics-Informed and Differential Models, physics-informed deep models consistently improve inverse-dynamics prediction and friction compensation compared to purely black-box networks, while using only encoder and motor data~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277,Q4_5_10305255}.
 At the same time, they are trained on carefully designed excitation trajectories and then deployed as fixed models, without explicit treatment of changing payloads or contact forces, and some architectures become quite
 complex when scaling beyond low-DoF setups or single joints.
-Thus, Q4 provides strong structured baselines for fixed robot dynamics, but does not yet realise an online, unified dynamic awareness of robot, tool and payload with explicit force estimation, as targeted in this work.
+Thus, physical informed and differnetial models provides strong structured baselines for fixed robot dynamics, but does not yet realise an online, unified dynamic awareness of robot, tool and payload with explicit force estimation, as targeted in this work.
 
-\textbf{Overall}, the literature spans the full spectrum in Fig.~\ref{fig:approach_landscape}: from classical model engineering and system identification (Q1), through GP residual models (Q2), to black-box deep learning (Q3) and
-physics-inspired networks (Q4). Classical RBD+LS/observer pipelines in Q1 provide strong RDPI/PDPI under carefully designed calibration trajectories, but remain sensitive to friction and payload changes and rarely yield a
-unified, online notion of the effective rigid body. GP and deep black-box methods in Q2-Q3 model unmodelled dynamics and contact well, yet largely treat friction, payload and interaction forces as a single residual and
-do not produce a physics-consistent wrench model in the measurement frame. Physics-informed DeLaN/PINN approaches in Q4 bridge these extremes by embedding Lagrangian structure and achieving joint-torque
+Overall, the literature spans the full spectrum in Fig.~\ref{fig:approach_landscape}: from classical model engineering and system identification, through GP residual models, to black-box deep learning and
+physics-inspired networks. Classical rigid body dynamic observer and model based methods provide strong RDPI/PDPI under carefully designed calibration trajectories, but remain sensitive to friction and payload changes and rarely yield a
+unified, online notion of the effective rigid body. Gaussian process and deep black-box models are robost as residual models to cover unmodelled dynamics and contact, yet largely treat friction, payload and interaction forces as a single residual and
+do not produce a physics-consistent wrench model in the measurement frame. Physics-informed DeLaN/PINN approaches in the from the fourth category bridge these extremes by embedding Lagrangian structure and achieving joint-torque
 prediction from proprioception alone, but are typically trained for fixed tools and evaluated only in joint space. This thesis therefore positions itself in the “physics-inspired networks” quadrant of
 Fig.~\ref{fig:approach_landscape}, combining a DeLaN-style backbone with an LSTM residual model to obtain a single joint-space inverse-dynamics model that also serves as a reliable nominal wrench model in the measurement
 frame and a basis for PDPI.
 
 \section{Limitations of the Current State of the Art}
-The subsection \emph{Limitations of the Current State of the Art} then identifies the main shortcomings of existing identification and estimation methods
-    in the literature, thereby motivating the contribution of this work.
-
-The SoA analysis in reveals several recurring gaps that are directly relevant for this work:
+The reviewed literature reveals several recurring limitations that motivate the approach developed in this thesis:
 
 \begin{itemize}
-\item \textbf{Weak and fragmentary treatment of payload inertia and effective rigid body.}
-In Q1, payload mass (and often CoM) can be estimated accurately, but inertia tensors are frequently weakly excited, ill-conditioned or only partially validated, especially in cobot-safe regimes~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024} %\cite{Q1_1, Q1_5, Q1_7, Q1_10, Q1_16}
-Q2-Q4 largely \emph{assume} fixed tools/payloads and do not identify the full effective rigid body at all~\cite{Q2_1_contact_force_gp_observer,Q2_4_GIACOMUZZO20231584,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277} %\cite{Q2_1, Q2_4, Q3_3, Q3_4, Q4_1, Q4_3, Q4_4}
-As a result, there is no robust, general mechanism to obtain and maintain an accurate $\boldsymbol{\phi}_{\mathrm{eff}}$ that could be used systematically for tool/gripper compensation and subsequent PDPI.
+\item \textbf{Calibration-centric identification and limited continuity across tasks.}
+Accurate RDPI/PDPI results are commonly obtained in dedicated calibration phases using carefully designed excitation trajectories and repeated with/without-payload experiments~\cite{Q1_1_fast_inertial_id_cobots,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_16_xu_payload_difference_2024,Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting}.
+Even online variants presuppose a sufficiently accurate nominal model and friction compensation~\cite{Q1_2_online_payload_mo,Q1_16_xu_payload_difference_2024}.
+This leaves a gap for methods that provide a single, continuously usable nominal dynamics model during general manipulation tasks.
 
-\item \textbf{Entangled or black-box treatment of friction, transmission and contact effects.}
-Many observer-based and LS/NE methods in Q1 are highly sensitive to imperfect friction and transmission models; errors grow around velocity reversals and at higher speeds, even with advanced observers or NN friction terms~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_6_hu2025_fdrdi,Q1_12_han_finite_time_observer,Q1_15_tang2023wls_rwspo,Q1_17_liu2021sensorless_dob_nn} %\cite{Q1_3, Q1_4, Q1_6, Q1_12, Q1_15, Q1_17}
-Q2 explicitly models all unmodelled dynamics, friction and contacts as a single GP disturbance~\cite{Q2_1_contact_force_gp_observer,Q2_2_contact_force_gpadkf,Q2_3_contact_detection_gp}, %\cite{Q2_1, Q2_2, Q2_3}
-which improves prediction but makes it hard to separate payload, friction and contact contributions in a physics-consistent way.
-Q3 and Q4 introduce powerful black-box or PINN components, but again focus on reducing torque/current residuals rather than producing explicit interaction
-wrenches~\cite{Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_4_10729277}. %\cite{Q3_3, Q3_4, Q4_1, Q4_4}
+\item \textbf{Incomplete treatment of payload inertia and the effective rigid body.}
+In Q1, payload mass (and often CoM) can be estimated accurately, but payload inertia is frequently weakly excited, ill-conditioned, or only partially validated, especially in cobot-safe regimes~\cite{Q1_1_fast_inertial_id_cobots,Q1_5_payload_estimation_compensation_2025,Q1_7_10947736,Q1_10_duan_payload_ftsensor,Q1_16_xu_payload_difference_2024}.
+Learning-based approaches in Categories~Q2--Q4 largely assume fixed tools/payloads and therefore do not maintain an explicit, continuously updated effective rigid-body representation~\cite{Q2_1_contact_force_gp_observer,Q2_4_GIACOMUZZO20231584,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q4_1_extended_delan_motor,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277}.
 
-\item \textbf{Dependence on carefully designed excitation and repeated with/without-payload experiments.}
-Strong RDPI/PDPI results in Q1 and Q3 typically rely on long, highly exciting trajectories (S-curves, Fourier/RRT paths) and repeated runs with and without payloads, often for each new object~\cite{Q1_1_fast_inertial_id_cobots,Q1_6_hu2025_fdrdi,Q1_7_10947736,Q1_8_10944553,Q1_9_xu2022_double_weighting_payload_id,Q1_13_dynamic_model_id_swevers2007,Q1_16_xu_payload_difference_2024,Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting} %\cite{Q1_1, Q1_6, Q1_7, Q1_8, Q1_9, Q1_13, Q1_16, Q3_2, Q3_6, Q3_7, Q3_8}
-This calibration-style use of offline data is practical for commissioning, but gives limited evidence that a single offline-trained model, once obtained, can provide robust dynamic awareness across diverse everyday
-motions and payload changes without further re-identification.
+\item \textbf{Entangled treatment of friction, transmission, and contact effects.}
+Observer-based schemes and LS/NE identification remain sensitive to imperfect friction and transmission models. Residual errors often peak around velocity reversals and during highly dynamic motion phases~\cite{Q1_3_external_torque_smo,Q1_4_contact_force_kf,Q1_6_hu2025_fdrdi,Q1_12_han_finite_time_observer,Q1_15_tang2023wls_rwspo,Q1_17_liu2021sensorless_dob_nn}.
+GP and deep residual models can reduce these errors but commonly absorb friction, backlash, and contact effects into a single disturbance term~\cite{Q2_1_contact_force_gp_observer,Q2_2_contact_force_gpadkf,Q2_3_contact_detection_gp,Q3_1_tao_bll,Q3_3_lstm_force_estimation,Q4_4_10729277}, which complicates separating payload-induced dynamics from interaction-induced effects in a physics-consistent way.
 
-\item \textbf{Limited use of temporal models for physics-consistent PDPI and force estimation.}
-Deep sequence models (LSTM/GRU/TCN) are used either as black-box torque/force predictors~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q3_5_contact_localization_cnn}
-or for payload classification/estimation in largely static mappings~\cite{Q3_2_encoder_attention_payload,Q3_6_payload_id_incremental_ensemble,Q3_7_payload_id_online_ensemble,Q3_8_payload_id_catastrophic_forgetting}.
-Physics-informed DeLaN/PINN models, with or without temporal residuals~\cite{Q4_1_extended_delan_motor,Q4_3_residual_pinns_dynamics_id,Q4_4_10729277,Q4_6_HU2026103093},
-focuse on joint-torque prediction in joint space. No existing work couples a temporal model with an explicit effective rigid-body representation to jointly obtain accurate joint-torque prediction,
-tool/gripper compensation and interaction-force estimation in the measurement frame.
-
+\item \textbf{Limited integration of temporal residual learning with physics-structured models in the actuation domain.}
+Deep sequence models are frequently used either as black-box regressors from motion histories to torques/forces or as residual predictors on top of rigid-body baselines~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation,Q3_4_asgrnn_force_observer,Q3_5_contact_localization_cnn}.
+Physics-informed DeLaN/PINN models improve inverse-dynamics prediction and can leverage motor-side measurements when joint-torque sensing is unavailable~\cite{Q4_1_extended_delan_motor,Q4_2_lutter2023combiningphysicsdeeplearning,Q4_4_10729277,Q4_6_HU2026103093}, but are typically trained and evaluated as fixed predictors.
+This motivates a pragmatic two-stage architecture that combines a physics-consistent inverse-dynamics backbone with a learned history-dependent residual, trained from encoder and motor-current data, to serve as a nominal model for downstream tool/payload compensation and PDPI.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -259,30 +252,40 @@ tool/gripper compensation and interaction-force estimation in the measurement fr
     \caption[Concept graph of the SoA literature]{The Concept graph summarising the reviewed literature. 
     Green nodes represent method categories Q1-Q4 with node the size proportional to the number of papers in each category. 
     Blue nodes denote the main estimation goals scaled by how many papers address each goal. 
-    Red nodes correspond to individual references R1-R34; their diameter is proportional to the citation count (clipped at the maximum). 
+    Red nodes correspond to individual references R1-R34. Their diameter is proportional to the citation count (clipped at the maximum). 
     Directed edges indicate that a given reference belongs to a method category and contributes to one or more estimation goals. R1-R34 table in Appendix \ref{soa_references_graph}}
 
     ~\label{fig:SoA_concept_graph}
     \end{figure}
 
+\clearpage
+
+\section{Related Work}~\label{subsec:relatedWork}
+
+This thesis is most closely related to physics-informed inverse-dynamics models that combine Lagrangian structure with learning-based compensation in settings without direct joint-torque supervision.
+Wu et al.~\cite{Q4_1_extended_delan_motor} propose an extended DeLaN formulation that incorporates motor-side effects and couplings and learns dynamics directly from electrical motor signals. This motivates current-domain supervision when only motor currents are available.
+Hu et al.~\cite{Q4_4_10729277} develop a friction-inclusive, PINN-style dynamics model that combines a structured backbone with an explicit friction model and a sequential residual learner (TCN), which is conceptually closest to the two-stage ``structured baseline + temporal residual'' design adopted in this thesis.
+Finally, the DeLaN framework and benchmark presented by Lutter et al.~\cite{Q4_2_lutter2023combiningphysicsdeeplearning} provides the methodological baseline for physics-inspired dynamics learning and serves as the code-level starting point for the DeLaN implementation used in this work.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Deep Lagrangian Networks}
+Deep Lagrangian Networks (DeLaN) are physics-inspired neural models for rigid-body dynamics that embed Lagrangian mechanics directly into the network structure.
+Instead of learning a black-box mapping from state to actuation, DeLaN parameterises the system energy and derives the dynamics via the Euler--Lagrange equations, which yields models that are physically plausible by construction and provide access to multiple consistent quantities (energy, forward dynamics, inverse dynamics) from the same set of parameters~\cite{Q4_2_lutter2023combiningphysicsdeeplearning}.
+Concretely, DeLaN represents the Lagrangian $\mathcal{L}(\mathbf{q},\dot{\mathbf{q}})=T(\mathbf{q},\dot{\mathbf{q}})-V(\mathbf{q})$ by learning a configuration-dependent inertia matrix and a potential-energy term, and then evaluates the implied inverse dynamics
+\(
+  \hat{\boldsymbol{\tau}}(\mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}})
+\)
+through analytic differentiation.
+To respect key structural properties, common DeLaN implementations enforce symmetry and positive definiteness of the learned inertia (e.g., via a Cholesky-factor parameterisation), while non-conservative effects are modelled through an additional friction term or residual component~\cite{Q4_2_lutter2023combiningphysicsdeeplearning,Q4_4_10729277}.
+DeLaN models are well suited to dynamics-learning problems that are strongly constrained by mechanics.
 
-Do i have to explain how DeLaN and LSTM work? ->~\cite{Q4_4_10729277,Q4_6_HU2026103093} show DeLaN (also with figures) 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%         DeLaN            %%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Long-Short-Term-Memory}~\label{sec:lstm_general}
 
+Long short-term memory (LSTM) networks are recurrent neural networks designed to learn temporal dependencies in sequential data.
+An LSTM processes a time series step by step and maintains an internal cell state as a dedicated memory, whose content is controlled by multiplicative gates (forget, input, output).
+This gating mechanism enables the model to selectively retain or overwrite information over long horizons, which is crucial when dynamics depend on history rather than solely on the instantaneous state.
 
-\section{Long-Short-Term-Memory}
-
-and~\cite{Q3_1_tao_bll,Q3_3_lstm_force_estimation} show LSTM (also with figures). I could also do one figure each, very short explain these two and cite with the given above and DeLaN / LSTM base paper. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%         LSTM             %%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+In robotics, LSTMs are therefore frequently used as sequence-to-vector or sequence-to-sequence regressors to infer forces and torques from histories of proprioceptive signals.
+Kru\v{z}i\'{c} et al.~\cite{Q3_3_lstm_force_estimation} demonstrate this idea for a 7-DoF manipulator by training deep networks (including an LSTM) to estimate end-effector forces and joint torques from measured motion signals, without requiring an explicit analytical dynamics model.
+Tao et al.~\cite{Q3_1_tao_bll} apply an LSTM as a residual predictor in a hybrid inverse-dynamics compensation scheme, where the recurrent model learns the unmodelled error terms (e.g., due to friction and other uncertainties) on top of a rigid-body baseline and thereby reduces the remaining torque residuals.

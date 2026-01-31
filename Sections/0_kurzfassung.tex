@@ -1,14 +1,11 @@
 % \chapter{Kurzfassung}
-    {
-     Im Kontext der digitalen Fabrik an der UAS Technikum Wien, wo Menschen und Roboter sich die Aufgaben und den Arbeitsbereich teilen, 
-    ist die sichere und effiziente Handhabung von Nutzlasten von entscheidender Bedeutung. In der digitalen Fabrik der UAS werden Nutzlasten derzeit noch ohne Kenntnis 
-    ihrer internen Parameter gehandhabt, was zu potenziellen Manipulationsfehlern führen kann, die Menschen Schaden zufügen. Diese Studie beschreibt 
-    die Entwicklung einer fortschrittlichen Methode zur Kraft-/Drehmomentabschätzung, um die Fähigkeit eines UR5-Roboters zu verbessern, verschiedene Nutzlastbedingungen zu erkennen und zu handhaben. 
-    Diese Fähigkeit gewährleistet die Wahrnehmung des auf einer mobilen Industrieroboterplattform montierten UR5-Roboters, um den sicheren und effizienten Transfer
-    von Nutzlasten zwischen verschiedenen Arbeitsbereichen innerhalb der Fabrik zu erleichtern. Die modernsten Methoden zur Kraft-/Drehmomentabschätzung für Industrieroboter nutzen 
-    neuronale Netze und Gauß-Prozesse als führende Methoden für genaue Nutzlastabschätzungen. Es wurde ein Gauß-Prozess-Modell entwickelt, um 
-    die Kräfte und Drehmomente abzuschätzen, die vom Roboter bei der Ausführung von Trajektorien erzeugt werden. In einem zukünftigen Projekt kann das Bewusstsein für Nutzlasten 
-    auf dem UR5-Roboter hinzugefügt werden. Auf diese Weise zielt die Studie darauf ab, die Intelligenz von Robotersystemen in industriellen Umgebungen zu verbessern und den Weg für eine höhere 
-    Produktivität und Sicherheit in digitalen Fertigungsumgebungen zu ebnen. Dieses Projekt führte auch zu einer Simulation, die eine Grundlage für die Aufzeichnung der 
-    Sensordaten aus dem UR5-Interieur.
-    }
+	    {
+	    In der kollaborativen Robotik erfordern Online-Nutzlasterkennung und sichere Interaktion genaue Inversdynamikmodelle bei eingeschränkter Sensorik.
+	    Diese Arbeit untersucht das physikinspirierte Lernen der Gelenkaktuation aus propriozeptiven Signalen, wenn nur Motorstrommessungen verfügbar sind.
+	    Es wird eine zweistufige Pipeline vorgeschlagen: Ein Deep Lagrangian Network (DeLaN) lernt ein mechanikkonsistentes Basismodell für die Motorströme aus Gelenkpositionen, -geschwindigkeiten und -beschleunigungen, und ein LSTM-Sequenzmodell wird auf dem Residuum trainiert, um geschichtsabhängige Effekte abzubilden.
+	    Dazu werden ein Trajektorien-basiertes Vorverarbeitungs- und Split-Protokoll sowie ein Best-Model-Selektionsschema eingeführt, das Validierungsgenauigkeit und Seed-Stabilität ausbalanciert.
+	    Experimente auf den IEEE-DataPort-Datensätzen UR3e/UR10e quantifizieren, wie die Trajektorienabdeckung Konvergenz und Generalisierung beeinflusst, und benchmarken den Ansatz gegen die publizierte lineare Identifikations-Baseline.
+	    Die Ergebnisse zeigen, dass eine höhere Anzahl von Trajektorien die Variabilität über Datensatz-Seeds reduziert und dass das Residual-LSTM den verbleibenden Motorstromfehler des DeLaN-Baselinesystems systematisch verringert.
+	    Bei benchmark-großen Splits ($50{,}000$ Trainings- und $5{,}000$ ungesehene Test-Samples) übertrifft das vorgeschlagene DeLaN+LSTM-Modell die Baseline unter Last deutlich und verbessert die Performance auf dem größeren Roboter, während die Baseline im unbelasteten UR3e-Fall weiterhin am stärksten ist.
+	    Die Arbeit stellt eine durchgängige, containerisierte Implementierung und ein Reporting-Protokoll für reproduzierbares, physikstrukturiertes Inversdynamik-Lernen im Motorstrombereich bereit.
+	    }
