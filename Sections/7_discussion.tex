@@ -21,7 +21,7 @@ to learn and therefore higher validation error; for $K \geq 32$ the curves colla
 indicating reduced sensitivity to the particular split.
 
 \textbf{Stage~1 (DeLaN): error over motion progress and per-joint balance.}
-The progress-aligned RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}) highlights
+The progress-aligned motor-current RMSE (Figure~\ref{fig:kdom_delan_rmse_progress_by_k}) highlights
 that the smallest setting ($K=8$) exhibits pronounced error spikes and large variability along the
 trajectory, while increasing $K$ stabilises the error over the full progress range.
 Moreover, the per-joint analysis (Figure~\ref{fig:kdom_delan_rmse_per_joint}) shows that for
@@ -43,7 +43,7 @@ larger $K$ provides a more stable residual learning problem.
 \textbf{End-to-end implication.}
 The representative overlays (Figures~\ref{fig:kdom_torque_overlay_example}
 and~\ref{fig:kdom_residual_overlay_example}) illustrate that the residual learner compensates
-systematic deviations of the DeLaN prediction and thereby reduces the final torque error.
+systematic deviations of the DeLaN prediction and thereby reduces the final motor-current error.
 Taken together, the K-domination results support the interpretation that a minimum trajectory
 count is required before the two-stage pipeline becomes robust to the particular trajectory
 selection and split, with diminishing returns as $K$ approaches the full dataset.

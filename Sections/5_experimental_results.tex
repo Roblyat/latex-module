@@ -26,12 +26,12 @@ convergence and improved generalisation.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/k_story/delan/A2_val_mse_by_K.png}
-    \caption{DeLaN validation MSE by $K$ shown as median $\pm$ IQR across dataset seeds (with seed-wise aggregation across DeLaN initialisations).}
+    \caption{DeLaN validation MSE (motor current) by $K$ shown as median $\pm$ IQR across dataset seeds (with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:kdom_delan_val_mse_by_k}
 \end{figure}
 
-\textbf{Stage~1 (DeLaN): torque error as a function of motion progress.}
-Figure~\ref{fig:kdom_delan_rmse_progress_by_k} reports the torque RMSE along the
+\textbf{Stage~1 (DeLaN): motor-current error as a function of motion progress.}
+Figure~\ref{fig:kdom_delan_rmse_progress_by_k} reports the motor-current RMSE along the
 normalised trajectory progress.
 The smallest setting ($K=8$) exhibits pronounced error spikes and large IQR,
 highlighting sensitivity to the selected trajectory subset.
@@ -41,12 +41,12 @@ variability, and the curves stabilise for large $K$.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/05_results/k_story/delan/A3_torque_rmse_progress_by_K.png}
-    \caption{DeLaN torque RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR.}
+    \caption{DeLaN motor-current RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR (shaded bands).}
     \label{fig:kdom_delan_rmse_per_joint}
 \end{figure}
 
 \textbf{Stage~1 (DeLaN): per-joint error.}
-Figure~\ref{fig:kdom_delan_rmse_per_joint} reports per-joint torque RMSE for a
+Figure~\ref{fig:kdom_delan_rmse_per_joint} reports per-joint motor-current RMSE for a
 representative subset of $K$ values.
 For small $K$, individual joints can dominate the overall error (here, notably
 joints 3 and 5), whereas larger $K$ leads to consistently low errors across all
@@ -55,7 +55,7 @@ joints and reduced dispersion.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/delan/A4_torque_rmse_per_joint_grouped.png}
-    \caption{DeLaN torque RMSE per joint (median $\pm$ IQR) for selected values of $K$ (bars) with IQR error bars.}
+    \caption{DeLaN motor-current RMSE per joint (median $\pm$ IQR) for selected values of $K$ (bars) with IQR error bars.}
     \label{fig:kdom_delan_rmse_progress_by_k}
 \end{figure}
 
@@ -82,7 +82,7 @@ residual model.
 \end{figure}
 
 \textbf{Stage~2 (LSTM): residual error.}
-Figure~\ref{fig:kdom_lstm_res_rmse_progress_by_k} shows the residual RMSE over
+Figure~\ref{fig:kdom_lstm_res_rmse_progress_by_k} shows the residual motor-current RMSE over
 normalised trajectory progress, and Figure~\ref{fig:kdom_lstm_res_rmse_per_joint}
 summarises per-joint residual errors.
 As for Stage~1, small $K$ leads to large spikes and high variability, whereas
@@ -92,14 +92,14 @@ errors across joints.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Images/05_results/k_story/lstm/B4_residual_rmse_per_joint_grouped.png}
-    \caption{LSTM residual RMSE per joint (median $\pm$ IQR) for selected values of $K$ ($H=100$, feature mode \texttt{full}).}
+    \caption{LSTM residual motor-current RMSE per joint (median $\pm$ IQR) for selected values of $K$ ($H=100$, feature mode \texttt{full}).}
     \label{fig:kdom_lstm_res_rmse_per_joint}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/05_results/k_story/lstm/B3_residual_rmse_progress_by_K.png}
-    \caption{LSTM residual RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR ($H=100$, feature mode \texttt{full}).}
+    \caption{LSTM residual motor-current RMSE over normalised progress ($0 \rightarrow 1$) by $K$ shown as median $\pm$ IQR (shaded bands) ($H=100$, feature mode \texttt{full}).}
     \label{fig:kdom_lstm_res_rmse_progress_by_k}
 \end{figure}
 
@@ -108,17 +108,17 @@ Figure~\ref{fig:kdom_torque_overlay_example} illustrates a representative test
 trajectory (evaluated only on indices $k \geq H-1$).
 The DeLaN prediction captures the gross trend but exhibits systematic deviations
 in amplitude and offset, which are compensated by the residual model such that
-the combined torque prediction closely follows the measured signal.
+the combined motor-current prediction closely follows the measured signal.
 
-\textbf{End-to-end torque accuracy (per joint).}
-Figure~\ref{fig:kdom_combined_rmse_per_joint_example} reports per-joint torque
+\textbf{End-to-end motor-current accuracy (per joint).}
+Figure~\ref{fig:kdom_combined_rmse_per_joint_example} reports per-joint motor-current
 RMSE for the same representative evaluation, demonstrating that the residual
-learner reduces the torque error consistently across all joints.
+learner reduces the motor-current error consistently across all joints.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/k_story/evaluation/torque_rmse_per_joint_grouped_test_H100.png}
-    \caption{Representative per-joint torque RMSE: DeLaN versus combined DeLaN+LSTM prediction (test split, valid indices $k\geq H-1$, $H=100$).}
+    \caption{Representative per-joint motor-current RMSE on the test split comparing DeLaN and the combined DeLaN+LSTM predictor (valid indices $k\geq H-1$, $H=100$).}
     \label{fig:kdom_combined_rmse_per_joint_example}
 \end{figure}
 
@@ -126,7 +126,7 @@ learner reduces the torque error consistently across all joints.
 Figure~\ref{fig:kdom_residual_overlay_example} shows that the learned residual
 signal closely matches the ground-truth residual across joints, including sharp
 transitions, which directly explains the improvements observed in the combined
-torque prediction.
+motor-current prediction.
 
 \subsection{Best Model Approach Results}
 
@@ -135,28 +135,28 @@ torque prediction.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/delan_best_train_val_curves_by_hp.png}
-    \caption{Train Loss / Validation MSE DeLaN median+IQR across seeds by hyper set}
+    \caption{DeLaN training loss (left) and validation MSE in motor-current units (right) shown as median $\pm$ IQR across seeds for each hyperparameter preset.}
     \label{fig:delan_train_val_loss_across_seed_by_hyper}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/scatter_accuracy_vs_stability.png}
-    \caption{Scatter validation RMSE vs validation RMSE IQR}
+    \caption{Hyperparameter comparison: median validation motor-current RMSE versus seed-stability measured by the median within-split IQR of validation RMSE (each point denotes one DeLaN hyperparameter preset; statistics aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:delan_scatter_val_vs_valIQR}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/scatter_val_vs_test.png}
-    \caption{Scatter validation RMSE vs test RMSE}
+    \caption{Hyperparameter comparison: median validation motor-current RMSE versus median test motor-current RMSE (each point denotes one DeLaN hyperparameter preset; statistics aggregated across dataset seeds with seed-wise aggregation across DeLaN initialisations).}
     \label{fig:delan_scatter_val_vs_test}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/delan/A4_torque_rmse_per_joint_grouped.png}
-    % \caption{i_motor RMSE per joint by hyper set}
+    \caption{DeLaN motor-current RMSE per joint (median $\pm$ IQR) grouped by hyperparameter preset.}
     \label{fig:delan_rmse_per_joint}
 \end{figure}
 
@@ -167,35 +167,35 @@ torque prediction.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_best_val_loss_vs_rmse_total.png}
-    % \caption{lstm validation loss vs i_motor RMSE total}
+    \caption{Best validation loss versus total motor-current RMSE on the test split for the LSTM residual model (marker colour denotes feature mode; marker outline denotes history length $H$).}
     \label{fig:lstm_val_loss_vs_rmse_total}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_overfit_ratio_by_feature_mode.png}
-    \caption{Overfit ration by feature mode}
+    \caption{Overfit indicator (final validation loss / final training loss) by feature mode shown as boxplots across runs (green triangles indicate means; panels use different $y$-axis ranges for readability).}
     \label{fig:lstm_overfit_ratio}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_residual_rmse_by_feature_mode.png}
-    % \caption{i_motor residual RMSE by feature mode}
+    \caption{LSTM residual motor-current RMSE on the test split by feature mode shown as boxplots across runs (green triangles indicate means; panels use different $y$-axis ranges for readability).}
     \label{fig:lstm_residual_rmse_by_feature_mode}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/lstm_residual_rmse_by_H.png}
-    % \caption{i_motor residual RMSE by window length}
+    \caption{LSTM residual motor-current RMSE on the test split shown as boxplots across history lengths $H$ (green triangles indicate means).}
     \label{fig:lstm_residual_rmse_by_window_length}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/lstm/residual_gt_vs_pred_test_H150.png}
-    % \caption{i_motor residual GT vs residual prediction}
+    \caption{Representative residual motor-current traces: ground-truth residual versus LSTM residual prediction on the test split (valid indices $k\geq H-1$, $H=150$).}
     \label{fig:lstm_residual_gt_vs_predicted}
 \end{figure}
 
@@ -206,14 +206,14 @@ torque prediction.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/evaluation/torque_rmse_per_joint_grouped_test_H150.png}
-    \caption{Best pipeline total RMSE per joint}
+    \caption{Best pipeline motor-current RMSE per joint on the test split comparing DeLaN and the combined DeLaN+LSTM predictor (valid indices $k\geq H-1$, $H=150$).}
     \label{fig:kdom_residual_overlay_example}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{Images/05_results/best_model_story/evaluation/torque_gt_vs_delan_vs_combined_test_H150.png}
-    \caption{Representative torque overlay: ground truth, DeLaN prediction, and combined DeLaN+LSTM prediction (test split, valid indices $k\geq H-1$, $H=100$).}
+    \caption{Representative motor-current overlay: ground truth, DeLaN prediction, and combined DeLaN+LSTM prediction on the test split (valid indices $k\geq H-1$, $H=150$).}
     \label{fig:kdom_torque_overlay_example}
 \end{figure}
 

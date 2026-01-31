@@ -4,23 +4,23 @@
     general notion of \emph{dynamic awareness} for collaborative manipulators.
     Several conceptual implications and natural extensions are worth highlighting.
 
-    \paragraph{Online torque awareness for safety–critical control.}
+    \paragraph{Online motor-current awareness for safety–critical control.}
     Once the DeLaN+LSTM architecture has been trained and deployed, the robot
-    possesses an accurate estimate of its joint torques
-    $\hat{\boldsymbol{\tau}}_{\mathrm{RG},k}$ at every time step, and---via the
+    possesses an accurate estimate of its joint motor currents
+    $\hat{\mathbf{i}}_{\mathrm{RG},k}$ at every time step and---via the known conversion factor $k_t$ and the
     Jacobian---of the corresponding end–effector wrench
     $\hat{\vec{F}}_{\mathrm{RG},k}$ in the measurement frame. In principle, this
     enables model–predictive controllers and safety monitors to operate directly on
-    end–effector torque or wrench limits, for example those prescribed for
+    end–effector wrench limits, for example those prescribed for
     collaborative operation, rather than relying on conservative joint–space
-    bounds. By exploiting the available torque margin more tightly, such a
+    bounds. By exploiting the available actuation margin more tightly, such a
     controller could realise higher velocity and acceleration profiles while
     remaining within certified interaction–force constraints.
 
     \paragraph{Beyond joint space: evaluation of end–effector wrench prediction.}
     The present thesis restricts training and quantitative evaluation to joint
-    space: the DeLaN+LSTM model is trained on joint states and motor torques, and
-    its quality is assessed primarily via joint–torque prediction errors. A
+    space: the DeLaN+LSTM model is trained on joint states and motor currents, and
+    its quality is assessed primarily via motor-current prediction errors. A
     natural next step is a systematic evaluation of end–effector wrench prediction
     against ground–truth FT data at the flange. One promising route is to combine
     IsaacSim–based data generation (with and without domain randomisation and
@@ -38,7 +38,7 @@
 
     \paragraph{Tool/gripper calibration as a third learning stage.}
     In the current experiments, the LSTM residual model in Stage~2 reduces the
-    joint–torque error on the nominal robot–only configuration to near zero. When
+    motor-current error on the nominal robot–only configuration to near zero. When
     a fixed gripper is mounted, one could either re–record the entire dataset with
     the gripper attached or, more interestingly, treat the gripper as an additional
     structured disturbance to be learned. Conceptually, this suggests a
@@ -53,7 +53,7 @@
     Once tool/gripper effects are compensated, remaining discrepancies between the
     nominal robot–gripper wrench model and the measured flange wrench can be
     attributed primarily to external interaction and payload dynamics. Mapping the
-    Stage~2/Stage~3 residuals into the end–effector frame via the Jacobian yields
+    Stage~2/Stage~3 residuals into the end–effector frame via the Jacobian (after applying $k_t$) yields
     an estimate of the interaction wrench along and around the $x/y/z$ axes. In
     combination with the corresponding end–effector linear and angular velocities
     and accelerations, this opens the door to a further stage in which a dedicated
@@ -72,11 +72,11 @@
     identified dynamics. A complementary avenue for future work is to apply sparse identification
     of nonlinear dynamics (SINDy)%~\cite{SOA_SINDy} 
     to the same joint–space data. In such a
-    setting, the candidate function library could explicitly include standard rigid–body torque
-    models (e.g.\ Newton–Euler and Lagrangian terms), nonlinear Coriolis and gravity terms, and
+    setting, the candidate function library could explicitly include standard rigid–body inverse-dynamics
+    terms (e.g.\ Newton–Euler and Lagrangian terms) expressed in current units, nonlinear Coriolis and gravity terms, and
     parametric friction models, together with a small number of additional generic nonlinear
     features. SINDy would then select a parsimonious subset of these terms that best explains the
-    observed motor torques, potentially yielding an interpretable model in which a few physically
+    observed motor currents, potentially yielding an interpretable model in which a few physically
     meaningful contributions account for most of the variance in the data. This would provide
     insight into which dynamic effects the robot actually relies on in practice, and would offer a
     transparent counterpart to the high–capacity DeLaN+LSTM model used in the present work.%
