@@ -1,106 +1,84 @@
-\textbf{Stage 2: Should we already set up the LSTM best-model loop?}
-Yes—\emph{you can set up Stage 2 now} without first having identified the single best DeLaN configuration, as long as Stage~2 is formulated as a \emph{conditional} optimization: \emph{given} a reasonably stable DeLaN baseline (selected by validation error), we then optimize the residual learner and quantify the added value.
+\chapter{Summary and Outlook}
 
-This is consistent with the standard two-stage residual-compensation logic used in the literature: (i) learn a physics-based inverse dynamics model, (ii) learn a data-driven residual term capturing unmodeled effects such as friction and other nonlinearities. :contentReference[oaicite:0]{index=0}
+\section{Discussion and Outlook}
+\label{sec:discussion_outlook}
 
-\paragraph{Why Stage 2 is already meaningful (even if DeLaN is not fully “final”).}
-\begin{itemize}
-    \item Your K-domination experiments indicate that DeLaN variance is dominated by the data regime $K$ (and by fold/seed effects at low $K$). This means you already know the correct strategy for Stage~2: \textbf{freeze a strong DeLaN regime} (high $K$) and then study what the residual learner can add \emph{in a stable baseline setting}.
-    \item In related robotic torque/force estimation work, LSTM-style models are trained with \textbf{early stopping based on validation loss} (e.g., stop when validation loss does not improve for 5 consecutive epochs) and sequence length was found to matter (longer histories improved performance). 
-    \item Also, including torque-related signals as inputs can materially improve sequential models (reported improvement on the order of $\sim$15\% in one study), which directly motivates testing feature modes that \textbf{include $\hat{\tau}$} vs.\ those that do not. :contentReference[oaicite:2]{index=2}
-\end{itemize}
+    The results in this thesis can be interpreted as a first step towards a more
+    general notion of \emph{dynamic awareness} for collaborative manipulators.
+    Several conceptual implications and natural extensions are worth highlighting.
 
-\subsection{Recommended Stage 2 “best LSTM” experiment design}
-The goal is to identify an LSTM configuration that (i) reliably converges (no premature stopping), (ii) yields consistent gains over the DeLaN baseline, and (iii) generalizes across dataset splits.
+    \paragraph{Online torque awareness for safety–critical control.}
+    Once the DeLaN+LSTM architecture has been trained and deployed, the robot
+    possesses an accurate estimate of its joint torques
+    $\hat{\boldsymbol{\tau}}_{\mathrm{RG},k}$ at every time step, and---via the
+    Jacobian---of the corresponding end–effector wrench
+    $\hat{\vec{F}}_{\mathrm{RG},k}$ in the measurement frame. In principle, this
+    enables model–predictive controllers and safety monitors to operate directly on
+    end–effector torque or wrench limits, for example those prescribed for
+    collaborative operation, rather than relying on conservative joint–space
+    bounds. By exploiting the available torque margin more tightly, such a
+    controller could realise higher velocity and acceleration profiles while
+    remaining within certified interaction–force constraints.
 
-\paragraph{Core principle: nested selection.}
-Do \textbf{not} sweep LSTM hyperparameters on weak DeLaN runs. Instead:
-\begin{enumerate}
-    \item For each dataset split (dataset seed), train multiple DeLaN initializations.
-    \item Select the best DeLaN using validation torque RMSE (or MSE equivalently).
-    \item Only then train the residual LSTM(s) on the residuals of the selected DeLaN.
-\end{enumerate}
-This reduces wasted LSTM training and makes LSTM comparisons interpretable.
+    \paragraph{Beyond joint space: evaluation of end–effector wrench prediction.}
+    The present thesis restricts training and quantitative evaluation to joint
+    space: the DeLaN+LSTM model is trained on joint states and motor torques, and
+    its quality is assessed primarily via joint–torque prediction errors. A
+    natural next step is a systematic evaluation of end–effector wrench prediction
+    against ground–truth FT data at the flange. One promising route is to combine
+    IsaacSim–based data generation (with and without domain randomisation and
+    sensor noise) with real–robot experiments using the same excitation families
+    as in this work. This would allow a comprehensive comparison between
+    \emph{(i)} models trained purely in simulation and tested on the real robot,
+    \emph{(ii)} models trained on real data and tested on held–out real
+    trajectories, and \emph{(iii)} hybrid training schemes that mix simulated and
+    measured data. Such an evaluation pipeline would provide strong evidence for
+    the robustness of the joint–space training strategy when viewed in the
+    measurement frame. Once this consistency between Jacobian–mapped model predictions 
+    and ground–truth flange wrenches has been demonstrated, the same DeLaN+LSTM architecture 
+    can, in principle, be trained and deployed using proprioceptive data alone, without
+    requiring an FT sensor in the loop.
 
-\paragraph{Stage 2 sweep axes (what to vary).}
-Given your observations (H=25 fails; patience too small stops at 5--15 epochs), the highest-value sweep is:
+    \paragraph{Tool/gripper calibration as a third learning stage.}
+    In the current experiments, the LSTM residual model in Stage~2 reduces the
+    joint–torque error on the nominal robot–only configuration to near zero. When
+    a fixed gripper is mounted, one could either re–record the entire dataset with
+    the gripper attached or, more interestingly, treat the gripper as an additional
+    structured disturbance to be learned. Conceptually, this suggests a
+    third learning stage in which a small network (e.g.\ another LSTM) takes the
+    residual error of Stage~2 as input and learns a tool–specific compensation
+    term. From a closed–loop viewpoint, the robot would then iteratively refine
+    its internal model when a new tool is attached, realising a form of transfer
+    learning for tool calibration without rebuilding the entire inverse–dynamics
+    model from scratch.
 
-\begin{itemize}
-    \item \textbf{History length $H$ (primary axis).} 
-    Use a small set biased toward longer contexts, e.g.
-    \[
-    H \in \{50, 100, 150, 200\}.
-    \]
-    Rationale: longer sequences improved sequential model performance in related work. :contentReference[oaicite:3]{index=3}
+    \paragraph{Towards payload identification from residual wrenches.}
+    Once tool/gripper effects are compensated, remaining discrepancies between the
+    nominal robot–gripper wrench model and the measured flange wrench can be
+    attributed primarily to external interaction and payload dynamics. Mapping the
+    Stage~2/Stage~3 residuals into the end–effector frame via the Jacobian yields
+    an estimate of the interaction wrench along and around the $x/y/z$ axes. In
+    combination with the corresponding end–effector linear and angular velocities
+    and accelerations, this opens the door to a further stage in which a dedicated
+    estimator recovers the payload dynamic parameters
+    $\boldsymbol{\phi}_{\mathrm{payload}} = (m,\mathbf{c},\mathbf{I}) \in \mathbb{R}^{10}$
+    from these residual wrenches in a Newton–Euler framework. In other words, the
+    same DeLaN+LSTM backbone that currently provides accurate joint–space
+    prediction could serve, after appropriate extensions, as the core of an
+    online PDPI pipeline that incrementally refines the effective rigid–body model
+    (robot + tool + payload) during everyday manipulation tasks.
 
-    \item \textbf{Early stopping policy (primary axis).}
-    Your current policy (warm-up $=0$, patience $=10$) can stop too early.
-    Use a \emph{minimum-training constraint} plus patience:
-    \[
-    \text{warm-up} \in \{10, 20\}, \quad \text{patience} \in \{20, 30\}.
-    \]
-    This matches the general practice of validation-based stopping (commonly used in torque/force estimation networks) but avoids premature termination. :contentReference[oaicite:4]{index=4}
-
-    \item \textbf{Feature modes (secondary axis, but important for interpretation).}
-    For a thesis-ready story, I would run:
-    \[
-    \texttt{full},\ \texttt{state},\ \texttt{tau\_hat},\ \texttt{state\_tauhat}.
-    \]
-    Motivation: papers report that adding torque(-like) signals can help sequential estimators. :contentReference[oaicite:5]{index=5}
-    In your case, $\hat{\tau}_{\mathrm{DeLaN}}$ is the torque-like proxy; this makes the comparison scientifically meaningful:
-    \begin{itemize}
-        \item \texttt{state} tests whether residuals are explainable purely from kinematics.
-        \item \texttt{tau\_hat} tests whether the residual mainly depends on the baseline prediction.
-        \item \texttt{full} tests whether kinematics + baseline together is best.
-    \end{itemize}
-
-    \item \textbf{Model capacity (secondary axis).}
-    Keep most LSTM capacity fixed initially to isolate $H$ and early stopping:
-    \[
-    \text{units}=128,\ \text{dropout}=0.2,\ \text{layers}=2
-    \]
-    and only if results saturate, test one larger and one smaller setting, e.g.\ units $\in\{64,128,256\}$.
-
-    \item \textbf{Seeds.}
-    For Stage 2, add \textbf{LSTM seeds} only after narrowing to 1--2 best configs:
-    \[
-    s_{\mathrm{LSTM}} \in \{0,1,2\}
-    \]
-    is usually enough to quantify residual-model variance.
-\end{itemize}
-
-\subsection{How to define the Stage 2 selection metric (what “best” means)}
-To match your pipeline and avoid leakage:
-
-\begin{itemize}
-    \item Select the \textbf{best LSTM config} by minimizing \textbf{validation residual RMSE} (or validation loss if your loss is residual MSE).
-    \item Report final performance on the test set via your combined evaluation metrics:
-    \[
-    \mathrm{RMSE}(\tau_{\mathrm{gt}}, \tau_{\mathrm{DeLaN}}),\quad
-    \mathrm{RMSE}(\tau_{\mathrm{gt}}, \tau_{\mathrm{DeLaN}}+\hat{r}),
-    \]
-    and derived gain metrics.
-\end{itemize}
-
-\subsection{Implementation notes that matter for correctness}
-% \begin{itemize}
-%     \item \textbf{Avoid Unicode combining characters in \LaTeX:} use $\ddot{q}$ instead of $q̈$.
-%     \item \textbf{Filtering/derivatives:} Lutter explicitly computes velocities/accelerations via finite differences and low-pass filtering (offline, zero-phase) to avoid phase shift. 
-%     This supports your approach of filtered signals before residual learning.
-% \end{itemize}
-
-\subsection{A concrete Stage 2 “best LSTM” loop (thesis-ready)}
-With DeLaN fixed to a stable regime (e.g., your lutter-like preset and high $K$):
-
-\begin{enumerate}
-    \item Fix a stable DeLaN regime (high $K$) and select best DeLaN per dataset seed using validation RMSE.
-    \item For each selected DeLaN:
-    \begin{enumerate}
-        \item Sweep $H \in \{50,100,150,200\}$.
-        \item Sweep early stopping settings: warm-up $\in\{10,20\}$, patience $\in\{20,30\}$.
-        \item Sweep feature modes: \texttt{full}, \texttt{state}, \texttt{tau\_hat}, \texttt{state\_tauhat}.
-        \item Train LSTM, select best checkpoint on validation.
-        \item Run combined evaluation and store $(\mathrm{delan\_rmse}, \mathrm{rg\_rmse}, \mathrm{gain}, \mathrm{gain\_ratio})$.
-    \end{enumerate}
-    \item Pick the final Stage~2 config as the one with the best (median) test gain ratio and low dispersion (IQR) across dataset seeds.
-\end{enumerate}
+    \paragraph{Interpretable sparse models via SINDy.}
+    The DeLaN+LSTM architecture used in this thesis is deliberately expressive but remains a
+    largely black–box regression model: the Lagrangian network and the recurrent residual model
+    jointly fit the data, yet they do not expose which physical effects are actually dominant in the
+    identified dynamics. A complementary avenue for future work is to apply sparse identification
+    of nonlinear dynamics (SINDy)~\cite{SOA_SINDy} to the same joint–space data. In such a
+    setting, the candidate function library could explicitly include standard rigid–body torque
+    models (e.g.\ Newton–Euler and Lagrangian terms), nonlinear Coriolis and gravity terms, and
+    parametric friction models, together with a small number of additional generic nonlinear
+    features. SINDy would then select a parsimonious subset of these terms that best explains the
+    observed motor torques, potentially yielding an interpretable model in which a few physically
+    meaningful contributions account for most of the variance in the data. This would provide
+    insight into which dynamic effects the robot actually relies on in practice, and would offer a
+    transparent counterpart to the high–capacity DeLaN+LSTM model used in the present work.%

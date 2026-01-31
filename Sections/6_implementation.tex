@@ -1,1 +1,61 @@
 \chapter{Implementation}
+
+\textbf{Chapter overview.}
+This chapter briefly describes the implementation of the proposed two-stage identification pipeline and the experimental automation used to generate the results in Chapter~5.
+All experiments are executed in a containerised environment (\texttt{docker compose}) to ensure reproducibility and to provide a consistent GPU-enabled runtime for both Stage~1 (DeLaN) and Stage~2 (residual LSTM).
+In the following, the actuation signal is the measured motor current $\mathbf{i}_{\mathrm{motor}}$ in $\mathrm{A}$.
+For compatibility with the upstream DeLaN codebase [reference Lutter github], some internal variable names use the legacy identifier \texttt{tau}; throughout the implementation, \texttt{tau} should be interpreted as $\mathbf{i}_{\mathrm{motor}}$.
+
+\section{Execution Environment (Docker)}
+
+\textbf{Containerised stack.}
+The implementation resides in the submodule \texttt{payload\_estimation/} and defines one compose stack that separates preprocessing, Stage~1 training, Stage~2 training, and evaluation into dedicated services.
+Preprocessing is executed in a lightweight CPU container (\texttt{python:3.11-slim}), whereas the learning stages run in GPU-enabled containers.
+Stage~1 is implemented in JAX (Haiku/Optax) on top of \texttt{nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04}, and Stage~2 as well as the evaluation scripts use the GPU TensorFlow runtime (\texttt{tensorflow/tensorflow:2.16.1-gpu}).
+Plot generation is configured for non-interactive execution (\texttt{MPLBACKEND=Agg}) such that sweeps can run unattended.
+Across services, \texttt{numpy} is used as the common tensor/array backbone; preprocessing relies on \texttt{scipy} for the Butterworth filtering, the residual LSTM pipeline uses \texttt{scikit-learn} for scaling utilities, and the JAX-based DeLaN container additionally installs \texttt{torch} because the upstream DeLaN codebase imports a PyTorch-based replay memory component.
+
+\textbf{Artefact management.}
+All services exchange datasets and trained models via a shared host directory (\texttt{payload\_estimation/shared/}) mounted into the containers.
+This directory contains raw data, intermediate \texttt{.npz} artefacts, trained checkpoints, evaluation outputs, and run logs.
+The compose configuration also maps the host user and group ID into the containers, ensuring that generated files remain writable on the host.
+
+\section{Implementation of the Two-Stage Pipeline}
+
+\textbf{Preprocessing.}
+The preprocessing step converts the raw robot logs into a trajectory-wise \texttt{.npz} dataset suitable for DeLaN training.
+It supports trajectory-level train/validation/test splits and, for the $K$-domination study, subsampling a fixed number of trajectories using a seeded selection.
+A Butterworth low-pass filter is applied prior to derivative computation in order to stabilise acceleration and actuation signals.
+
+\textbf{Stage~1 (DeLaN) and residual export.}
+Stage~1 trains a DeLaN model to predict motor currents from the joint state and its derivative acceleration.
+Training uses preset hyperparameters (e.g., \texttt{lutter\_like\_256}) and produces a checkpoint together with run metadata and learning curves.
+Given a selected checkpoint, the residual dataset is exported by evaluating the model on each trajectory and storing the residual signal
+\[
+    \mathbf{r}_i = \mathbf{i}_{\mathrm{motor}} - \hat{\mathbf{i}}_{\mathrm{DeLaN}}
+\]
+alongside the corresponding kinematics.
+The exported residual \texttt{.npz} file forms the interface between Stage~1 and Stage~2.
+ 
+\textbf{Stage~2 (residual LSTM).}
+Stage~2 trains an LSTM to predict the residual motor current from a fixed-length history of features.
+A windowing step constructs sliding input windows of length $H$ and assigns the residual at the window end as target.
+The feature construction is shared between training and evaluation and supports multiple feature modes (state-only, DeLaN-only, and combined state+DeLaN);  $\hat{\mathbf{i}}_{\mathrm{DeLaN}}$ denotes the DeLaN-predicted motor current.
+During training, inputs and targets are standardised using statistics computed on the training split, and the resulting scalers are stored together with the best model checkpoint.
+
+\textbf{Combined evaluation.}
+Evaluation loads a residual trajectory dataset, the trained LSTM checkpoint, and the stored scalers, and reconstructs the combined estimate by
+\[
+    \hat{\mathbf{i}}_{\mathrm{comb}} = \hat{\mathbf{i}}_{\mathrm{DeLaN}} + \hat{\mathbf{r}}_i.
+\]
+The evaluation scripts report MSE and RMSE for DeLaN alone, residual prediction alone, and the combined model, both aggregated across joints and per joint, and the evaluation service generates the plots used in Chapter~5.
+
+\section{Experimental Orchestration (Sweeps)}
+
+\textbf{Sweep controller.}
+The experimental loops are implemented in a sweep service and are executed on the host, while the heavy computations run inside the containers.
+The sweep controller builds \texttt{docker compose exec} commands for preprocessing, DeLaN training, residual export, LSTM training, and evaluation, and stores a complete log of each run under \texttt{shared/logs/}.
+Experiment parameters such as dataset identifiers, $K$ values, random seeds, feature modes, and history lengths are defined in a single configuration file and are therefore version-controlled together with the code.
+
+\textbf{Sweep variants.}
+Three sweep entrypoints correspond to the experiments reported in Chapters~4--5: the $K$-domination loop, the Stage~1 hyperparameter sweep for selecting a best DeLaN model, and the Stage~2 sweep over $(H,\text{feature mode})$ for selecting the best residual LSTM.

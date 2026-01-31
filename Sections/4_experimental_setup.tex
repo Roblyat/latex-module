@@ -3,6 +3,7 @@
 \textbf{Measurement convention (motor current domain).}
 From this chapter onwards, we formulate training objectives and evaluation metrics in the measured actuation domain provided by the dataset, i.e., per-joint motor currents $\mathbf{i}_{\mathrm{motor}}$ in $\mathrm{A}$.
 When needed for interpretation, current-domain errors can be mapped to equivalent motor-domain errors via the (previously introduced) constant conversion factor $k_t$, i.e., by multiplying with $k_t$.
+Consistent with this convention and the pipeline overview in Fig.~\ref{fig:methods_pipeline}, we omit the conversion $\boldsymbol{\tau}_{\mathrm{motor}} = k_t\,\mathbf{i}_{\mathrm{motor}}$ and the rightmost Jacobian-based flange-wrench mapping block, and evaluate the approach directly as a combined motor-current model $\hat{\mathbf{i}}_{\mathrm{comb}}$.
 
 \section{Dataset of Collaborative Robots}
 
@@ -218,9 +219,10 @@ initialisations?
 \newpage
 
 \begin{algorithm}[H]
-\caption{Best-model selection for the DeLaN+LSTM pipeline}\label{alg:best_model_approach}
+\caption{Best-model selection for the DeLaN}\label{alg:best_model_approach}
 \begin{algorithmic}
-\Require Trajectory pool size $K=84$ with fixed split $(N_{\mathrm{train}},N_{\mathrm{val}},N_{\mathrm{test}})=(59,8,17)$
+\Require 4th-order Butterworth low-pass filter with cutoff frequency $f_c = 10\,\mathrm{Hz}$
+\Require Trajectory pool size $K=86$ with fixed split $(N_{\mathrm{train}},N_{\mathrm{val}},N_{\mathrm{test}})=(60,8,17)$
 \Require Dataset seeds $\mathcal{D}=\{0,1,2,3,4\}$, DeLaN seeds $\mathcal{S}_{\mathrm{DeLaN}}=\{0,1,2,3,4\}$, LSTM seeds $\mathcal{S}_{\mathrm{LSTM}}=\{0,1,2,3,4\}$
 \Require Hyperparameter presets $\mathcal{H}_{\mathrm{DeLaN}}$ and $\mathcal{H}_{\mathrm{LSTM}}$ with $|\mathcal{H}_{\cdot}|=5$
 \Ensure Best DeLaN checkpoint and best LSTM checkpoint for the fixed $K$
